@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <functional>
 #include <ArduinoJson.h>
-#include "Storage.h"
+#include "../Storage/Storage.h"
 
 class ConfigFile {
   public:

@@ -7,7 +7,7 @@
  * debug output to serial for this file
  */
 //#define DEBUG
-#include "debug.h"
+#include "../Debug/Debug.h"
 
 const char *Network::_stationConfigFilePath = "/config/network/station.json";
 const char *Network::_apConfigFilePath = "/config/network/ap.json";

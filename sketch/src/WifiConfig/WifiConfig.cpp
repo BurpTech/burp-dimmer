@@ -7,7 +7,7 @@
  * debug output to serial for this file
  */
 //#define DEBUG
-#include "debug.h"
+#include "../Debug/Debug.h"
 
 #define WIFI_CONFIG_JSON_DOCUMENT_SIZE 256
 

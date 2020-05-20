@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
-#include "Storage.h"
+#include "../Storage/Storage.h"
 #include "ConfigFile.h"
 
 /*
@@ -8,7 +8,7 @@
  * debug output to serial for this file
  */
 //#define DEBUG
-#include "debug.h"
+#include "../Debug/Debug.h"
 
 void ConfigFile::init(const char *path, JsonDocument *pDoc) {
   _pStorage = Storage::getInstance();

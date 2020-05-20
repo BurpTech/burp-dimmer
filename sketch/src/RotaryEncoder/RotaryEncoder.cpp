@@ -6,7 +6,7 @@
  * debug output to serial for this file
  */
 //#define DEBUG
-#include "debug.h"
+#include "../Debug/Debug.h"
 
 #define ROTARY_ENCODER_A_RISING 1
 #define ROTARY_ENCODER_A_FALLING 2

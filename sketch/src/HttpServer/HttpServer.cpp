@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <ESP8266WebServer.h>
-#include "WifiConfig.h"
-#include "Storage.h"
+#include "../WifiConfig/WifiConfig.h"
+#include "../Storage/Storage.h"
 #include "HttpServer.h"
 
 /*
@@ -9,7 +9,7 @@
  * debug output to serial for this file
  */
 //#define DEBUG
-#include "debug.h"
+#include "../Debug/Debug.h"
 
 #define HTTP_SERVER_PORT 80
 

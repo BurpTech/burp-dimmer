@@ -6,7 +6,7 @@
  * debug output to serial for this file
  */
 //#define DEBUG
-#include "debug.h"
+#include "../Debug/Debug.h"
 
 #define BUTTON_DEBOUNCE_DELAY 50
 

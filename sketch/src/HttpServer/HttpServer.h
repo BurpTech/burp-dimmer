@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <functional>
 #include <ESP8266WebServer.h>
-#include "Storage.h"
+#include "../Storage/Storage.h"
 
 class HttpServer {
   using f_onSettings = std::function<void(const char *ssid, const char *password)>;

@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <functional>
-#include "ConfigFile.h"
+#include "../ConfigFile/ConfigFile.h"
 
 #define WIFI_CONFIG_SSID_BUFFER_SIZE 33
 #define WIFI_CONFIG_PASSWORD_BUFFER_SIZE 64

@@ -6,7 +6,7 @@
  * debug output to serial for this file
  */
 //#define DEBUG
-#include "debug.h"
+#include "../Debug/Debug.h"
 
 #define LIGHT_DEFAULT_BRIGHTNESS LIGHT_MAX_BRIGHTNESS
 #define LIGHT_DEFAULT_ON false

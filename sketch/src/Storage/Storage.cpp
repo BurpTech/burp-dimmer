@@ -7,7 +7,7 @@
  * debug output to serial for this file
  */
 //#define DEBUG
-#include "debug.h"
+#include "../Debug/Debug.h"
 
 Storage *Storage::getInstance() {
   static Storage storage;

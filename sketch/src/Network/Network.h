@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <functional>
-#include "WifiConfig.h"
+#include "../WifiConfig/WifiConfig.h"
 
 class Network {
   public:

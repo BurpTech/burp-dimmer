@@ -1,16 +1,16 @@
-#include "Light.h"
-#include "Button.h"
-#include "RotaryEncoder.h"
-#include "Storage.h"
-#include "Network.h"
-#include "HttpServer.h"
+#include "src/Light/Light.h"
+#include "src/Button/Button.h"
+#include "src/RotaryEncoder/RotaryEncoder.h"
+#include "src/Storage/Storage.h"
+#include "src/Network/Network.h"
+#include "src/HttpServer/HttpServer.h"
 
 /*
  * Uncomment the next line to enable
  * debug output to serial for this file
  */
 //#define DEBUG
-#include "debug.h"
+#include "src/Debug/Debug.h"
 
 Storage *pStorage = Storage::getInstance();
 
