@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# halt on error
+set -e
+
 DEVICE=$1
 BAUDRATE=$2
 
@@ -7,17 +10,18 @@ BAUDRATE=$2
 cat ${DEVICE} &
 PID=$!
 
-# Have to change baudrate after
-# starting cat for it to stick
-stty -f ${DEVICE} speed ${BAUDRATE}
-
+# trap exit and stop the cat process (eg: ctrl-c)
+# we set this up before continuing in case we
+# we have to clean up after an error
 cleanup()
 {
   kill $PID 2> /dev/null
 }
-
-# trap exit and stop the cat process (eg: ctrl-c)
 trap cleanup EXIT
+
+# Have to change baudrate after
+# starting cat for it to stick
+stty -f ${DEVICE} speed ${BAUDRATE}
 
 # loop while the cat process is running
 while kill -0 $PID 2> /dev/null; do
