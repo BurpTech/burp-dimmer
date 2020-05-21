@@ -13,9 +13,17 @@ stty -f ${DEVICE} speed ${BAUDRATE}
 
 cleanup()
 {
-  kill $PID
+  kill $PID 2> /dev/null
 }
 
-# loop till ctrl-c then kill cat
-trap cleanup 0
-read -r -d '' _ </dev/tty
+# trap exit and stop the cat process (eg: ctrl-c)
+trap cleanup EXIT
+
+# loop while the cat process is running
+while kill -0 $PID 2> /dev/null; do
+  # don't do anything
+  sleep 1
+done
+
+# cat process has stopped so clear the trap
+trap - EXIT
