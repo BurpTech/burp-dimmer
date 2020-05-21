@@ -47,10 +47,10 @@ void WifiConfig::init() {
   StaticJsonDocument<_WIFI_CONFIG_JSON_DOCUMENT_SIZE> doc;
   _pConfigFile->read(&doc);
   if (doc.isNull()) {
+    DEBUG_MSG(F("JSON document is NULL, applying defaults"));
+  } else {
     ssid = doc[_WIFI_CONFIG_SSID_FIELD_NAME] | _defaultSsid;
     password = doc[_WIFI_CONFIG_PASSWORD_FIELD_NAME] | _defaultPassword;
-  } else {
-    DEBUG_MSG(F("JSON document is NULL, applying defaults"));
   }
   // Always notify last as we don't know what will happen
   // in the onChange callback

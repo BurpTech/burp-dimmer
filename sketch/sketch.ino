@@ -10,6 +10,9 @@
 #include "src/Network.hpp"
 #include "src/HttpServer.hpp"
 
+#include "src/ConfigFile.hpp"
+#include "src/Config.hpp"
+
 #define RESET_DELAY 1000
 
 void lightOnUpdate(bool on, int brightness);
@@ -28,6 +31,45 @@ RotaryEncoder knob(D5, D6, knobInterruptDispatch, knobOnChange);
 void networkOnStateChange(Network::State state);
 void httpServerOnSettings(const char *ssid, const char *password);
 
+void appleSerialize(JsonObject *pObj) {
+  (*pObj)["color"] = "red";
+}
+
+void appleDeserialize(JsonObject *pObj) {
+  const char *color = (*pObj)["color"];
+  DEBUG_VAL(F("apple"), F("color"), color);
+}
+
+void bananaSerialize(JsonObject *pObj) {
+  (*pObj)["color"] = "yellow";
+}
+
+void bananaDeserialize(JsonObject *pObj) {
+  const char *color = (*pObj)["color"];
+  DEBUG_VAL(F("banana"), F("color"), color);
+}
+
+using namespace std::placeholders; // for _1, _2
+ConfigFile _configFile("/config.json");
+ConfigSection _configSections[] = {
+  ConfigSection(
+    "apple",
+    appleSerialize,
+    appleDeserialize
+  ),
+  ConfigSection(
+    "banana",
+    bananaSerialize,
+    bananaDeserialize
+  )
+};
+Config<256> _config(
+  CONFIG_SECTION_ARRAY_LENGTH(_configSections),
+  _configSections,
+  std::bind(&ConfigFile::write, _configFile, _1),
+  std::bind(&ConfigFile::read, _configFile, _1)
+);
+
 void setup() {
   Serial.begin(115200);
   Storage::begin();
@@ -37,6 +79,10 @@ void setup() {
   knob.setup();
   Network::setup(networkOnStateChange);
   HttpServer::setup(httpServerOnSettings);
+
+  // Testing new config
+  _config.serialize();
+  _config.deserialize();
 }
 
 void loop() {
