@@ -1,25 +1,25 @@
-#ifndef ConfigFile_hpp
-#define ConfigFile_hpp
+#ifndef JsonFile_hpp
+#define JsonFile_hpp
 
 #include <ArduinoJson.h>
 
 #include "Debug.hpp"
 
-class ConfigFile {
+class JsonFile {
   const char *_path;
 
   public:
-    ConfigFile(const char *path);
+    JsonFile(const char *path);
     void read(JsonDocument *pDoc);
     void write(JsonDocument *pDoc);
     void remove();
 };
 
-ConfigFile::ConfigFile(const char *path) {
+JsonFile::JsonFile(const char *path) {
   _path = path;
 }
 
-void ConfigFile::read(JsonDocument *pDoc) {
+void JsonFile::read(JsonDocument *pDoc) {
   DEBUG_VAL(F("check file"), F("path"), _path);
   if (Storage::exists(_path)) {
     File file = Storage::open(_path, "r");
@@ -50,7 +50,7 @@ void ConfigFile::read(JsonDocument *pDoc) {
   DEBUG_VAL(F("File does not exist"), F("path"), _path);
 }
 
-void ConfigFile::write(JsonDocument *pDoc) {
+void JsonFile::write(JsonDocument *pDoc) {
   File file = Storage::open(_path, "w");
   if (file) {
     DEBUG_VAL(F("Opened file"), F("path"), _path);
@@ -67,7 +67,7 @@ void ConfigFile::write(JsonDocument *pDoc) {
   DEBUG_VAL(F("Failed to open file"), F("path"), _path);
 }
 
-void ConfigFile::remove() {
+void JsonFile::remove() {
   if (!Storage::remove(_path)) {
     DEBUG_VAL(F("Failed to remove file"), F("path"), _path);
   }

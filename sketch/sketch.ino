@@ -10,9 +10,10 @@
 #include "src/Network.hpp"
 #include "src/HttpServer.hpp"
 
-#include "src/ConfigFile.hpp"
-#include "src/Config.hpp"
+#include "src/JsonFile.hpp"
+#include "src/JsonConfig.hpp"
 
+#define CONFIG_FILE_PATH "/config.json"
 #define RESET_DELAY 1000
 
 void lightOnUpdate(bool on, int brightness);
@@ -29,45 +30,28 @@ void knobOnChange(int direction);
 RotaryEncoder knob(D5, D6, knobInterruptDispatch, knobOnChange);
 
 void networkOnStateChange(Network::State state);
+void networkOnConfigChange();
 void httpServerOnSettings(const char *ssid, const char *password);
 
-void appleSerialize(JsonObject *pObj) {
-  (*pObj)["color"] = "red";
-}
-
-void appleDeserialize(JsonObject *pObj) {
-  const char *color = (*pObj)["color"];
-  DEBUG_VAL(F("apple"), F("color"), color);
-}
-
-void bananaSerialize(JsonObject *pObj) {
-  (*pObj)["color"] = "yellow";
-}
-
-void bananaDeserialize(JsonObject *pObj) {
-  const char *color = (*pObj)["color"];
-  DEBUG_VAL(F("banana"), F("color"), color);
-}
-
 using namespace std::placeholders; // for _1, _2
-ConfigFile _configFile("/config.json");
-ConfigSection _configSections[] = {
-  ConfigSection(
-    "apple",
-    appleSerialize,
-    appleDeserialize
+JsonFile configFile(CONFIG_FILE_PATH);
+JsonConfigSection configSections[] = {
+  JsonConfigSection(
+    NETWORK_STATION_WIFI_CONFIG,
+    std::bind(&WifiConfig::serialize, &Network::stationConfig, _1),
+    std::bind(&WifiConfig::deserialize, &Network::stationConfig, _1)
   ),
-  ConfigSection(
-    "banana",
-    bananaSerialize,
-    bananaDeserialize
+  JsonConfigSection(
+    NETWORK_STATION_AP_CONFIG,
+    std::bind(&WifiConfig::serialize, &Network::apConfig, _1),
+    std::bind(&WifiConfig::deserialize, &Network::apConfig, _1)
   )
 };
-Config<256> _config(
-  CONFIG_SECTION_ARRAY_LENGTH(_configSections),
-  _configSections,
-  std::bind(&ConfigFile::write, _configFile, _1),
-  std::bind(&ConfigFile::read, _configFile, _1)
+JsonConfig<256> config(
+  CONFIG_SECTION_ARRAY_LENGTH(configSections),
+  configSections,
+  std::bind(&JsonFile::write, &configFile, _1),
+  std::bind(&JsonFile::read, &configFile, _1)
 );
 
 void setup() {
@@ -77,12 +61,11 @@ void setup() {
   light.setup();
   button.setup();
   knob.setup();
-  Network::setup(networkOnStateChange);
+  Network::setup(networkOnStateChange, networkOnConfigChange);
   HttpServer::setup(httpServerOnSettings);
 
-  // Testing new config
-  _config.serialize();
-  _config.deserialize();
+  // read in the configuration
+  config.deserialize();
 }
 
 void loop() {
@@ -124,10 +107,14 @@ void networkOnStateChange(Network::State state) {
   DEBUG_VAL(F("new state"), F("state"), static_cast<int>(state));
 }
 
+void networkOnConfigChange() {
+  config.serialize();
+}
+
 void httpServerOnSettings(const char *ssid, const char *password) {
   DEBUG_LIST_START(F("new settings"));
   DEBUG_LIST_VAL(F("ssid"), ssid);
   DEBUG_LIST_VAL(F("password"), password);
   DEBUG_LIST_END;
-  Network::setStationConfig(ssid, password);
+  Network::stationConfig.setConfig(ssid, password);
 }

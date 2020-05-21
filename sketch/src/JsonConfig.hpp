@@ -1,27 +1,27 @@
-#ifndef Config_hpp
-#define Config_hpp
+#ifndef JsonConfig_hpp
+#define JsonConfig_hpp
 
 #include <ArduinoJson.h>
 
 #include "Debug.hpp"
 
-#include "ConfigSection.hpp"
+#include "JsonConfigSection.hpp"
 
 template <int capacity>
-class Config {
-  using f_jsonCallback = std::function<void(JsonDocument *pDoc)>;
+class JsonConfig {
+  using f_callback = std::function<void(JsonDocument *pDoc)>;
 
   const unsigned int _sectionCount;
-  const ConfigSection *_sections;
-  const f_jsonCallback _onSerialize;
-  const f_jsonCallback _onDeserialize;
+  const JsonConfigSection *_sections;
+  const f_callback _onSerialize;
+  const f_callback _onDeserialize;
 
   public:
-    Config(
+    JsonConfig(
       const unsigned int sectionCount,
-      const ConfigSection *sections,
-      const f_jsonCallback onSerialize,
-      const f_jsonCallback onDeserialize
+      const JsonConfigSection *sections,
+      const f_callback onSerialize,
+      const f_callback onDeserialize
     )
     : _sectionCount(sectionCount),
       _sections(sections),
@@ -33,7 +33,7 @@ class Config {
 };
 
 template <int capacity>
-void Config<capacity>::serialize() {
+void JsonConfig<capacity>::serialize() {
   DEBUG_LIST_START(F("creating StaticJsonDocument"));
   DEBUG_LIST_VAL(F("capacity"), capacity);
   DEBUG_LIST_VAL(F("section count"), _sectionCount);
@@ -48,7 +48,7 @@ void Config<capacity>::serialize() {
 }
 
 template <int capacity>
-void Config<capacity>::deserialize() {
+void JsonConfig<capacity>::deserialize() {
   DEBUG_LIST_START(F("creating StaticJsonDocument"));
   DEBUG_LIST_VAL(F("capacity"), capacity);
   DEBUG_LIST_VAL(F("section count"), _sectionCount);

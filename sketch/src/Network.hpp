@@ -8,8 +8,9 @@
 #include "ConfigFile.hpp"
 #include "WifiConfig.hpp"
 
-#define _NETWORK_STATION_CONFIG_FILE_PATH "/config/network/station.json"
-#define _NETWORK_AP_CONFIG_FILE_PATH "/config/network/ap.json"
+#define NETWORK_STATION_WIFI_CONFIG "wifi-station"
+#define NETWORK_STATION_AP_CONFIG "wifi-ap"
+
 #define _NETWORK_STATION_DEFAULT_SSID ""
 #define _NETWORK_STATION_DEFAULT_PASSWORD ""
 #define _NETWORK_AP_DEFAULT_SSID "smart-dimmer"
@@ -30,57 +31,47 @@ class Network {
     };
 
   using f_onStateChange = std::function<void(State state)>;
+  using f_onConfigChange = std::function<void()>;
 
   private:
     static f_onStateChange _onStateChange;
+    static f_onConfigChange _onConfigChange;
     static Mode _mode;
     static State _state;
-    static ConfigFile _stationConfigFile;
-    static WifiConfig _stationConfig;
-    static ConfigFile _apConfigFile;
-    static WifiConfig _apConfig;
     static void _setState(State state);
-    static void _onStationConfigChange(const char *ssid, const char *password);
-    static void _onApConfigChange(const char *ssid, const char *password);
+    static void _onStationConfigInit();
+    static void _onStationConfigChange();
+    static void _onApConfigInit();
+    static void _onApConfigChange();
 
   public:
-    static void setup(f_onStateChange onStateChange);
+    static WifiConfig stationConfig;
+    static WifiConfig apConfig;
+    static void setup(f_onStateChange onStateChange, f_onConfigChange onConfigChange);
     static void loop();
     static State getState();
     static void setMode(Mode);
     static Mode getMode();
-    static void setStationConfig(const char *ssid, const char *password);
-    static void resetStationConfig();
-    static char *getStationSsid();
-    static char *getStationPassword();
-    static void setApConfig(const char *ssid, const char *password);
-    static void resetApConfig();
-    static char *getApSsid();
-    static char *getApPassword();
     static void scan();
 };
 
 Network::Mode Network::_mode = Network::Mode::NONE;
 Network::State Network::_state = Network::State::IDLE;
 Network::f_onStateChange Network::_onStateChange;
-ConfigFile Network::_stationConfigFile(_NETWORK_STATION_CONFIG_FILE_PATH);
-WifiConfig Network::_stationConfig(&_stationConfigFile, _NETWORK_STATION_DEFAULT_SSID, _NETWORK_STATION_DEFAULT_PASSWORD, _onStationConfigChange);
-ConfigFile Network::_apConfigFile(_NETWORK_AP_CONFIG_FILE_PATH);
-WifiConfig Network::_apConfig(&_apConfigFile, _NETWORK_AP_DEFAULT_SSID, _NETWORK_AP_DEFAULT_PASSWORD, _onApConfigChange);
+Network::f_onConfigChange Network::_onConfigChange;
+WifiConfig Network::stationConfig(_NETWORK_STATION_DEFAULT_SSID, _NETWORK_STATION_DEFAULT_PASSWORD, _onStationConfigInit, _onStationConfigChange);
+WifiConfig Network::apConfig(_NETWORK_AP_DEFAULT_SSID, _NETWORK_AP_DEFAULT_PASSWORD, _onApConfigInit, _onApConfigChange);
 
-void Network::setup(f_onStateChange onStateChange) {
+void Network::setup(f_onStateChange onStateChange, f_onConfigChange onConfigChange) {
   _onStateChange = onStateChange;
-
-  _stationConfig.init();
-  _apConfig.init();
-
+  _onConfigChange = onConfigChange;
   _setState(State::IDLE);
 }
 
 void Network::loop() {
   // TODO: Check status and notify state changes
   if (_state == State::IDLE) {
-    if (WiFi.softAP(_apConfig.getSsid(), _apConfig.getPassword())) {
+    if (WiFi.softAP(apConfig.ssid, apConfig.password)) {
       DEBUG_VAL(F("started AP"), F("IP"), WiFi.softAPIP());
       _setState(State::AP_ACTIVE);
     } else {
@@ -107,52 +98,40 @@ Network::Mode Network::getMode() {
   return _mode;
 }
 
-void Network::setStationConfig(const char *ssid, const char *password) {
-  _stationConfig.setConfig(ssid, password);
-}
-
-void Network::resetStationConfig() {
-  _stationConfig.reset();
-}
-
-char *Network::getStationSsid() {
-  return _stationConfig.getSsid();
-}
-
-char *Network::getStationPassword() {
-  return _stationConfig.getPassword();
-}
-
-void Network::_onStationConfigChange(const char *ssid, const char *password) {
+void Network::_onStationConfigInit() {
   DEBUG_LIST_START(F("new station config"));
-  DEBUG_LIST_VAL(F("ssid"), ssid);
-  DEBUG_LIST_VAL(F("password"), password);
+  DEBUG_LIST_VAL(F("ssid"), stationConfig.ssid);
+  DEBUG_LIST_VAL(F("password"), stationConfig.password);
   DEBUG_LIST_END;
   // TODO: restart station?
+  // Initialising so don't notify a change
 }
 
-void Network::setApConfig(const char *ssid, const char *password) {
-  _apConfig.setConfig(ssid, password);
+void Network::_onStationConfigChange() {
+  DEBUG_LIST_START(F("new station config"));
+  DEBUG_LIST_VAL(F("ssid"), stationConfig.ssid);
+  DEBUG_LIST_VAL(F("password"), stationConfig.password);
+  DEBUG_LIST_END;
+  // TODO: restart station?
+  _onConfigChange();
 }
 
-void Network::resetApConfig() {
-  _apConfig.reset();
-}
-
-char *Network::getApSsid() {
-  return _apConfig.getSsid();
-}
-
-char *Network::getApPassword() {
-  return _apConfig.getPassword();
-}
-
-void Network::_onApConfigChange(const char *ssid, const char *password) {
+void Network::_onApConfigInit() {
   DEBUG_LIST_START(F("new AP config"));
-  DEBUG_LIST_VAL(F("ssid"), ssid);
-  DEBUG_LIST_VAL(F("password"), password);
+  DEBUG_LIST_VAL(F("ssid"), apConfig.ssid);
+  DEBUG_LIST_VAL(F("password"), apConfig.password);
   DEBUG_LIST_END;
   // TODO: restart AP?
+  // Initialising so don't notify a change
+}
+
+void Network::_onApConfigChange() {
+  DEBUG_LIST_START(F("new AP config"));
+  DEBUG_LIST_VAL(F("ssid"), apConfig.ssid);
+  DEBUG_LIST_VAL(F("password"), apConfig.password);
+  DEBUG_LIST_END;
+  // TODO: restart AP?
+  _onConfigChange();
 }
 
 void Network::scan() {

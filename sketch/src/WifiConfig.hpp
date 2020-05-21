@@ -5,8 +5,6 @@
 
 #include "Debug.hpp"
 
-#include "ConfigFile.hpp"
-
 #define WIFI_CONFIG_SSID_BUFFER_SIZE 33
 #define WIFI_CONFIG_PASSWORD_BUFFER_SIZE 64
 
@@ -15,80 +13,70 @@
 #define _WIFI_CONFIG_PASSWORD_FIELD_NAME "password"
 
 class WifiConfig {
-  using f_onChange = std::function<void(const char *ssid, const char *password)>;
+  using f_callback = std::function<void()>;
 
-  f_onChange _onChange;
-  ConfigFile *_pConfigFile;
+  f_callback _onInit;
+  f_callback _onChange;
   const char *_defaultSsid;
   const char *_defaultPassword;
-  char _ssid[WIFI_CONFIG_SSID_BUFFER_SIZE];
-  char _password[WIFI_CONFIG_PASSWORD_BUFFER_SIZE];
-  void _applyConfig(const char *ssid, const char *password);
+  void _applyConfig(const char *newSsid, const char *newPassword);
 
   public:
-    WifiConfig(ConfigFile *pConfigFile, const char *defaultSsid, const char *defaultPassword, f_onChange onChange);
-    void init();
-    void setConfig(const char *ssid, const char *password);
-    char *getSsid();
-    char *getPassword();
+    char ssid[WIFI_CONFIG_SSID_BUFFER_SIZE];
+    char password[WIFI_CONFIG_PASSWORD_BUFFER_SIZE];
+    WifiConfig(const char *defaultSsid, const char *defaultPassword, f_callback onInit, f_callback onChange)
+    : _defaultSsid(defaultSsid),
+      _defaultPassword(defaultPassword),
+      _onInit(onInit),
+      _onChange(onChange)
+    {}
+    void deserialize(JsonObject *pObj);
+    void serialize(JsonObject *pObj);
+    void setConfig(const char *newSsid, const char *newPassword);
     void reset();
 };
 
-WifiConfig::WifiConfig(ConfigFile *pConfigFile, const char *defaultSsid, const char *defaultPassword, f_onChange onChange) {
-  _pConfigFile = pConfigFile;
-  _defaultSsid = defaultSsid;
-  _defaultPassword = defaultPassword;
-  _onChange = onChange;
+void WifiConfig::_applyConfig(const char *newSsid, const char *newPassword) {
+  strlcpy(ssid, newSsid, WIFI_CONFIG_SSID_BUFFER_SIZE);
+  strlcpy(password, newPassword, WIFI_CONFIG_PASSWORD_BUFFER_SIZE);
+  DEBUG_LIST_START(F("settings copied"));
+  DEBUG_LIST_VAL(F("ssid"), ssid);
+  DEBUG_LIST_VAL(F("password"), password);
+  DEBUG_LIST_END;
 }
 
-void WifiConfig::init() {
-  const char *ssid = _defaultSsid;
-  const char *password = _defaultPassword;
-  StaticJsonDocument<_WIFI_CONFIG_JSON_DOCUMENT_SIZE> doc;
-  _pConfigFile->read(&doc);
-  if (doc.isNull()) {
-    DEBUG_MSG(F("JSON document is NULL, applying defaults"));
+void WifiConfig::deserialize(JsonObject *pObj) {
+  const char *newSsid = _defaultSsid;
+  const char *newPassword = _defaultPassword;
+  if (pObj->isNull()) {
+    DEBUG_LIST_START(F("Field is not present, using defaults"));
+    DEBUG_LIST_VAL(F("_defaultSsid"), _defaultSsid);
+    DEBUG_LIST_VAL(F("_defaultPassword"), _defaultPassword);
+    DEBUG_LIST_END;
   } else {
-    ssid = doc[_WIFI_CONFIG_SSID_FIELD_NAME] | _defaultSsid;
-    password = doc[_WIFI_CONFIG_PASSWORD_FIELD_NAME] | _defaultPassword;
+    newSsid = (*pObj)[_WIFI_CONFIG_SSID_FIELD_NAME] | _defaultSsid;
+    newPassword = (*pObj)[_WIFI_CONFIG_PASSWORD_FIELD_NAME] | _defaultPassword;
   }
+  _applyConfig(newSsid, newPassword);
   // Always notify last as we don't know what will happen
   // in the onChange callback
-  _applyConfig(ssid, password);
+  _onInit();
 }
 
-void WifiConfig::setConfig(const char *ssid, const char *password) {
-  StaticJsonDocument<_WIFI_CONFIG_JSON_DOCUMENT_SIZE> doc;
-  doc[_WIFI_CONFIG_SSID_FIELD_NAME] = ssid;
-  doc[_WIFI_CONFIG_PASSWORD_FIELD_NAME] = password;
-  DEBUG_VAL(F("JSON document created"), F("field count"), doc.size());
-  _pConfigFile->write(&doc);
+void WifiConfig::serialize(JsonObject *pObj) {
+  (*pObj)[_WIFI_CONFIG_SSID_FIELD_NAME] = ssid;
+  (*pObj)[_WIFI_CONFIG_PASSWORD_FIELD_NAME] = password;
+}
+
+void WifiConfig::setConfig(const char *newSsid, const char *newPassword) {
+  _applyConfig(newSsid, newPassword);
   // Always notify last as we don't know what will happen
   // in the onChange callback
-  _applyConfig(ssid, password);
-}
-
-char *WifiConfig::getSsid() {
-  return _ssid;
-}
-
-char *WifiConfig::getPassword() {
-  return _password;
+  _onChange();
 }
 
 void WifiConfig::reset() {
-  _pConfigFile->remove();
-  // Always notify last as we don't know what will happen
-  // in the onChange callback
-  _applyConfig(_defaultSsid, _defaultPassword);
-}
-
-void WifiConfig::_applyConfig(const char *ssid, const char *password) {
-  strlcpy(_ssid, ssid, WIFI_CONFIG_SSID_BUFFER_SIZE);
-  strlcpy(_password, password, WIFI_CONFIG_PASSWORD_BUFFER_SIZE);
-  // Always notify last as we don't know what will happen
-  // in the onChange callback
-  _onChange(_ssid, _password);
+  setConfig(_defaultSsid, _defaultPassword);
 }
 
 #endif
