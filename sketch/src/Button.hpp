@@ -1,14 +1,24 @@
-#include <Arduino.h>
-#include "Button.h"
+#ifndef Button_hpp
+#define Button_hpp
 
-/*
- * Uncomment the next line to enable
- * debug output to serial for this file
- */
-//#define DEBUG
-#include "../Debug/Debug.h"
+#include "Debug.hpp"
 
-#define BUTTON_DEBOUNCE_DELAY 50
+#define _BUTTON_DEBOUNCE_DELAY 50
+
+class Button {
+  using f_onRelease = std::function<void()>;
+
+  int _pin;
+  int _pinState;
+  int _lastPinState;
+  unsigned long _lastDebounceTime;
+  f_onRelease _onRelease;
+
+  public:
+    Button(int pin, f_onRelease onRelease);
+    void setup();
+    void loop();
+};
 
 Button::Button(int pin, f_onRelease onRelease) {
   _pin = pin;
@@ -30,7 +40,7 @@ void Button::loop() {
   }
 
   if (_pinState != pinState) {
-    if ((millis() - _lastDebounceTime) > BUTTON_DEBOUNCE_DELAY) {
+    if ((millis() - _lastDebounceTime) > _BUTTON_DEBOUNCE_DELAY) {
       _pinState = pinState;
       if (_pinState == HIGH) {
         _onRelease();
@@ -38,3 +48,5 @@ void Button::loop() {
     }
   }
 }
+
+#endif

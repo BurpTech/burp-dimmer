@@ -1,62 +1,65 @@
-#include <Arduino.h>
+#ifndef HttpServer_hpp
+#define HttpServer_hpp
+
+#include "Debug.hpp"
+
 #include <ESP8266WebServer.h>
-#include "../WifiConfig/WifiConfig.h"
-#include "../Storage/Storage.h"
-#include "HttpServer.h"
 
-/*
- * Uncomment the next line to enable
- * debug output to serial for this file
- */
-//#define DEBUG
-#include "../Debug/Debug.h"
+#define _HTTP_SERVER_PORT 80
 
-#define HTTP_SERVER_PORT 80
+class HttpServer {
+  using f_onSettings = std::function<void(const char *ssid, const char *password)>;
 
-HttpServer *HttpServer::getInstance() {
-  static ESP8266WebServer server(HTTP_SERVER_PORT);
-  static HttpServer httpServer(&server);
-  return &httpServer;
-}
+  static ESP8266WebServer _server;
+  static f_onSettings _onSettings;
+  static File _uploadFile;
+  static String _getContentType(String path);
+  static void _handleFileRead(String path);
+  static void _handleFileUpload();
+  static void _handleSettings();
 
-HttpServer::HttpServer(ESP8266WebServer *pServer) {
-  _pStorage = Storage::getInstance();
-  _pServer = pServer;
-}
+  public:
+    static void setup(f_onSettings onSettings);
+    static void loop();
+};
+
+HttpServer::f_onSettings HttpServer::_onSettings;
+File HttpServer::_uploadFile;
+ESP8266WebServer HttpServer::_server(_HTTP_SERVER_PORT);
 
 void HttpServer::setup(f_onSettings onSettings) {
   _onSettings = onSettings;
 
-  _pServer->on(
+  _server.on(
       "/settings",
       HTTP_GET,
       [=](){ _handleFileRead("/settings.html"); });
 
-  _pServer->on(
+  _server.on(
       "/settings",
       HTTP_POST,
-      std::bind(&HttpServer::_handleSettings, this));
+      _handleSettings);
 
-  _pServer->on(
+  _server.on(
       "/upload",
       HTTP_GET,
-      [=](){ _handleFileRead("/upload.html"); });
+      [](){ _handleFileRead("/upload.html"); });
 
-  _pServer->on(
+  _server.on(
       "/upload",
       HTTP_POST,
-      [=](){ _pServer->send(200); },
-      std::bind(&HttpServer::_handleFileUpload, this));
+      [](){ _server.send(200); },
+      _handleFileUpload);
 
-  _pServer->onNotFound([=](){ _handleFileRead(_pServer->uri()); });
+  _server.onNotFound([=](){ _handleFileRead(_server.uri()); });
 
-  _pServer->begin();
+  _server.begin();
 
-  DEBUG_VAL(F("HTTP Server started"), F("port"), HTTP_SERVER_PORT);
+  DEBUG_VAL(F("HTTP Server started"), F("port"), _HTTP_SERVER_PORT);
 }
 
 void HttpServer::loop() {
-  _pServer->handleClient();
+  _server.handleClient();
 }
 
 String HttpServer::_getContentType(String path) {
@@ -80,45 +83,45 @@ void HttpServer::_handleFileRead(String path) {
     path += "index.html";
   }
   DEBUG_VAL(F("adjusted"), F("path"), path);
-  String contentType = HttpServer::_getContentType(path);
+  String contentType = _getContentType(path);
   DEBUG_VAL(F("checked content type"), F("contentType"), contentType);
-  if (_pStorage->exists(path)) {
-    File file = _pStorage->open(path, "r");
-    size_t sent = _pServer->streamFile(file, contentType);
+  if (Storage::exists(path)) {
+    File file = Storage::open(path, "r");
+    size_t sent = _server.streamFile(file, contentType);
     DEBUG_VAL(F("file streamed"), F("sent bytes"), sent);
     file.close();
     return;
   }
   DEBUG_MSG(F("file not found"));
-  _pServer->send(404, "text/plain", "404: Not Found");
+  _server.send(404, "text/plain", "404: Not Found");
 }
 
 void HttpServer::_handleSettings() {
   char ssid[WIFI_CONFIG_SSID_BUFFER_SIZE] = "";
   char password[WIFI_CONFIG_PASSWORD_BUFFER_SIZE] = "";
-  DEBUG_VAL(F("POST data received"), F("raw"), _pServer->arg("plain")); 
-  if (!_pServer->hasArg("ssid") ||
-      !_pServer->hasArg("password") ||
-      _pServer->arg("ssid") == NULL ||
-      _pServer->arg("password") == NULL) {
-      _pServer->send(400, "text/plain", "400: Invalid Request");
+  DEBUG_VAL(F("POST data received"), F("raw"), _server.arg("plain")); 
+  if (!_server.hasArg("ssid") ||
+      !_server.hasArg("password") ||
+      _server.arg("ssid") == NULL ||
+      _server.arg("password") == NULL) {
+      _server.send(400, "text/plain", "400: Invalid Request");
       return;
   }
-  _pServer->sendHeader("Location", "/success.html");
-  _pServer->send(303);
-  _pServer->arg("ssid").toCharArray(ssid, WIFI_CONFIG_SSID_BUFFER_SIZE);
-  _pServer->arg("password").toCharArray(password, WIFI_CONFIG_PASSWORD_BUFFER_SIZE);
+  _server.sendHeader("Location", "/success.html");
+  _server.send(303);
+  _server.arg("ssid").toCharArray(ssid, WIFI_CONFIG_SSID_BUFFER_SIZE);
+  _server.arg("password").toCharArray(password, WIFI_CONFIG_PASSWORD_BUFFER_SIZE);
   _onSettings(ssid, password);
 }
 
 void HttpServer::_handleFileUpload() {
-  HTTPUpload &upload = _pServer->upload();
+  HTTPUpload &upload = _server.upload();
   if (upload.status == UPLOAD_FILE_START) {
     String filename = upload.filename;
     DEBUG_VAL(F("started upload"), F("filename"), filename);
     if (!filename.startsWith("/")) filename = "/" + filename;
     DEBUG_VAL(F("adjusted filename"), F("filename"), filename);
-    _uploadFile = _pStorage->open(filename, "w");
+    _uploadFile = Storage::open(filename, "w");
     DEBUG_VAL(F("opened file"), F("handle"), _uploadFile);
     filename = String();
   } else if (upload.status == UPLOAD_FILE_WRITE) {
@@ -134,10 +137,12 @@ void HttpServer::_handleFileUpload() {
     if (_uploadFile) {
       DEBUG_VAL(F("upload complete"), F("total size"), upload.totalSize);
       _uploadFile.close();
-      _pServer->sendHeader("Location", "/success.html");
-      _pServer->send(303);
+      _server.sendHeader("Location", "/success.html");
+      _server.send(303);
     } else {
-      _pServer->send(500, "text/plain", "500: couldn't create file");
+      _server.send(500, "text/plain", "500: couldn't create file");
     }
   }
 }
+
+#endif

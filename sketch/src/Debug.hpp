@@ -1,7 +1,5 @@
-#ifndef debug_h
-#define debug_h
-
-#include <Arduino.h>
+#ifndef debug_hpp
+#define debug_hpp
 
 /*
  * Uncomment the next line to globally enable
@@ -36,7 +34,7 @@
 #define DEBUG_START(BAUDRATE)
 #define DEBUG_MSG(MSG)
 #define DEBUG_VAL(MSG, LABEL, VALUE)
-#define DEBUG_LIST(MSG)
+#define DEBUG_LIST_START(MSG)
 #define DEBUG_LIST_VAL(LABEL, VALUE)
 #define DEBUG_LIST_END
 #define DEBUG_DO

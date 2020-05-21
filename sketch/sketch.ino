@@ -1,18 +1,16 @@
-#include "src/Light/Light.h"
-#include "src/Button/Button.h"
-#include "src/RotaryEncoder/RotaryEncoder.h"
-#include "src/Storage/Storage.h"
-#include "src/Network/Network.h"
-#include "src/HttpServer/HttpServer.h"
+#include <Arduino.h>
+#include <functional>
 
-/*
- * Uncomment the next line to enable
- * debug output to serial for this file
- */
-//#define DEBUG
-#include "src/Debug/Debug.h"
+#include "src/Debug.hpp"
 
-Storage *pStorage = Storage::getInstance();
+#include "src/Button.hpp"
+#include "src/RotaryEncoder.hpp"
+#include "src/Light.hpp"
+#include "src/Storage.hpp"
+#include "src/Network.hpp"
+#include "src/HttpServer.hpp"
+
+#define RESET_DELAY 1000
 
 void lightOnUpdate(bool on, int brightness);
 Light light(D1, lightOnUpdate);
@@ -20,31 +18,39 @@ Light light(D1, lightOnUpdate);
 void buttonOnRelease();
 Button button(D7, buttonOnRelease);
 
+void resetButtonOnRelease();
+Button resetButton(D2, resetButtonOnRelease);
+
 ICACHE_RAM_ATTR void knobInterruptDispatch();
 void knobOnChange(int direction);
 RotaryEncoder knob(D5, D6, knobInterruptDispatch, knobOnChange);
 
 void networkOnStateChange(Network::State state);
-Network *pNetwork = Network::getInstance();
-
 void httpServerOnSettings(const char *ssid, const char *password);
-HttpServer *pHttpServer = HttpServer::getInstance();
 
 void setup() {
   Serial.begin(115200);
-  pStorage->setup();
+  Storage::begin();
+  resetButton.setup();
   light.setup();
   button.setup();
   knob.setup();
-  pNetwork->setup(networkOnStateChange);
-  pHttpServer->setup(httpServerOnSettings);
+  Network::setup(networkOnStateChange);
+  HttpServer::setup(httpServerOnSettings);
 }
 
 void loop() {
+  resetButton.loop();
   button.loop();
   knob.loop();
-  pNetwork->loop();
-  pHttpServer->loop();
+  Network::loop();
+  HttpServer::loop();
+}
+
+void resetButtonOnRelease() {
+  DEBUG_VAL(F("Resetting"), F("delay (ms)"), RESET_DELAY);
+  delay(RESET_DELAY);
+  ESP.reset();
 }
 
 void lightOnUpdate(bool on, int brightness) {
@@ -77,5 +83,5 @@ void httpServerOnSettings(const char *ssid, const char *password) {
   DEBUG_LIST_VAL(F("ssid"), ssid);
   DEBUG_LIST_VAL(F("password"), password);
   DEBUG_LIST_END;
-  pNetwork->setStationConfig(ssid, password);
+  Network::setStationConfig(ssid, password);
 }
