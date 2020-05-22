@@ -14,9 +14,12 @@
 #include "src/Json/File.hpp"
 #include "src/Json/Object.hpp"
 #include "src/Json/Config.hpp"
+#include "src/Json/HttpApi.hpp"
 
 #define CONFIG_FILE_PATH "/config.json"
+#define HTTP_API_PREFIX "/api/"
 #define RESET_DELAY 1000
+
 #define POINTER_ARRAY_LENGTH(ARRAY) (sizeof(ARRAY)/sizeof(void*))
 
 bool setupComplete = false;
@@ -49,6 +52,13 @@ Json::Config config(
   configSections,
   &configFile
 );
+Json::HttpApi api(
+  HTTP_API_PREFIX,
+  Json::Allocator<StaticJsonDocument<256>>::withDoc,
+  POINTER_ARRAY_LENGTH(configSections),
+  configSections,
+  &HttpServer::server
+);
 
 void setup() {
   Serial.begin(115200);
@@ -58,6 +68,7 @@ void setup() {
   button.setup();
   knob.setup();
   Network::setup(networkOnStateChange, saveConfig);
+  api.setup();
   HttpServer::setup(httpServerOnSettings);
 
   // read in the configuration

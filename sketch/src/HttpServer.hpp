@@ -10,44 +10,45 @@
 class HttpServer {
   using f_onSettings = std::function<void(const char *ssid, const char *password)>;
 
-  static ESP8266WebServer _server;
   static f_onSettings _onSettings;
   static File _uploadFile;
 
   public:
+    static ESP8266WebServer server;
+
     static void setup(f_onSettings onSettings) {
       _onSettings = onSettings;
 
-      _server.on(
+      server.on(
           "/settings",
           HTTP_GET,
           [=](){ _handleFileRead("/settings.html"); });
 
-      _server.on(
+      server.on(
           "/settings",
           HTTP_POST,
           _handleSettings);
 
-      _server.on(
+      server.on(
           "/upload",
           HTTP_GET,
           [](){ _handleFileRead("/upload.html"); });
 
-      _server.on(
+      server.on(
           "/upload",
           HTTP_POST,
-          [](){ _server.send(200); },
+          [](){ server.send(200); },
           _handleFileUpload);
 
-      _server.onNotFound([=](){ _handleFileRead(_server.uri()); });
+      server.onNotFound([=](){ _handleFileRead(server.uri()); });
 
-      _server.begin();
+      server.begin();
 
       DEBUG_VAL(F("HTTP Server started"), F("port"), _HTTP_SERVER_PORT);
     }
 
     static void loop() {
-      _server.handleClient();
+      server.handleClient();
     }
 
   private:
@@ -76,35 +77,35 @@ class HttpServer {
       DEBUG_VAL(F("checked content type"), F("contentType"), contentType);
       if (Storage::exists(path)) {
         File file = Storage::open(path, "r");
-        size_t sent = _server.streamFile(file, contentType);
+        size_t sent = server.streamFile(file, contentType);
         DEBUG_VAL(F("file streamed"), F("sent bytes"), sent);
         file.close();
         return;
       }
       DEBUG_MSG(F("file not found"));
-      _server.send(404, "text/plain", "404: Not Found");
+      server.send(404, "text/plain", "404: Not Found");
     }
 
     static void _handleFileUpload() {
       char ssid[WIFI_CONFIG_SSID_BUFFER_SIZE] = "";
       char password[WIFI_CONFIG_PASSWORD_BUFFER_SIZE] = "";
-      DEBUG_VAL(F("POST data received"), F("raw"), _server.arg("plain")); 
-      if (!_server.hasArg("ssid") ||
-          !_server.hasArg("password") ||
-          _server.arg("ssid") == NULL ||
-          _server.arg("password") == NULL) {
-          _server.send(400, "text/plain", "400: Invalid Request");
+      DEBUG_VAL(F("POST data received"), F("raw"), server.arg("plain")); 
+      if (!server.hasArg("ssid") ||
+          !server.hasArg("password") ||
+          server.arg("ssid") == NULL ||
+          server.arg("password") == NULL) {
+          server.send(400, "text/plain", "400: Invalid Request");
           return;
       }
-      _server.sendHeader("Location", "/success.html");
-      _server.send(303);
-      _server.arg("ssid").toCharArray(ssid, WIFI_CONFIG_SSID_BUFFER_SIZE);
-      _server.arg("password").toCharArray(password, WIFI_CONFIG_PASSWORD_BUFFER_SIZE);
+      server.sendHeader("Location", "/success.html");
+      server.send(303);
+      server.arg("ssid").toCharArray(ssid, WIFI_CONFIG_SSID_BUFFER_SIZE);
+      server.arg("password").toCharArray(password, WIFI_CONFIG_PASSWORD_BUFFER_SIZE);
       _onSettings(ssid, password);
     }
 
     static void _handleSettings() {
-      HTTPUpload &upload = _server.upload();
+      HTTPUpload &upload = server.upload();
       if (upload.status == UPLOAD_FILE_START) {
         String filename = upload.filename;
         DEBUG_VAL(F("started upload"), F("filename"), filename);
@@ -126,10 +127,10 @@ class HttpServer {
         if (_uploadFile) {
           DEBUG_VAL(F("upload complete"), F("total size"), upload.totalSize);
           _uploadFile.close();
-          _server.sendHeader("Location", "/success.html");
-          _server.send(303);
+          server.sendHeader("Location", "/success.html");
+          server.send(303);
         } else {
-          _server.send(500, "text/plain", "500: couldn't create file");
+          server.send(500, "text/plain", "500: couldn't create file");
         }
       }
     }
@@ -137,6 +138,6 @@ class HttpServer {
 
 HttpServer::f_onSettings HttpServer::_onSettings;
 File HttpServer::_uploadFile;
-ESP8266WebServer HttpServer::_server(_HTTP_SERVER_PORT);
+ESP8266WebServer HttpServer::server(_HTTP_SERVER_PORT);
 
 #endif
