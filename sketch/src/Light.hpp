@@ -18,71 +18,64 @@ class Light {
   bool _on;
   int _brightness;
   f_onUpdate _onUpdate;
-  void _update();
 
   public:
-    Light(int pin, f_onUpdate onUpdate);
-    void setup();
-    void toggle();
-    void setOn(bool on);
-    void setBrightness(int brightness);
-    void changeBrightness(int change);
+    Light(int pin, f_onUpdate onUpdate) :
+      _pin(pin),
+      _onUpdate(onUpdate),
+      _brightness(_LIGHT_DEFAULT_BRIGHTNESS),
+      _on(_LIGHT_DEFAULT_ON) {
+    }
+
+    void setup() {
+      pinMode(_pin, OUTPUT);
+      _update();
+    }
+
+    void toggle() {
+      _on = !_on;
+      _update();
+    }
+
+    void setOn(bool on) {
+      _on = on;
+      _update();
+    }
+
+    void setBrightness(int brightness) {
+      _on = true;
+      _brightness = _LIGHT_LIMIT_BRIGHTNESS(brightness);
+      _update();
+    }
+
+    void changeBrightness(int change) {
+      if (_on) {
+        _brightness = _LIGHT_LIMIT_BRIGHTNESS(_brightness + change);
+        _update();
+      } else if (change > 0) {
+        _on = true;
+        _brightness = _LIGHT_LIMIT_BRIGHTNESS(change);
+        _update();
+      }
+    }
+
+  private:
+    void _update() {
+      if (_brightness == 0) {
+        _on = false;
+        _brightness = LIGHT_MAX_BRIGHTNESS;
+      }
+
+      if (!_on) {
+        digitalWrite(_pin, LOW);
+      } else {
+        int pwmLevel = _LIGHT_PWM_LEVEL(_brightness);
+        DEBUG_VAL(F("setting output"), F("pwmLevel"), pwmLevel);
+        analogWrite(_pin, pwmLevel);
+      }
+
+      _onUpdate(_on, _brightness);
+    }
 };
-
-Light::Light(int pin, f_onUpdate onUpdate) {
-  _pin = pin;
-  _onUpdate = onUpdate;
-  _brightness = _LIGHT_DEFAULT_BRIGHTNESS;
-  _on = _LIGHT_DEFAULT_ON;
-}
-
-void Light::setup() {
-  pinMode(_pin, OUTPUT);
-  _update();
-}
-
-void Light::_update() {
-  if (_brightness == 0) {
-    _on = false;
-    _brightness = LIGHT_MAX_BRIGHTNESS;
-  }
-
-  if (!_on) {
-    digitalWrite(_pin, LOW);
-  } else {
-    int pwmLevel = _LIGHT_PWM_LEVEL(_brightness);
-    DEBUG_VAL(F("setting output"), F("pwmLevel"), pwmLevel);
-    analogWrite(_pin, pwmLevel);
-  }
-
-  _onUpdate(_on, _brightness);
-}
-
-void Light::toggle() {
-  _on = !_on;
-  _update();
-}
-
-void Light::setOn(bool on) {
-  _on = on;
-  _update();
-}
-
-void Light::setBrightness(int brightness) {
-  _on = true;
-  _brightness = _LIGHT_LIMIT_BRIGHTNESS(brightness);
-  _update();
-}
-
-void Light::changeBrightness(int change) {
-  if (_on) {
-    _brightness = _LIGHT_LIMIT_BRIGHTNESS(_brightness + change);
-    _update();
-  } else if (change > 0) {
-    _on = true;
-    _brightness = _LIGHT_LIMIT_BRIGHTNESS(change);
-    _update();
-  }
-}
 
 #endif

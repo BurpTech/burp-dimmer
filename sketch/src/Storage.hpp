@@ -7,26 +7,21 @@
 
 class Storage {
   public:
-    static void begin();
-    static File open(String path, const char *mode);
-    static bool exists(String path);
-    static bool remove(String path);
+    static void begin() {
+      LittleFS.begin();
+    }
+
+    static File open(String path, const char *mode) {
+      return LittleFS.open(path, mode);
+    }
+
+    static bool exists(String path) {
+      return LittleFS.exists(path);
+    }
+
+    static bool remove(String path) {
+      return LittleFS.remove(path);
+    }
 };
-
-void Storage::begin() {
-  LittleFS.begin();
-}
-
-File Storage::open(String path, const char *mode) {
-  return LittleFS.open(path, mode);
-}
-
-bool Storage::exists(String path) {
-  return LittleFS.exists(path);
-}
-
-bool Storage::remove(String path) {
-  return LittleFS.remove(path);
-}
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef JsonDoc_hpp
-#define JsonDoc_hpp
+#ifndef JsonAllocator_hpp
+#define JsonAllocator_hpp
 
 #include <ArduinoJson.h>
 
@@ -9,7 +9,7 @@
 
 namespace Json {
   template <class T>
-  class Doc {
+  class Allocator {
     public:
       static void withDoc(f_onDoc onDoc) {
         DEBUG_MSG(F("creating temporary JSON document"));

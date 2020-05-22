@@ -10,12 +10,14 @@
 #include "src/Network.hpp"
 #include "src/HttpServer.hpp"
 
-#include "src/Json/Doc.hpp"
+#include "src/Json/Allocator.hpp"
 #include "src/Json/File.hpp"
+#include "src/Json/Object.hpp"
 #include "src/Json/Config.hpp"
 
 #define CONFIG_FILE_PATH "/config.json"
 #define RESET_DELAY 1000
+#define POINTER_ARRAY_LENGTH(ARRAY) (sizeof(ARRAY)/sizeof(void*))
 
 bool setupComplete = false;
 void saveConfig();
@@ -36,27 +38,16 @@ RotaryEncoder knob(D5, D6, knobInterruptDispatch, knobOnChange);
 void networkOnStateChange(Network::State state);
 void httpServerOnSettings(const char *ssid, const char *password);
 
-using namespace std::placeholders; // for _1, _2
 Json::File configFile(CONFIG_FILE_PATH);
-Json::Object configSections[] = {
-  Json::Object(
-    NETWORK_STATION_WIFI_CONFIG,
-    std::bind(&WifiConfig::serialize, &Network::stationConfig, _1),
-    std::bind(&WifiConfig::deserialize, &Network::stationConfig, _1)
-  ),
-  Json::Object(
-    NETWORK_STATION_AP_CONFIG,
-    std::bind(&WifiConfig::serialize, &Network::apConfig, _1),
-    std::bind(&WifiConfig::deserialize, &Network::apConfig, _1)
-  )
+Json::Object *configSections[] = {
+  &Network::stationConfig,
+  &Network::apConfig
 };
-
 Json::Config config(
-  Json::Doc<StaticJsonDocument<256>>::withDoc,
-  JSON_OBJECT_ARRAY_LENGTH(configSections),
+  Json::Allocator<StaticJsonDocument<256>>::withDoc,
+  POINTER_ARRAY_LENGTH(configSections),
   configSections,
-  std::bind(&Json::File::write, &configFile, _1),
-  std::bind(&Json::File::read, &configFile, _1)
+  &configFile
 );
 
 void setup() {
