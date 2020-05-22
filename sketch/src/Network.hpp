@@ -5,7 +5,6 @@
 
 #include "Debug.hpp"
 
-#include "ConfigFile.hpp"
 #include "WifiConfig.hpp"
 
 #define NETWORK_STATION_WIFI_CONFIG "wifi-station"
@@ -39,9 +38,7 @@ class Network {
     static Mode _mode;
     static State _state;
     static void _setState(State state);
-    static void _onStationConfigInit();
     static void _onStationConfigChange();
-    static void _onApConfigInit();
     static void _onApConfigChange();
 
   public:
@@ -59,8 +56,8 @@ Network::Mode Network::_mode = Network::Mode::NONE;
 Network::State Network::_state = Network::State::IDLE;
 Network::f_onStateChange Network::_onStateChange;
 Network::f_onConfigChange Network::_onConfigChange;
-WifiConfig Network::stationConfig(_NETWORK_STATION_DEFAULT_SSID, _NETWORK_STATION_DEFAULT_PASSWORD, _onStationConfigInit, _onStationConfigChange);
-WifiConfig Network::apConfig(_NETWORK_AP_DEFAULT_SSID, _NETWORK_AP_DEFAULT_PASSWORD, _onApConfigInit, _onApConfigChange);
+WifiConfig Network::stationConfig(_NETWORK_STATION_DEFAULT_SSID, _NETWORK_STATION_DEFAULT_PASSWORD, _onStationConfigChange);
+WifiConfig Network::apConfig(_NETWORK_AP_DEFAULT_SSID, _NETWORK_AP_DEFAULT_PASSWORD, _onApConfigChange);
 
 void Network::setup(f_onStateChange onStateChange, f_onConfigChange onConfigChange) {
   _onStateChange = onStateChange;
@@ -98,15 +95,6 @@ Network::Mode Network::getMode() {
   return _mode;
 }
 
-void Network::_onStationConfigInit() {
-  DEBUG_LIST_START(F("new station config"));
-  DEBUG_LIST_VAL(F("ssid"), stationConfig.ssid);
-  DEBUG_LIST_VAL(F("password"), stationConfig.password);
-  DEBUG_LIST_END;
-  // TODO: restart station?
-  // Initialising so don't notify a change
-}
-
 void Network::_onStationConfigChange() {
   DEBUG_LIST_START(F("new station config"));
   DEBUG_LIST_VAL(F("ssid"), stationConfig.ssid);
@@ -114,15 +102,6 @@ void Network::_onStationConfigChange() {
   DEBUG_LIST_END;
   // TODO: restart station?
   _onConfigChange();
-}
-
-void Network::_onApConfigInit() {
-  DEBUG_LIST_START(F("new AP config"));
-  DEBUG_LIST_VAL(F("ssid"), apConfig.ssid);
-  DEBUG_LIST_VAL(F("password"), apConfig.password);
-  DEBUG_LIST_END;
-  // TODO: restart AP?
-  // Initialising so don't notify a change
 }
 
 void Network::_onApConfigChange() {

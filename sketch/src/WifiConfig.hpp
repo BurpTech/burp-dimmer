@@ -15,19 +15,16 @@
 class WifiConfig {
   using f_callback = std::function<void()>;
 
-  f_callback _onInit;
   f_callback _onChange;
   const char *_defaultSsid;
   const char *_defaultPassword;
-  void _applyConfig(const char *newSsid, const char *newPassword);
 
   public:
     char ssid[WIFI_CONFIG_SSID_BUFFER_SIZE];
     char password[WIFI_CONFIG_PASSWORD_BUFFER_SIZE];
-    WifiConfig(const char *defaultSsid, const char *defaultPassword, f_callback onInit, f_callback onChange)
+    WifiConfig(const char *defaultSsid, const char *defaultPassword, f_callback onChange)
     : _defaultSsid(defaultSsid),
       _defaultPassword(defaultPassword),
-      _onInit(onInit),
       _onChange(onChange)
     {}
     void deserialize(JsonObject *pObj);
@@ -35,15 +32,6 @@ class WifiConfig {
     void setConfig(const char *newSsid, const char *newPassword);
     void reset();
 };
-
-void WifiConfig::_applyConfig(const char *newSsid, const char *newPassword) {
-  strlcpy(ssid, newSsid, WIFI_CONFIG_SSID_BUFFER_SIZE);
-  strlcpy(password, newPassword, WIFI_CONFIG_PASSWORD_BUFFER_SIZE);
-  DEBUG_LIST_START(F("settings copied"));
-  DEBUG_LIST_VAL(F("ssid"), ssid);
-  DEBUG_LIST_VAL(F("password"), password);
-  DEBUG_LIST_END;
-}
 
 void WifiConfig::deserialize(JsonObject *pObj) {
   const char *newSsid = _defaultSsid;
@@ -57,10 +45,7 @@ void WifiConfig::deserialize(JsonObject *pObj) {
     newSsid = (*pObj)[_WIFI_CONFIG_SSID_FIELD_NAME] | _defaultSsid;
     newPassword = (*pObj)[_WIFI_CONFIG_PASSWORD_FIELD_NAME] | _defaultPassword;
   }
-  _applyConfig(newSsid, newPassword);
-  // Always notify last as we don't know what will happen
-  // in the onChange callback
-  _onInit();
+  setConfig(newSsid, newPassword);
 }
 
 void WifiConfig::serialize(JsonObject *pObj) {
@@ -69,7 +54,12 @@ void WifiConfig::serialize(JsonObject *pObj) {
 }
 
 void WifiConfig::setConfig(const char *newSsid, const char *newPassword) {
-  _applyConfig(newSsid, newPassword);
+  strlcpy(ssid, newSsid, WIFI_CONFIG_SSID_BUFFER_SIZE);
+  strlcpy(password, newPassword, WIFI_CONFIG_PASSWORD_BUFFER_SIZE);
+  DEBUG_LIST_START(F("settings copied"));
+  DEBUG_LIST_VAL(F("ssid"), ssid);
+  DEBUG_LIST_VAL(F("password"), password);
+  DEBUG_LIST_END;
   // Always notify last as we don't know what will happen
   // in the onChange callback
   _onChange();
