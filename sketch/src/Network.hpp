@@ -5,6 +5,7 @@
 
 #include "Debug.hpp"
 
+#include "FactorySettings.hpp"
 #include "WifiConfig.hpp"
 
 #define _NETWORK_STATION_WIFI_CONFIG "wifi-station"
@@ -69,6 +70,7 @@ class Network {
     static void setup(f_onStateChange onStateChange, f_onConfigChange onConfigChange) {
       _onStateChange = onStateChange;
       _onConfigChange = onConfigChange;
+      apConfig.setDefaults(FactorySettings::values.ssid, FactorySettings::values.password);
       _setState(State::IDLE);
     }
 
@@ -106,7 +108,7 @@ Network::Mode Network::_mode = Network::Mode::NONE;
 Network::State Network::_state = Network::State::IDLE;
 Network::f_onStateChange Network::_onStateChange;
 Network::f_onConfigChange Network::_onConfigChange;
-WifiConfig Network::stationConfig(_NETWORK_STATION_WIFI_CONFIG, _NETWORK_STATION_DEFAULT_SSID, _NETWORK_STATION_DEFAULT_PASSWORD, _onStationConfigChange);
-WifiConfig Network::apConfig(_NETWORK_AP_WIFI_CONFIG, _NETWORK_AP_DEFAULT_SSID, _NETWORK_AP_DEFAULT_PASSWORD, _onApConfigChange);
+WifiConfig Network::stationConfig(_NETWORK_STATION_WIFI_CONFIG, _onStationConfigChange);
+WifiConfig Network::apConfig(_NETWORK_AP_WIFI_CONFIG, _onApConfigChange);
 
 #endif

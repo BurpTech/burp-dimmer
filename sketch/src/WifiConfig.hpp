@@ -17,16 +17,15 @@ class WifiConfig: public Json::Object {
   using f_callback = std::function<void()>;
 
   f_callback _onChange;
-  const char *_defaultSsid;
-  const char *_defaultPassword;
+  char _defaultSsid[WIFI_CONFIG_SSID_BUFFER_SIZE];
+  char _defaultPassword[WIFI_CONFIG_PASSWORD_BUFFER_SIZE];
 
   public:
     char ssid[WIFI_CONFIG_SSID_BUFFER_SIZE];
     char password[WIFI_CONFIG_PASSWORD_BUFFER_SIZE];
-    WifiConfig(const char * name, const char *defaultSsid, const char *defaultPassword, f_callback onChange) :
+
+    WifiConfig(const char * name, f_callback onChange) :
       Json::Object(name),
-      _defaultSsid(defaultSsid),
-      _defaultPassword(defaultPassword),
       _onChange(onChange) {
     }
 
@@ -48,6 +47,15 @@ class WifiConfig: public Json::Object {
     void serialize(JsonObject *pObj) {
       (*pObj)[_WIFI_CONFIG_SSID_FIELD_NAME] = ssid;
       (*pObj)[_WIFI_CONFIG_PASSWORD_FIELD_NAME] = password;
+    }
+
+    void setDefaults(const char *newSsid, const char *newPassword) {
+      strlcpy(_defaultSsid, newSsid, WIFI_CONFIG_SSID_BUFFER_SIZE);
+      strlcpy(_defaultPassword, newPassword, WIFI_CONFIG_PASSWORD_BUFFER_SIZE);
+      DEBUG_LIST_START(F("default settings copied"));
+      DEBUG_LIST_VAL(F("ssid"), _defaultSsid);
+      DEBUG_LIST_VAL(F("password"), _defaultPassword);
+      DEBUG_LIST_END;
     }
 
     void setConfig(const char *newSsid, const char *newPassword) {
