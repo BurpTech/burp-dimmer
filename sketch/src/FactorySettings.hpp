@@ -1,5 +1,5 @@
-#ifndef FirstBoot_hpp
-#define FirstBoot_hpp
+#ifndef FactorySettings_hpp
+#define FactorySettings_hpp
 
 #include <EEPROM.h>
 #include <CRC32.h>
@@ -20,7 +20,7 @@
 // The length of the random password
 #define FIRST_BOOT_PASSWORD_LENGTH 8
 
-class FirstBoot {
+class FactorySettings {
   // This structure should never change
   struct Check {
     uint32_t version;
@@ -47,16 +47,16 @@ class FirstBoot {
 
   static void _initialize() {
     // initialize new random values
-    strlcpy(initialValues.ssid, FIRST_BOOT_NAME_PREFIX, WIFI_CONFIG_SSID_BUFFER_SIZE);
-    _fillRandom(initialValues.ssid, sizeof(FIRST_BOOT_NAME_PREFIX) - 1, FIRST_BOOT_NAME_SUFFIX_LENGTH, WIFI_CONFIG_SSID_BUFFER_SIZE);
-    _fillRandom(initialValues.password, 0, FIRST_BOOT_PASSWORD_LENGTH, WIFI_CONFIG_PASSWORD_BUFFER_SIZE);
+    strlcpy(values.ssid, FIRST_BOOT_NAME_PREFIX, WIFI_CONFIG_SSID_BUFFER_SIZE);
+    _fillRandom(values.ssid, sizeof(FIRST_BOOT_NAME_PREFIX) - 1, FIRST_BOOT_NAME_SUFFIX_LENGTH, WIFI_CONFIG_SSID_BUFFER_SIZE);
+    _fillRandom(values.password, 0, FIRST_BOOT_PASSWORD_LENGTH, WIFI_CONFIG_PASSWORD_BUFFER_SIZE);
 
     // Create a new Check structure
     Check check;
     check.version = FIRST_BOOT_VERSION;
     check.checksum = CRC32::calculate(
-      (uint8_t *) &initialValues,
-      sizeof(InitialValues)
+      (uint8_t *) &values,
+      sizeof(Values)
     );
     
     int address = 0;
@@ -71,23 +71,23 @@ class FirstBoot {
 
     // write initial values to EEPROM
     DEBUG_LIST_START(F("initial values are"));
-    DEBUG_LIST_VAL(F("ssid"), initialValues.ssid);
-    DEBUG_LIST_VAL(F("password"), initialValues.password);
+    DEBUG_LIST_VAL(F("ssid"), values.ssid);
+    DEBUG_LIST_VAL(F("password"), values.password);
     DEBUG_LIST_END;
-    EEPROM.put(address, initialValues);
-    address += sizeof(InitialValues);
+    EEPROM.put(address, values);
+    address += sizeof(Values);
 
     //Commit the changes
     EEPROM.commit();
   }
 
   public:
-    struct InitialValues {
+    struct Values {
       char ssid[WIFI_CONFIG_SSID_BUFFER_SIZE];
       char password[WIFI_CONFIG_PASSWORD_BUFFER_SIZE];
     };
 
-    static InitialValues initialValues;
+    static Values values;
 
     // This uses the random function so
     // randomSeed should really be called before
@@ -119,15 +119,15 @@ class FirstBoot {
         // We may have initialized already so read in
         // the initialized values
         DEBUG_VAL(F("Read initialized values from EEPROM"), F("EEPROM address"), address);
-        EEPROM.get(address, initialValues);
-        address += sizeof(InitialValues);
+        EEPROM.get(address, values);
+        address += sizeof(Values);
 
         // We don't trust these values so let's calculate
         // the checksum and compare to the previously
         // read checksum
         uint32_t checksum = CRC32::calculate(
-          (uint8_t *) &initialValues,
-          sizeof(InitialValues)
+          (uint8_t *) &values,
+          sizeof(Values)
         );
         if (checksum != check.checksum) {
           DEBUG_LIST_START(F("Checksum invalid, initializing with new values"));
@@ -137,14 +137,14 @@ class FirstBoot {
           _initialize();
         } else {
           DEBUG_LIST_START(F("Checksum valid, initial values are"));
-          DEBUG_LIST_VAL(F("ssid"), initialValues.ssid);
-          DEBUG_LIST_VAL(F("password"), initialValues.password);
+          DEBUG_LIST_VAL(F("ssid"), values.ssid);
+          DEBUG_LIST_VAL(F("password"), values.password);
           DEBUG_LIST_END;
         }
       }
     }
 };
 
-FirstBoot::InitialValues FirstBoot::initialValues;
+FactorySettings::Values FactorySettings::values;
 
 #endif

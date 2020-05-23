@@ -4,7 +4,7 @@
 
 #include "src/Debug.hpp"
 
-#include "src/FirstBoot.hpp"
+#include "src/FactorySettings.hpp"
 #include "src/Button.hpp"
 #include "src/RotaryEncoder.hpp"
 #include "src/Light.hpp"
@@ -72,7 +72,7 @@ void setup() {
   // every time
   randomSeed(0);
   EEPROM.begin(EEPROM_SIZE);
-  FirstBoot::initialize();
+  FactorySettings::initialize();
   Storage::begin();
   resetButton.setup();
   light.setup();
