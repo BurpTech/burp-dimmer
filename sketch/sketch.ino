@@ -1,8 +1,10 @@
 #include <Arduino.h>
+#include <EEPROM.h>
 #include <functional>
 
 #include "src/Debug.hpp"
 
+#include "src/FirstBoot.hpp"
 #include "src/Button.hpp"
 #include "src/RotaryEncoder.hpp"
 #include "src/Light.hpp"
@@ -16,6 +18,7 @@
 #include "src/Json/Config.hpp"
 #include "src/Json/HttpApi.hpp"
 
+#define EEPROM_SIZE 512
 #define CONFIG_FILE_PATH "/config.json"
 #define HTTP_API_PREFIX "/api/"
 #define RESET_DELAY 1000
@@ -62,6 +65,14 @@ Json::HttpApi api(
 
 void setup() {
   Serial.begin(115200);
+  // TODO: We may not be concerned about
+  // real random values but should probably
+  // change this seed. However at present
+  // this does still generate different values
+  // every time
+  randomSeed(0);
+  EEPROM.begin(EEPROM_SIZE);
+  FirstBoot::initialize();
   Storage::begin();
   resetButton.setup();
   light.setup();

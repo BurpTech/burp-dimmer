@@ -58,6 +58,8 @@ Additionally you will need to install the following:
   - Go to `Tools/Board/Boards Manager...` and install the `esp8266` package
 - ArduinoJson (currently version 6.15.2) - https://arduinojson.org/
   - Go to `Tools/Manage libraries...` and install through the `Library Manager`
+- CRC32 (currently version 2.0.0) - https://github.com/bakercp/CRC32
+  - Go to `Tools/Manage libraries...` and install through the `Library Manager`
 - ESP8266LittleFS plugin for Arduino (currently version 2.6.0)
   - Download from https://github.com/earlephilhower/arduino-esp8266littlefs-plugin/releases
   - Unzip to `~/Documents/Arduino/tools`
