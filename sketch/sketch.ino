@@ -9,8 +9,11 @@
 #include "src/RotaryEncoder.hpp"
 #include "src/Light.hpp"
 #include "src/Storage.hpp"
-#include "src/Network.hpp"
 #include "src/HttpServer.hpp"
+
+#include "src/Wifi/Config.hpp"
+#include "src/Wifi/Ap.hpp"
+#include "src/Wifi/Station.hpp"
 
 #include "src/Json/Allocator.hpp"
 #include "src/Json/File.hpp"
@@ -41,13 +44,30 @@ ICACHE_RAM_ATTR void knobInterruptDispatch();
 void knobOnChange(int direction);
 RotaryEncoder knob(D5, D6, knobInterruptDispatch, knobOnChange);
 
-void networkOnStateChange(Network::State state);
+void apOnStateChange(Wifi::Ap::State state);
+void stationOnStateChange(Wifi::Station::State state);
 void httpServerOnSettings(const char *ssid, const char *password);
+
+Wifi::Config apConfig(
+  WIFI_AP_CONFIG_SECTION,
+  []() {
+    Wifi::Ap::setConfig(apConfig.ssid, apConfig.password);
+    saveConfig();
+  }
+);
+
+Wifi::Config stationConfig(
+  WIFI_STATION_CONFIG_SECTION,
+  []() {
+    Wifi::Station::setConfig(stationConfig.ssid, stationConfig.password);
+    saveConfig();
+  }
+);
 
 Json::File configFile(CONFIG_FILE_PATH);
 Json::Object *configSections[] = {
-  &Network::stationConfig,
-  &Network::apConfig
+  &stationConfig,
+  &apConfig
 };
 Json::Config config(
   Json::Allocator<StaticJsonDocument<256>>::withDoc,
@@ -73,12 +93,14 @@ void setup() {
   randomSeed(0);
   EEPROM.begin(EEPROM_SIZE);
   FactorySettings::initialize();
+  apConfig.setDefaults(FactorySettings::values.ssid, FactorySettings::values.password);
   Storage::begin();
   resetButton.setup();
   light.setup();
   button.setup();
   knob.setup();
-  Network::setup(networkOnStateChange, saveConfig);
+  Wifi::Ap::setup(apOnStateChange);
+  Wifi::Station::setup(stationOnStateChange);
   api.setup();
   HttpServer::setup(httpServerOnSettings);
 
@@ -93,7 +115,8 @@ void loop() {
   resetButton.loop();
   button.loop();
   knob.loop();
-  Network::loop();
+  Wifi::Ap::loop();
+  Wifi::Station::loop();
   HttpServer::loop();
 }
 
@@ -124,7 +147,11 @@ void knobOnChange(int direction) {
   light.changeBrightness(direction);
 }
 
-void networkOnStateChange(Network::State state) {
+void apOnStateChange(Wifi::Ap::State state) {
+  DEBUG_VAL(F("new state"), F("state"), static_cast<int>(state));
+}
+
+void stationOnStateChange(Wifi::Station::State state) {
   DEBUG_VAL(F("new state"), F("state"), static_cast<int>(state));
 }
 
@@ -140,5 +167,5 @@ void httpServerOnSettings(const char *ssid, const char *password) {
   DEBUG_LIST_VAL(F("ssid"), ssid);
   DEBUG_LIST_VAL(F("password"), password);
   DEBUG_LIST_END;
-  Network::stationConfig.setConfig(ssid, password);
+  stationConfig.setConfig(ssid, password);
 }

@@ -6,7 +6,7 @@
 
 #include "Debug.hpp"
 
-#include "WifiConfig.hpp"
+#include "Wifi/Config.hpp"
 
 // The version should change if format of serialized data changes
 #define FIRST_BOOT_VERSION 1
