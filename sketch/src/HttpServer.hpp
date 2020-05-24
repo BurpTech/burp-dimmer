@@ -44,7 +44,7 @@ class HttpServer {
 
       server.begin();
 
-      DEBUG_VAL(F("HTTP Server started"), F("port"), _HTTP_SERVER_PORT);
+      DEBUG_PRINT("HTTP Server started: port: [%d]", _HTTP_SERVER_PORT);
     }
 
     static void loop() {
@@ -68,28 +68,28 @@ class HttpServer {
     }
 
     static void _handleFileRead(String path) {
-      DEBUG_VAL(F("start"), F("path"), path);
+      DEBUG_PRINT("start: path: [%s]", path.c_str());
       if (path.endsWith("/")) {
         path += "index.html";
       }
-      DEBUG_VAL(F("adjusted"), F("path"), path);
+      DEBUG_PRINT("adjusted: path: [%s]", path.c_str());
       String contentType = _getContentType(path);
-      DEBUG_VAL(F("checked content type"), F("contentType"), contentType);
+      DEBUG_PRINT("checked content type: contentType: [%s]", contentType.c_str());
       if (Storage::exists(path)) {
         File file = Storage::open(path, "r");
         size_t sent = server.streamFile(file, contentType);
-        DEBUG_VAL(F("file streamed"), F("sent bytes"), sent);
+        DEBUG_PRINT("file streamed: sent bytes: [%d]", sent);
         file.close();
         return;
       }
-      DEBUG_MSG(F("file not found"));
+      DEBUG_PRINT("file not found");
       server.send(404, "text/plain", "404: Not Found");
     }
 
     static void _handleFileUpload() {
       char ssid[WIFI_CONFIG_SSID_BUFFER_SIZE] = "";
       char password[WIFI_CONFIG_PASSWORD_BUFFER_SIZE] = "";
-      DEBUG_VAL(F("POST data received"), F("raw"), server.arg("plain")); 
+      DEBUG_PRINT("POST data received: raw: %[s]", server.arg("plain").c_str()); 
       if (!server.hasArg("ssid") ||
           !server.hasArg("password") ||
           server.arg("ssid") == NULL ||
@@ -108,24 +108,21 @@ class HttpServer {
       HTTPUpload &upload = server.upload();
       if (upload.status == UPLOAD_FILE_START) {
         String filename = upload.filename;
-        DEBUG_VAL(F("started upload"), F("filename"), filename);
+        DEBUG_PRINT("started upload: filename: [%s]", filename.c_str());
         if (!filename.startsWith("/")) filename = "/" + filename;
-        DEBUG_VAL(F("adjusted filename"), F("filename"), filename);
+        DEBUG_PRINT("adjusted filename: [%s]", filename.c_str());
         _uploadFile = Storage::open(filename, "w");
-        DEBUG_VAL(F("opened file"), F("handle"), _uploadFile);
+        DEBUG_PRINT("opened file: filename: [%s]", filename.c_str());
         filename = String();
       } else if (upload.status == UPLOAD_FILE_WRITE) {
-        DEBUG_LIST_START(F("received chunk"));
-        DEBUG_LIST_VAL(F("bytes"), upload.currentSize);
-        DEBUG_LIST_VAL(F("file handle"), _uploadFile);
-        DEBUG_LIST_END;
+        DEBUG_PRINT("received chunk: bytes: [%d]", upload.currentSize);
         if (_uploadFile) {
           size_t bytesWritten = _uploadFile.write(upload.buf, upload.currentSize);
-          DEBUG_VAL(F("bytes written"), F("bytesWritten"), bytesWritten);
+          DEBUG_PRINT("bytes written: [%d]", bytesWritten);
         }
       } else if (upload.status == UPLOAD_FILE_END) {
         if (_uploadFile) {
-          DEBUG_VAL(F("upload complete"), F("total size"), upload.totalSize);
+          DEBUG_PRINT("upload complete: total size: [%d]", upload.totalSize);
           _uploadFile.close();
           server.sendHeader("Location", "/success.html");
           server.send(303);

@@ -30,12 +30,10 @@ namespace Json {
       }
 
       void serialize() {
-        DEBUG_LIST_START(F("creating JsonDocument"));
-        DEBUG_LIST_VAL(F("section count"), _sectionCount);
-        DEBUG_LIST_END;
+        DEBUG_PRINT("creating JsonDocument: section count: [%d]", _sectionCount);
         _withDoc([=](JsonDocument *pDoc) {
           for (int i = 0; i < _sectionCount; i++) {
-            DEBUG_VAL(F("serializing section"), F("name"), _sections[i]->name);
+            DEBUG_PRINT("serializing section: name: [%s]", _sections[i]->name);
             JsonObject section = pDoc->createNestedObject(_sections[i]->name);
             _sections[i]->serialize(&section);
           }
@@ -44,13 +42,11 @@ namespace Json {
       }
 
       void deserialize() {
-        DEBUG_LIST_START(F("creating JsonDocument"));
-        DEBUG_LIST_VAL(F("section count"), _sectionCount);
-        DEBUG_LIST_END;
+        DEBUG_PRINT("creating JsonDocument: section count: [%d]", _sectionCount);
         _withDoc([=](JsonDocument *pDoc) {
           _pDocument->deserialize(pDoc);
           for (int i = 0; i < _sectionCount; i++) {
-            DEBUG_VAL(F("deserializing section"), F("name"), _sections[i]->name);
+            DEBUG_PRINT("deserializing section: name: [%s]", _sections[i]->name);
             JsonObject section = (*pDoc)[_sections[i]->name];
             _sections[i]->deserialize(&section);
           }

@@ -12,7 +12,7 @@ namespace Json {
   class Allocator {
     public:
       static void withDoc(f_onDoc onDoc) {
-        DEBUG_MSG(F("creating temporary JSON document"));
+        DEBUG_PRINT("creating temporary JSON document");
         T doc;
         onDoc(&doc);
       }

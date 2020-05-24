@@ -40,19 +40,16 @@ namespace Wifi {
         // TODO: Check status and notify state changes
         if (_state == State::IDLE) {
           if (WiFi.softAP(_ssid, _password)) {
-            DEBUG_VAL(F("started AP"), F("IP"), WiFi.softAPIP());
+            DEBUG_PRINT("started AP: IP: [%s]", DEBUG_STR(WiFi.softAPIP()));
             _setState(State::AP_ACTIVE);
           } else {
-            DEBUG_MSG(F("failed to start AP"));
+            DEBUG_PRINT("failed to start AP");
           }
         }
       }
 
       static void setConfig(const char * ssid, const char * password) {
-        DEBUG_LIST_START(F("new config"));
-        DEBUG_LIST_VAL(F("ssid"), ssid);
-        DEBUG_LIST_VAL(F("password"), password);
-        DEBUG_LIST_END;
+        DEBUG_PRINT("new config: ssid: [%s]: password: [%s]", ssid, password);
         _ssid = ssid;
         _password = password;
         // TODO: restart AP?

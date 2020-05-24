@@ -36,10 +36,7 @@ namespace Wifi {
         const char *newSsid = _defaultSsid;
         const char *newPassword = _defaultPassword;
         if (pObj->isNull()) {
-          DEBUG_LIST_START(F("Field is not present, using defaults"));
-          DEBUG_LIST_VAL(F("_defaultSsid"), _defaultSsid);
-          DEBUG_LIST_VAL(F("_defaultPassword"), _defaultPassword);
-          DEBUG_LIST_END;
+          DEBUG_PRINT("Field is not present, using defaults: _defaultSsid: [%s]: _defaultPassword: [%s]", _defaultSsid, _defaultPassword);
         } else {
           newSsid = (*pObj)[_WIFI_CONFIG_SSID_FIELD_NAME] | _defaultSsid;
           newPassword = (*pObj)[_WIFI_CONFIG_PASSWORD_FIELD_NAME] | _defaultPassword;
@@ -55,19 +52,13 @@ namespace Wifi {
       void setDefaults(const char *newSsid, const char *newPassword) {
         strlcpy(_defaultSsid, newSsid, WIFI_CONFIG_SSID_BUFFER_SIZE);
         strlcpy(_defaultPassword, newPassword, WIFI_CONFIG_PASSWORD_BUFFER_SIZE);
-        DEBUG_LIST_START(F("default settings copied"));
-        DEBUG_LIST_VAL(F("ssid"), _defaultSsid);
-        DEBUG_LIST_VAL(F("password"), _defaultPassword);
-        DEBUG_LIST_END;
+        DEBUG_PRINT("default settings copied: ssid: [%s]: password: [%s]", _defaultSsid, _defaultPassword);
       }
 
       void setConfig(const char *newSsid, const char *newPassword) {
         strlcpy(ssid, newSsid, WIFI_CONFIG_SSID_BUFFER_SIZE);
         strlcpy(password, newPassword, WIFI_CONFIG_PASSWORD_BUFFER_SIZE);
-        DEBUG_LIST_START(F("settings copied"));
-        DEBUG_LIST_VAL(F("ssid"), ssid);
-        DEBUG_LIST_VAL(F("password"), password);
-        DEBUG_LIST_END;
+        DEBUG_PRINT("settings copied: ssid: [%s]: password: [%s]", ssid, password);
         // Always notify last as we don't know what will happen
         // in the onChange callback
         _onChange();

@@ -33,51 +33,40 @@ namespace Json {
       }
 
       void setup() {
-        DEBUG_LIST_START(F("adding endpoints"));
-        DEBUG_LIST_VAL(F("endpoint count"), _endPointCount);
-        DEBUG_LIST_END;
+        DEBUG_PRINT("adding endpoints: endpoint count: [%d]", _endPointCount);
         for (int i = 0; i < _endPointCount; i++) {
           Object *endPoint = _endPoints[i];
           const char * name = endPoint->name;
-          DEBUG_VAL(F("adding endpoints for"), F("name"), name);
+          DEBUG_PRINT("adding endpoints for: name: [%s]", name);
           String path = _prefix + String(name);
-          DEBUG_VAL(F("adding GET handler"), F("path"), path);
+          DEBUG_PRINT("adding GET handler: path: [%s]", path.c_str());
           _pServer->on(
             path,
             HTTP_GET,
             [=]() {
-              DEBUG_VAL(F("GET"), F("path"), path);
+              DEBUG_PRINT("GET: path: [%s]", path.c_str());
               _withDoc([=](JsonDocument *pDoc) {
                 JsonObject obj = pDoc->to<JsonObject>();
                 endPoint->serialize(&obj);
                 String json;
                 size_t length = serializeJson(*pDoc, json);
-                DEBUG_LIST_START(F("sending JSON"));
-                DEBUG_LIST_VAL(F("length"), length);
-                DEBUG_LIST_VAL(F("json"), json);
-                DEBUG_LIST_END;
+                DEBUG_PRINT("sending JSON: length: [%d]: json: [%s]", length, json.c_str());
                 _pServer->send(200, "application/json", json);
               });
             }
           );
-          DEBUG_VAL(F("adding POST handler"), F("path"), path);
+          DEBUG_PRINT("adding POST handler: path: [%s]", path.c_str());
           _pServer->on(
             path,
             HTTP_POST,
             [=]() {
               String json = _pServer->arg("plain");
-              DEBUG_LIST_START(F("POST"));
-              DEBUG_LIST_VAL(F("path"), path);
-              DEBUG_LIST_VAL(F("json"), json);
-              DEBUG_LIST_END;
+              DEBUG_PRINT("POST: path: [%s]: json: [%s]", path.c_str(), json.c_str());
               _withDoc([=](JsonDocument *pDoc) {
                 JsonObject obj = pDoc->to<JsonObject>();
                 DeserializationError error = deserializeJson(*pDoc, json);
                 if (error) {
-                  DEBUG_LIST_START(F("Failed to deserialize POST data"));
-                  DEBUG_LIST_VAL(F("error"), error.c_str());
-                  DEBUG_LIST_VAL(F("json"), json);
-                  DEBUG_LIST_END;
+                  DEBUG_PRINT("Failed to deserialize POST data: error: [%s]: json: [%s]", error.c_str(), json.c_str());
                   _pServer->send(400, "text/plain", "400: Invalid Request");
                   return;
                 }

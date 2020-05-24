@@ -121,20 +121,17 @@ void loop() {
 }
 
 void resetButtonOnRelease() {
-  DEBUG_VAL(F("Resetting"), F("delay (ms)"), RESET_DELAY);
+  DEBUG_PRINT("Resetting: delay (ms): [%d]", RESET_DELAY);
   delay(RESET_DELAY);
   ESP.reset();
 }
 
 void lightOnUpdate(bool on, int brightness) {
-  DEBUG_LIST_START(F("new value"));
-  DEBUG_LIST_VAL(F("on"), on);
-  DEBUG_LIST_VAL(F("brightness"), brightness);
-  DEBUG_LIST_END;
+  DEBUG_PRINT("new value: on: [%d]: brightness: [%d]", on, brightness);
 }
 
 void buttonOnRelease() {
-  DEBUG_MSG(F("toggle the light"));
+  DEBUG_PRINT("toggle the light");
   light.toggle();
 }
 
@@ -143,16 +140,16 @@ void knobInterruptDispatch() {
 }
 
 void knobOnChange(int direction) {
-  DEBUG_VAL(F("change the light brightness"), F("change"), direction);
+  DEBUG_PRINT("change the light brightness: change: [%d]", direction);
   light.changeBrightness(direction);
 }
 
 void apOnStateChange(Wifi::Ap::State state) {
-  DEBUG_VAL(F("new state"), F("state"), static_cast<int>(state));
+  DEBUG_PRINT("new state: state: [%d]", static_cast<int>(state));
 }
 
 void stationOnStateChange(Wifi::Station::State state) {
-  DEBUG_VAL(F("new state"), F("state"), static_cast<int>(state));
+  DEBUG_PRINT("new state: state: [%d]", static_cast<int>(state));
 }
 
 void saveConfig() {
@@ -163,9 +160,6 @@ void saveConfig() {
 }
 
 void httpServerOnSettings(const char *ssid, const char *password) {
-  DEBUG_LIST_START(F("new settings"));
-  DEBUG_LIST_VAL(F("ssid"), ssid);
-  DEBUG_LIST_VAL(F("password"), password);
-  DEBUG_LIST_END;
+  DEBUG_PRINT("new settings: ssid: [%s]: password: [%s]", ssid, password);
   stationConfig.setConfig(ssid, password);
 }

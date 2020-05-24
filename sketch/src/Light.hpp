@@ -70,7 +70,7 @@ class Light {
         digitalWrite(_pin, LOW);
       } else {
         int pwmLevel = _LIGHT_PWM_LEVEL(_brightness);
-        DEBUG_VAL(F("setting output"), F("pwmLevel"), pwmLevel);
+        DEBUG_PRINT("setting output: pwmLevel: [%d]", pwmLevel);
         analogWrite(_pin, pwmLevel);
       }
 

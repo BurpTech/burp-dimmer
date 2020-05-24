@@ -40,10 +40,7 @@ namespace Wifi {
       }
 
       static void setConfig(const char * ssid, const char * password) {
-        DEBUG_LIST_START(F("new config"));
-        DEBUG_LIST_VAL(F("ssid"), ssid);
-        DEBUG_LIST_VAL(F("password"), password);
-        DEBUG_LIST_END;
+        DEBUG_PRINT("new config: ssid: [%s]: password: [%s]", ssid, password);
         _ssid = ssid;
         _password = password;
         // TODO: restart station?
