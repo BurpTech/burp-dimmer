@@ -70,6 +70,8 @@ The WiFi will be disconnected and no Access Point will be started.
 
 When the WiFi is turned back on it will return to the previous mode (either Normal or Access Point)
 
+NB. When the WiFi is off, the device will not be able to communicate with any other device and as such will revert to its default behaviour of only controlling its own output light.
+
 ## Configuration portal
 
 ## API
