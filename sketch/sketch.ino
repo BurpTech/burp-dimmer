@@ -40,14 +40,14 @@ namespace Blinks {
   };
 };
 
-namespace ResetDelay {
+namespace ResetLongPress {
   enum {
     RESET = 0,
     QUERY = 2000,
-    ACCESS_POINT = 5000,
-    WPS_CONFIG = 8000,
-    WIFI = 11000,
-    FACTORY_RESTORE = 14000
+    ACCESS_POINT = 3000,
+    WPS_CONFIG = 3000,
+    WIFI = 3000,
+    FACTORY_RESTORE = 3000
   };
 };
 
@@ -66,54 +66,54 @@ Button button(D7, BUTTON_DEBOUNCE_DELAY, buttonOnRelease);
 
 void flashStatus(unsigned int count);
 void reset();
-const Button::Delay resetDelay = {
-  ResetDelay::RESET,
+const Button::LongPress resetLongPress = {
+  ResetLongPress::RESET,
   NULL,
   reset
 };
 void queryNetworkMode();
-const Button::Delay resetQueryDelay = {
-  ResetDelay::QUERY,
+const Button::LongPress resetQueryLongPress = {
+  ResetLongPress::QUERY,
   std::bind(&flashStatus, Blinks::QUERY),
   queryNetworkMode
 };
 void toggleAccessPointMode();
-const Button::Delay resetAccessPointDelay = {
-  ResetDelay::ACCESS_POINT,
+const Button::LongPress resetAccessPointLongPress = {
+  ResetLongPress::ACCESS_POINT,
   std::bind(&flashStatus, Blinks::ACCESS_POINT),
   toggleAccessPointMode
 };
 void startWpsConfig();
-const Button::Delay resetWpsConfigDelay = {
-  ResetDelay::WPS_CONFIG,
+const Button::LongPress resetWpsConfigLongPress = {
+  ResetLongPress::WPS_CONFIG,
   std::bind(&flashStatus, Blinks::WPS_CONFIG),
   startWpsConfig
 };
 void toggleWifi();
-const Button::Delay resetWifiDelay = {
-  ResetDelay::WIFI,
+const Button::LongPress resetWifiLongPress = {
+  ResetLongPress::WIFI,
   std::bind(&flashStatus, Blinks::WIFI),
   toggleWifi
 };
 void restoreFactorySettings();
-const Button::Delay resetRestoreDelay = {
-  ResetDelay::FACTORY_RESTORE,
+const Button::LongPress resetRestoreLongPress = {
+  ResetLongPress::FACTORY_RESTORE,
   []() {
     flashStatus(Blinks::FACTORY_RESTORE);
     restoreFactorySettings();
   },
   NULL
 };
-const Button::Delay * resetButtonParam[] = {
-  &resetDelay,
-  &resetQueryDelay,
-  &resetAccessPointDelay,
-  &resetWpsConfigDelay,
-  &resetWifiDelay,
-  &resetRestoreDelay,
+const Button::LongPress * resetButtonLongPresses[] = {
+  &resetLongPress,
+  &resetQueryLongPress,
+  &resetAccessPointLongPress,
+  &resetWpsConfigLongPress,
+  &resetWifiLongPress,
+  &resetRestoreLongPress,
   NULL
 };
-Button resetButton(D2, BUTTON_DEBOUNCE_DELAY, resetButtonParam);
+Button resetButton(D2, BUTTON_DEBOUNCE_DELAY, resetButtonLongPresses);
 
 ICACHE_RAM_ATTR void knobInterruptDispatch();
 void knobOnChange(int direction);
@@ -203,15 +203,7 @@ void reset() {
 }
 
 void flashStatus(unsigned int count) {
-  static const Blinker::Pattern start = {0, BLINK_LENGTH};
-  static const Blinker::Pattern other = {BLINK_LENGTH, BLINK_LENGTH};
-  DEBUG_PRINT("count: [%u]", count);
-  const Blinker::Pattern * pattern[count + 1];
-  for (int i = 0; i < count; i++) {
-    pattern[i] = i ? &other : &start;
-  }
-  pattern[count] = NULL;
-  statusLight.blink(pattern);
+  statusLight.blink(count, BLINK_LENGTH);
 }
 
 void queryNetworkMode() {

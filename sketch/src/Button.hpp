@@ -8,11 +8,24 @@ class Button {
   public:
     using f_callback = std::function<void()>;
 
-    struct Delay {
+    struct LongPress {
       unsigned long delay;
-      f_callback onDelay;
+      f_callback onPress;
       f_callback onRelease;
     };
+
+    Button(
+      int pin,
+      unsigned long debounceDelay,
+      unsigned long delay,
+      f_callback onPress,
+      f_callback onRelease
+    ) :
+      _pin(pin),
+      _debounceDelay(debounceDelay),
+      _longPresses(_ppSingle),
+      _single({delay, onPress, onRelease}) {
+    }
 
     Button(
       int pin,
@@ -20,10 +33,16 @@ class Button {
       f_callback onPress,
       f_callback onRelease
     ) :
-      _pin(pin),
-      _debounceDelay(debounceDelay),
-      _delays(_singleDelays),
-      _singleDelay({0, onPress, onRelease}) {
+      Button(pin, debounceDelay, 0, onPress, onRelease) {
+    }
+
+    Button(
+      int pin,
+      unsigned long debounceDelay,
+      unsigned long delay,
+      f_callback onRelease
+    ) :
+      Button(pin, debounceDelay, delay, NULL, onRelease) {
     }
 
     Button(
@@ -31,20 +50,17 @@ class Button {
       unsigned long debounceDelay,
       f_callback onRelease
     ) :
-      _pin(pin),
-      _debounceDelay(debounceDelay),
-      _delays(_singleDelays),
-      _singleDelay({0, NULL, onRelease}) {
+      Button(pin, debounceDelay, NULL, onRelease) {
     }
 
     Button(
       int pin,
       unsigned long debounceDelay,
-      const Delay ** delays
+      const LongPress ** longPresses
     ) :
       _pin(pin),
       _debounceDelay(debounceDelay),
-      _delays(delays) {
+      _longPresses(longPresses) {
     }
 
     void setup() {
@@ -65,13 +81,13 @@ class Button {
         if (reading != _state) {
           _state = reading;
           if (_state == LOW) {
-            // start long hold timer and
+            // start long press timer and
             // reset the current callback
-            _delayStart = now;
-            _currentDelay = _delays;
+            _start = now;
+            _currentLongPress = _longPresses;
           } else {
             // call previous release callback
-            f_callback cb = (*_lastDelay)->onRelease;
+            f_callback cb = (*_lastLongPress)->onRelease;
             if (cb) {
               cb();
             }
@@ -80,11 +96,12 @@ class Button {
       }
 
       if (_state == LOW) {
-        // move to the correct delay
-        while (*_currentDelay && (now - _delayStart) > (*_currentDelay)->delay) {
-          f_callback cb = (*_currentDelay)->onDelay;
-          _lastDelay = _currentDelay;
-          _currentDelay++;
+        // move to the correct long press
+        while (*_currentLongPress && (now - _start) > (*_currentLongPress)->delay) {
+          _start += (*_currentLongPress)->delay;
+          f_callback cb = (*_currentLongPress)->onPress;
+          _lastLongPress = _currentLongPress;
+          _currentLongPress++;
           if (cb) {
             cb();
           }
@@ -95,17 +112,17 @@ class Button {
   private:
     int _pin;
     unsigned long _debounceDelay;
-    const Delay ** _delays;
-    const Delay ** _currentDelay = NULL;
-    const Delay ** _lastDelay = NULL;
-    unsigned long _delayStart = 0;
+    const LongPress ** _longPresses;
+    const LongPress ** _currentLongPress = NULL;
+    const LongPress ** _lastLongPress = NULL;
+    unsigned long _start = 0;
     unsigned long _lastDebounceTime = 0;
     int _state = HIGH;
     int _lastState = HIGH;
     bool _notified = false;
-    Delay _singleDelay;
-    const Delay * _singleDelays[2] = {
-      &_singleDelay,
+    LongPress _single;
+    const LongPress * _ppSingle[2] = {
+      &_single,
       NULL
     };
 };

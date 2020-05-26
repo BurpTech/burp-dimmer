@@ -7,11 +7,6 @@
 
 class Blinker {
   public:
-    struct Pattern {
-      unsigned long off;
-      unsigned long on;
-    };
-
     Blinker(int pin, int on) :
       _pin(pin),
       _on(on) {
@@ -19,25 +14,32 @@ class Blinker {
 
     void setup() {
       pinMode(_pin, OUTPUT);
-      _set(State::OFF);
+      _set(_OFF);
+    }
+
+    void blink(size_t count, unsigned long delay) {
+      blink(count, delay, delay);
     }
 
     // Blinking is synchronous so we don't interrupt it
-    void blink(const Pattern ** pattern) {
-      while (*pattern) {
-        _set(State::OFF);
-        delay((*pattern)->off);
-        _set(State::ON);
-        delay((*pattern)->on);
-        pattern++;
+    void blink(size_t count, unsigned long on, unsigned long off) {
+      if (count) {
+        _set(_ON);
+        delay(on);
+        for (int i = 1; i < count; i++) {
+          _set(_OFF);
+          delay(off);
+          _set(_ON);
+          delay(on);
+        }
+        _set(_OFF);
       }
-      _set(State::OFF);
     }
 
   private:
     enum State {
-      ON = true,
-      OFF = false
+      _ON = true,
+      _OFF = false
     };
 
     int _pin;
