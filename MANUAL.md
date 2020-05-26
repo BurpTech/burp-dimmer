@@ -27,14 +27,19 @@ Increasing the brightness from off will turn the output light on and increment f
 #### Reset button functions
 
 - Press to reboot the device
-- Press and hold for 2 seconds to toggle the Access Point network mode
-  - The status LED will flash once
-- Press and hold for 5 seconds to start WPS Config network mode
+- Press and hold for 2 seconds to query the current network mode
+  - The status LED will flash once and after the button is released it will flash the following numbers of times
+    - 1 - Normal mode
+    - 2 - Access point mode
+    - 4 - Off
+- Press and hold for 5 seconds to toggle the Access Point network mode
   - The status LED will flash twice
-- Press and hold for 10 seconds to toggle the WiFi on/off
+- Press and hold for 10 seconds to start WPS Config network mode
   - The status LED will flash 3 times
-- Press and hold for 20 seconds to restore factory settings
+- Press and hold for 20 seconds to toggle the WiFi on/off
   - The status LED will flash 4 times
+- Press and hold for 30 seconds to restore factory settings
+  - The status LED will flash 5 times
 
 ## Network modes
 
@@ -67,6 +72,8 @@ The device will attempt to retrieve WiFi configuration using WPS. After starting
 Once the configuration has been retrieved it will be applied and the device will change to Normal mode.
 
 If the WPS Config mode times out (after N seconds) the device will return to the previous mode (one of Normal, Access Point or Off).
+
+NB. WPS Config mode blocks the operation of the device, so it will not be possible to do anything else with it until it completes or times out.
 
 ### Off
 
