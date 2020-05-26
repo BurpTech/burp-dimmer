@@ -73,7 +73,7 @@ Once the configuration has been retrieved it will be applied and the device will
 
 If the WPS Config mode times out (after N seconds) the device will return to the previous mode (one of Normal, Access Point or Off).
 
-NB. WPS Config mode blocks the operation of the device, so it will not be possible to do anything else with it until it completes or times out.
+**NB. WPS Config mode blocks the operation of the device, so it will not be possible to do anything else with it until it completes or times out.**
 
 ### Off
 
@@ -81,7 +81,7 @@ The WiFi will be disconnected and no Access Point will be started.
 
 When the WiFi is turned back on it will return to the previous mode (either Normal or Access Point)
 
-NB. When the WiFi is off, the device will not be able to communicate with any other device and as such will revert to its default behaviour of only controlling its own output light.
+**NB. When the WiFi is off, the device will not be able to communicate with any other device and as such will revert to its default behaviour of only controlling its own output light.**
 
 ## Configuration portal
 
