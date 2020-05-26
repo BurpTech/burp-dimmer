@@ -56,6 +56,10 @@ The device will not connect to any configured WiFi network but will instead star
 
 When the Access Point is toggled off it will return to Normal mode.
 
+The Access Point can be configured to timeout after a fixed period. When this happens it will return to the previous mode (either Off or Normal).
+
+The Access Point can also be configured to not timeout if there are clients connected (the timer will restart when the last client disconnects).
+
 ### WPS Config
 
 The device will attempt to retrieve WiFi configuration using WPS. After starting this mode it is ncessary to press the WPS button on the Access Point you wish to connect to.
