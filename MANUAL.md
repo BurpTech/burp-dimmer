@@ -28,7 +28,7 @@ Increasing the brightness from off will turn the output light on and increment f
 
 - Press to reboot the device
 - Press and hold for 2 seconds to query the current network mode
-  - The status LED will flash once and after the button is released it will flash the following numbers of times
+  - The status LED will flash once and after the button is released it will flash the following additional times
     - 1 - Normal mode
     - 2 - Access point mode
     - 4 - Off
