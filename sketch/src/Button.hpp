@@ -4,14 +4,6 @@
 #include <Arduino.h>
 #include <functional>
 
-#define BUTTON_ON_RELEASE_PARAM(NAME,ON_RELEASE)\
-const Button::Delay __Button_##NAME##_delay = {\
-  0,\
-  NULL,\
-  ON_RELEASE\
-};\
-const Button::Delay * NAME[] = {&__Button_##NAME##_delay, NULL}
-
 class Button {
   public:
     using f_callback = std::function<void()>;
@@ -21,6 +13,29 @@ class Button {
       f_callback onDelay;
       f_callback onRelease;
     };
+
+    Button(
+      int pin,
+      unsigned long debounceDelay,
+      f_callback onPress,
+      f_callback onRelease
+    ) :
+      _pin(pin),
+      _debounceDelay(debounceDelay),
+      _delays(_singleDelays),
+      _singleDelay({0, onPress, onRelease}) {
+    }
+
+    Button(
+      int pin,
+      unsigned long debounceDelay,
+      f_callback onRelease
+    ) :
+      _pin(pin),
+      _debounceDelay(debounceDelay),
+      _delays(_singleDelays),
+      _singleDelay({0, NULL, onRelease}) {
+    }
 
     Button(
       int pin,
@@ -88,6 +103,11 @@ class Button {
     int _state = HIGH;
     int _lastState = HIGH;
     bool _notified = false;
+    Delay _singleDelay;
+    const Delay * _singleDelays[2] = {
+      &_singleDelay,
+      NULL
+    };
 };
 
 #endif

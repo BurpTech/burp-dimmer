@@ -62,8 +62,7 @@ Light light(D1, lightOnUpdate);
 Blinker statusLight(D4, LOW);
 
 void buttonOnRelease();
-BUTTON_ON_RELEASE_PARAM(buttonParam, buttonOnRelease);
-Button button(D7, BUTTON_DEBOUNCE_DELAY, buttonParam);
+Button button(D7, BUTTON_DEBOUNCE_DELAY, buttonOnRelease);
 
 void flashStatus(unsigned int count);
 void reset();
