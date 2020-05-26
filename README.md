@@ -1,4 +1,4 @@
-# smart-dimmer
+# burp-dimmer
 
 **IN DEVELOPMENT**
 
