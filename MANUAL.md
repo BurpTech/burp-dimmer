@@ -27,10 +27,10 @@ Increasing the brightness from off will turn the output light on and increment f
 #### Reset button functions
 
 - Press to reboot the device
-- Press and hold for 2 seconds to query the current network mode
+- Press and hold for 2 seconds to query the current network status
   - The status LED will flash once and after the button is released it will flash the following additional times
-    - 1 - Normal mode
-    - 2 - Access point mode
+    - 1 - Connected to configured WiFi network
+    - 2 - Access point started
     - 4 - Off
 - Press and hold for 5 seconds to toggle the Access Point network mode
   - The status LED will flash twice
