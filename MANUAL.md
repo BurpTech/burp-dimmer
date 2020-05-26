@@ -26,7 +26,7 @@ Increasing the brightness from off will turn the output light on and increment f
 
 #### Reset button functions
 
-- Press to reboot the device
+- Press and release to reboot the device
 - Press and hold for 2 seconds to query the current network mode
   - The status LED will flash once and after the button is released it will flash the following additional times
     - 1 - Normal
