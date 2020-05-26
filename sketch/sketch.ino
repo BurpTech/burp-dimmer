@@ -7,6 +7,7 @@
 #include "src/FactorySettings.hpp"
 #include "src/Button.hpp"
 #include "src/RotaryEncoder.hpp"
+#include "src/Blinker.hpp"
 #include "src/Light.hpp"
 #include "src/Storage.hpp"
 #include "src/HttpServer.hpp"
@@ -25,6 +26,30 @@
 #define CONFIG_FILE_PATH "/config.json"
 #define HTTP_API_PREFIX "/api/"
 #define RESET_DELAY 1000
+#define BUTTON_DEBOUNCE_DELAY 50
+
+#define BLINK_LENGTH 200
+
+namespace Blinks {
+  enum {
+    QUERY = 1,
+    ACCESS_POINT,
+    WPS_CONFIG,
+    WIFI,
+    FACTORY_RESTORE,
+  };
+};
+
+namespace ResetDelay {
+  enum {
+    RESET = 0,
+    QUERY = 2000,
+    ACCESS_POINT = 5000,
+    WPS_CONFIG = 8000,
+    WIFI = 11000,
+    FACTORY_RESTORE = 14000
+  };
+};
 
 #define POINTER_ARRAY_LENGTH(ARRAY) (sizeof(ARRAY)/sizeof(void*))
 
@@ -34,11 +59,62 @@ void saveConfig();
 void lightOnUpdate(bool on, int brightness);
 Light light(D1, lightOnUpdate);
 
-void buttonOnRelease();
-Button button(D7, buttonOnRelease);
+Blinker statusLight(D4, LOW);
 
-void resetButtonOnRelease();
-Button resetButton(D2, resetButtonOnRelease);
+void buttonOnRelease();
+BUTTON_ON_RELEASE_PARAM(buttonParam, buttonOnRelease);
+Button button(D7, BUTTON_DEBOUNCE_DELAY, buttonParam);
+
+void flashStatus(unsigned int count);
+void reset();
+const Button::Delay resetDelay = {
+  ResetDelay::RESET,
+  NULL,
+  reset
+};
+void queryNetworkMode();
+const Button::Delay resetQueryDelay = {
+  ResetDelay::QUERY,
+  std::bind(&flashStatus, Blinks::QUERY),
+  queryNetworkMode
+};
+void toggleAccessPointMode();
+const Button::Delay resetAccessPointDelay = {
+  ResetDelay::ACCESS_POINT,
+  std::bind(&flashStatus, Blinks::ACCESS_POINT),
+  toggleAccessPointMode
+};
+void startWpsConfig();
+const Button::Delay resetWpsConfigDelay = {
+  ResetDelay::WPS_CONFIG,
+  std::bind(&flashStatus, Blinks::WPS_CONFIG),
+  startWpsConfig
+};
+void toggleWifi();
+const Button::Delay resetWifiDelay = {
+  ResetDelay::WIFI,
+  std::bind(&flashStatus, Blinks::WIFI),
+  toggleWifi
+};
+void restoreFactorySettings();
+const Button::Delay resetRestoreDelay = {
+  ResetDelay::FACTORY_RESTORE,
+  []() {
+    flashStatus(Blinks::FACTORY_RESTORE);
+    restoreFactorySettings();
+  },
+  NULL
+};
+const Button::Delay * resetButtonParam[] = {
+  &resetDelay,
+  &resetQueryDelay,
+  &resetAccessPointDelay,
+  &resetWpsConfigDelay,
+  &resetWifiDelay,
+  &resetRestoreDelay,
+  NULL
+};
+Button resetButton(D2, BUTTON_DEBOUNCE_DELAY, resetButtonParam);
 
 ICACHE_RAM_ATTR void knobInterruptDispatch();
 void knobOnChange(int direction);
@@ -96,6 +172,7 @@ void setup() {
   apConfig.setDefaults(FactorySettings::values.ssid, FactorySettings::values.password);
   Storage::begin();
   resetButton.setup();
+  statusLight.setup();
   light.setup();
   button.setup();
   knob.setup();
@@ -120,10 +197,42 @@ void loop() {
   HttpServer::loop();
 }
 
-void resetButtonOnRelease() {
+void reset() {
   DEBUG_PRINT("Resetting: delay (ms): [%d]", RESET_DELAY);
   delay(RESET_DELAY);
   ESP.reset();
+}
+
+void flashStatus(unsigned int count) {
+  static const Blinker::Pattern start = {0, BLINK_LENGTH};
+  static const Blinker::Pattern other = {BLINK_LENGTH, BLINK_LENGTH};
+  DEBUG_PRINT("count: [%u]", count);
+  const Blinker::Pattern * pattern[count + 1];
+  for (int i = 0; i < count; i++) {
+    pattern[i] = i ? &other : &start;
+  }
+  pattern[count] = NULL;
+  statusLight.blink(pattern);
+}
+
+void queryNetworkMode() {
+  DEBUG_PRINT("TODO");
+}
+
+void toggleAccessPointMode() {
+  DEBUG_PRINT("TODO");
+}
+
+void startWpsConfig() {
+  DEBUG_PRINT("TODO");
+}
+
+void toggleWifi() {
+  DEBUG_PRINT("TODO");
+}
+
+void restoreFactorySettings() {
+  DEBUG_PRINT("TODO");
 }
 
 void lightOnUpdate(bool on, int brightness) {
