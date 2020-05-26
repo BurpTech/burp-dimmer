@@ -9,7 +9,7 @@
 
 ### Outputs
 
-- Status LED
+- Status LED (WEMOS built-in LED in prototype)
 - Output light (LED in prototype)
 
 ### Usage
