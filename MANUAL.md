@@ -48,7 +48,7 @@ If no WiFi network is configured then it will start the configured Access Point.
 
 The device will connect to the configured WiFi network.
 
-If the device fails to connect to the configured WiFi network then it will start an Access Point with configured settings, after the configured timeout if enabled.
+If the device fails to connect to the configured WiFi network then it will start an Access Point, with the configured settings, after the configured timeout (if enabled).
 
 ### Access Point
 
