@@ -2,25 +2,37 @@
 #include <EEPROM.h>
 #include <functional>
 
-#include "src/Debug.hpp"
+#ifndef APPL_NAME
+#define APPL_NAME application
+#endif
 
-#include "src/FactorySettings.hpp"
-#include "src/Button.hpp"
-#include "src/RotaryEncoder.hpp"
-#include "src/Blinker.hpp"
-#include "src/Light.hpp"
-#include "src/Storage.hpp"
-#include "src/HttpServer.hpp"
+#ifndef VERSION
+#define VERSION development
+#endif
 
-#include "src/Wifi/Config.hpp"
-#include "src/Wifi/Ap.hpp"
-#include "src/Wifi/Station.hpp"
+#ifndef BAUDRATE
+#define BAUDRATE 9600
+#endif
 
-#include "src/Json/Allocator.hpp"
-#include "src/Json/File.hpp"
-#include "src/Json/Object.hpp"
-#include "src/Json/Config.hpp"
-#include "src/Json/HttpApi.hpp"
+#include "Debug.hpp"
+
+#include "FactorySettings.hpp"
+#include "Button.hpp"
+#include "RotaryEncoder.hpp"
+#include "Blinker.hpp"
+#include "Light.hpp"
+#include "Storage.hpp"
+#include "HttpServer.hpp"
+
+#include "Wifi/Config.hpp"
+#include "Wifi/Ap.hpp"
+#include "Wifi/Station.hpp"
+
+#include "Json/Allocator.hpp"
+#include "Json/File.hpp"
+#include "Json/Object.hpp"
+#include "Json/Config.hpp"
+#include "Json/HttpApi.hpp"
 
 #define EEPROM_SIZE 512
 #define CONFIG_FILE_PATH "/config.json"
@@ -51,7 +63,8 @@ namespace ResetLongPress {
   };
 };
 
-#define POINTER_ARRAY_LENGTH(ARRAY) (sizeof(ARRAY)/sizeof(void*))
+#define _STR(VAL) #VAL
+#define STR(VAL) _STR(VAL)
 
 bool setupComplete = false;
 void saveConfig();
@@ -142,29 +155,29 @@ Wifi::Config stationConfig(
 Json::File configFile(CONFIG_FILE_PATH);
 Json::Object *configSections[] = {
   &stationConfig,
-  &apConfig
+  &apConfig,
+  NULL,
 };
 Json::Config config(
   Json::Allocator<StaticJsonDocument<256>>::withDoc,
-  POINTER_ARRAY_LENGTH(configSections),
   configSections,
   &configFile
 );
 Json::HttpApi api(
   HTTP_API_PREFIX,
   Json::Allocator<StaticJsonDocument<256>>::withDoc,
-  POINTER_ARRAY_LENGTH(configSections),
   configSections,
   &HttpServer::server
 );
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(BAUDRATE);
   // TODO: We may not be concerned about
   // real random values but should probably
   // change this seed. However at present
   // this does still generate different values
   // every time
+  Serial.println(STR(APPL_NAME) " : " STR(VERSION));
   randomSeed(0);
   EEPROM.begin(EEPROM_SIZE);
   FactorySettings::initialize();

@@ -89,7 +89,7 @@ class HttpServer {
     static void _handleFileUpload() {
       char ssid[WIFI_CONFIG_SSID_BUFFER_SIZE] = "";
       char password[WIFI_CONFIG_PASSWORD_BUFFER_SIZE] = "";
-      DEBUG_PRINT("POST data received: raw: %[s]", server.arg("plain").c_str()); 
+      DEBUG_PRINT("POST data received: raw: [%s]", server.arg("plain").c_str()); 
       if (!server.hasArg("ssid") ||
           !server.hasArg("password") ||
           server.arg("ssid") == NULL ||

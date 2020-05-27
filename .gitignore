@@ -1,9 +1,1 @@
-# macOS stuff
-.DS_Store
-
-# local configuration
-/local.mk
-
-# compiled output
-*.elf
-*.bin
+.pio

@@ -26,7 +26,7 @@ class Blinker {
       if (count) {
         _set(_ON);
         delay(on);
-        for (int i = 1; i < count; i++) {
+        for (size_t i = 1; i < count; i++) {
           _set(_OFF);
           delay(off);
           _set(_ON);

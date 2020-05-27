@@ -42,7 +42,7 @@ class Button {
       unsigned long delay,
       f_callback onRelease
     ) :
-      Button(pin, debounceDelay, delay, NULL, onRelease) {
+      Button(pin, debounceDelay, delay, nullptr, onRelease) {
     }
 
     Button(
@@ -50,7 +50,7 @@ class Button {
       unsigned long debounceDelay,
       f_callback onRelease
     ) :
-      Button(pin, debounceDelay, NULL, onRelease) {
+      Button(pin, debounceDelay, nullptr, onRelease) {
     }
 
     Button(
@@ -68,8 +68,6 @@ class Button {
     }
 
     void loop() {
-      bool notify = false;
-      bool longNotify = false;
       int reading = digitalRead(_pin);
       if (reading != _lastState) {
         _lastDebounceTime = millis();

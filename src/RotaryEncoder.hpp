@@ -24,8 +24,8 @@ class RotaryEncoder {
 
   int _pinA;
   int _pinB;
-  volatile unsigned int _pinAState;
-  volatile unsigned int _pinBState;
+  volatile int _pinAState;
+  volatile int _pinBState;
   volatile State _buffer[_ROTARY_ENCODER_BUFFER_SIZE];
   volatile unsigned int _writePos;
   unsigned int _readPos;

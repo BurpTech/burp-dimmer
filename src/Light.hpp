@@ -1,6 +1,8 @@
 #ifndef Light_hpp
 #define Light_hpp
 
+#include <Arduino.h>
+
 #include "Debug.hpp"
 
 #define LIGHT_MAX_BRIGHTNESS 25
@@ -12,19 +14,14 @@
 #define _LIGHT_PWM_LEVEL(BRIGHTNESS) (int((float(BRIGHTNESS) / float(LIGHT_MAX_BRIGHTNESS)) * 255))
 
 class Light {
-  using f_onUpdate = std::function<void(bool on, int brightness)>;
-
-  int _pin;
-  bool _on;
-  int _brightness;
-  f_onUpdate _onUpdate;
-
   public:
+    using f_onUpdate = std::function<void(bool on, int brightness)>;
+
     Light(int pin, f_onUpdate onUpdate) :
       _pin(pin),
-      _onUpdate(onUpdate),
+      _on(_LIGHT_DEFAULT_ON),
       _brightness(_LIGHT_DEFAULT_BRIGHTNESS),
-      _on(_LIGHT_DEFAULT_ON) {
+      _onUpdate(onUpdate) {
     }
 
     void setup() {
@@ -60,6 +57,11 @@ class Light {
     }
 
   private:
+    int _pin;
+    bool _on;
+    int _brightness;
+    f_onUpdate _onUpdate;
+
     void _update() {
       if (_brightness == 0) {
         _on = false;

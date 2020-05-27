@@ -3,24 +3,24 @@
 
 #include "Debug.hpp"
 
-#include <LittleFS.h>
+#include <FS.h>
 
 class Storage {
   public:
     static void begin() {
-      LittleFS.begin();
+      SPIFFS.begin();
     }
 
     static File open(String path, const char *mode) {
-      return LittleFS.open(path, mode);
+      return SPIFFS.open(path, mode);
     }
 
     static bool exists(String path) {
-      return LittleFS.exists(path);
+      return SPIFFS.exists(path);
     }
 
     static bool remove(String path) {
-      return LittleFS.remove(path);
+      return SPIFFS.remove(path);
     }
 };
 

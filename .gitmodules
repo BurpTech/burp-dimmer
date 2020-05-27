@@ -1,0 +1,6 @@
+[submodule "lib/CRC32"]
+	path = lib/CRC32
+	url = https://github.com/bakercp/CRC32.git
+[submodule "lib/ArduinoJson"]
+	path = lib/ArduinoJson
+	url = https://github.com/bblanchon/ArduinoJson.git

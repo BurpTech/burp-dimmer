@@ -11,31 +11,24 @@
 
 namespace Json {
   class HttpApi {
-    String _prefix;
-    const f_withDoc _withDoc;
-    const unsigned int _endPointCount;
-    Object **_endPoints;
-    ESP8266WebServer *_pServer;
-
     public:
       HttpApi(
         String prefix,
         const f_withDoc withDoc,
-        const unsigned int endPointCount,
         Object **endPoints,
         ESP8266WebServer *pServer
       ) :
         _prefix(prefix),
         _withDoc(withDoc),
-        _endPointCount(endPointCount),
         _endPoints(endPoints),
         _pServer(pServer) {
       }
 
       void setup() {
-        DEBUG_PRINT("adding endpoints: endpoint count: [%d]", _endPointCount);
-        for (int i = 0; i < _endPointCount; i++) {
-          Object *endPoint = _endPoints[i];
+        DEBUG_PRINT("adding endpoints");
+        Object ** _currentEndPoint = _endPoints;
+        while (*_currentEndPoint) {
+          Object *endPoint = (*_currentEndPoint);
           const char * name = endPoint->name;
           DEBUG_PRINT("adding endpoints for: name: [%s]", name);
           String path = _prefix + String(name);
@@ -75,8 +68,15 @@ namespace Json {
               });
             }
           );
+          _currentEndPoint++;
         }
       }
+
+    private:
+      String _prefix;
+      const f_withDoc _withDoc;
+      Object **_endPoints;
+      ESP8266WebServer *_pServer;
   };
 };
 
