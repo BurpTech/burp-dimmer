@@ -4,6 +4,8 @@
 
 ESP8266 smart dimmer implementation
 
+**NB. Clone recursively to get submodules**
+
 **NB. A note on my `Wemos D1 mini pro` board**
 
 My Wemos board seems to not be to spec as it only has 4MB flash memory instead of 16MB. As such I program it as a `d1_mini` platformio. If your board is to the correct spec then you may be able to use the `d1_mini_pro` option.
