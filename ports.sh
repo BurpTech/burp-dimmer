@@ -83,7 +83,7 @@ start() {
     echo "$FULL_COMMAND"
     $FULL_COMMAND >>$LOG_FILE 2>&1 &
     local CHILD=$!
-    echo "${LOCAL_PORTS[$i]} $TASK started, logging to $LOG_FILE"
+    echo "$i - ${LOCAL_PORTS[$i]} $TASK started, logging to $LOG_FILE"
     CHILDREN+=($CHILD)
     RUNNING="$RUNNING $CHILD"
   done
@@ -103,9 +103,9 @@ check() {
         wait $CHILD
         local STATUS=$?
         if (( STATUS == 0 )); then
-          echo "${LOCAL_PORTS[$i]} $TASK completed successfully"
+          echo "$i - ${LOCAL_PORTS[$i]} $TASK completed successfully"
         else 
-          echo "${LOCAL_PORTS[$i]} $TASK failed with exit code $STATUS"
+          echo "$i - ${LOCAL_PORTS[$i]} $TASK failed with exit code $STATUS"
           EXIT_CODE=1
         fi
       fi
