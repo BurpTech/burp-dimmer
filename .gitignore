@@ -1,5 +1,3 @@
 .pio
 /local-ports.sh
-/upload.*.log
-/uploadfs.*.log
-/monitor.*.log
+/logs/

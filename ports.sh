@@ -7,6 +7,7 @@ TASK=$1
 PRE_COMMAND=""
 COMMAND=""
 LOG_FILE_PREFIX=""
+LOG_DIR="logs"
 
 UPLOAD_TASK="upload"
 UPLOADFS_TASK="uploadfs"
@@ -32,9 +33,7 @@ case "$TASK" in
     LOG_FILE_PREFIX="$MONITOR_TASK"
     ;;
   "$CLEAN_TASK")
-    rm $UPLOAD_TASK.*.$LOG_FILE_SUFFIX
-    rm $UPLOADFS_TASK.*.$LOG_FILE_SUFFIX
-    rm $MONITOR_TASK.*.$LOG_FILE_SUFFIX
+    rm -rf $LOG_DIR
     exit 0
     ;;
   "$DEFAULT_TASK")
@@ -50,6 +49,14 @@ CHILDREN=()
 RUNNING=""
 EXIT_CODE=0
 
+run_with_error() {
+  $1
+  local STATUS=$?
+  if (( STATUS != 0 )); then
+    exit $STATUS
+  fi
+}
+
 # kill all children if killed
 cleanup() {
   for i in ${!CHILDREN[@]}; do
@@ -64,17 +71,14 @@ cleanup() {
 trap cleanup EXIT
 
 start() {
+  run_with_error "mkdir -p $LOG_DIR"
   if [ "$PRE_COMMAND" != "" ]; then
-    $PRE_COMMAND
-    local STATUS=$?
-    if (( STATUS != 0 )); then
-      exit $STATUS
-    fi
+    run_with_error "$PRE_COMMAND"
   fi
   RUNNING=""
   for i in ${!LOCAL_PORTS[@]}; do
     local LOCAL_PORT=${LOCAL_PORTS[$i]}
-    local LOG_FILE="$LOG_FILE_PREFIX.$i.$LOG_FILE_SUFFIX"
+    local LOG_FILE="$LOG_DIR/$LOG_FILE_PREFIX.$i.$LOG_FILE_SUFFIX"
     local FULL_COMMAND="$COMMAND $LOCAL_PORT"
     echo "$FULL_COMMAND"
     $FULL_COMMAND >>$LOG_FILE 2>&1 &
