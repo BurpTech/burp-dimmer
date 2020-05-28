@@ -71,3 +71,49 @@ Stop the monitor using `CTRL-C`
 ```
 platformio run -t erase
 ```
+
+## Updating multiple boards in parallel
+
+The `ports.sh` script can be used to update multiple boards at the same time. It should be configured by creating a `local-ports.sh` file with the following contents:
+
+```bash
+# add ports to the bash array
+LOCAL_PORTS=()
+LOCAL_PORTS+=(/dev/cu.usbserial-XXXXXXXX)
+LOCAL_PORTS+=(/dev/cu.usbserial-XXXXXXXX)
+LOCAL_PORTS+=(/dev/cu.usbserial-XXXXXXXX)
+LOCAL_PORTS+=(/dev/cu.usbserial-XXXXXXXX)
+export LOCAL_PORTS
+
+# index of the default port (board)
+DEFAULT_PORT=0
+export DEFAULT_PORT
+
+# Baudrate to use for the monitor task
+MONITOR_BAUDRATE=115200
+export MONITOR_BAUDRATE
+```
+
+Then run with:
+
+```
+./ports.sh <TASK>
+```
+
+The following tasks are available:
+
+- `upload` - build and upload the firmware
+- `uploadfs` - build and upload the file system
+- `monitor` - monitor the serial ouput
+- `clean` - remove all local log files
+- `default` - echos the default port
+
+The `upload`, `uploadfs` and `monitor` tasks append their output to local log files.
+
+The `default` task can be used to specify the default port in other commands, eg:
+
+```
+platformio run -t uploadfs --upload-port $(./ports.sh default)
+platformio run -t upload --upload-port $(./ports.sh default)
+platformio device monitor -p $(./ports.sh default)
+```
