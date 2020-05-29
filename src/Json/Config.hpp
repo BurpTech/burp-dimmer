@@ -14,37 +14,37 @@ namespace Json {
     public:
       Config(
         const f_withDoc withDoc,
-        Object **sections,
-        Document *pDocument
+        Object ** sections,
+        Document & document
       ) :
          _withDoc(withDoc),
         _sections(sections),
-        _pDocument(pDocument) {
+        _document(document) {
       }
 
       void serialize() {
         DEBUG_PRINT("creating JsonDocument");
-        _withDoc([=](JsonDocument *pDoc) {
+        _withDoc([=](JsonDocument & doc) {
           Object ** _currentSection = _sections;
           while (*_currentSection) {
             DEBUG_PRINT("serializing section: name: [%s]", (*_currentSection)->name);
-            JsonObject section = pDoc->createNestedObject((*_currentSection)->name);
-            (*_currentSection)->serialize(&section);
+            JsonObject section = doc.createNestedObject((*_currentSection)->name);
+            (*_currentSection)->serialize(section);
             _currentSection++;
           }
-          _pDocument->serialize(pDoc);
+          _document.serialize(doc);
         });
       }
 
       void deserialize() {
         DEBUG_PRINT("creating JsonDocument");
-        _withDoc([=](JsonDocument *pDoc) {
-          _pDocument->deserialize(pDoc);
+        _withDoc([=](JsonDocument & doc) {
+          _document.deserialize(doc);
           Object ** _currentSection = _sections;
           while (*_currentSection) {
             DEBUG_PRINT("deserializing section: name: [%s]", (*_currentSection)->name);
-            JsonObject section = (*pDoc)[(*_currentSection)->name];
-            (*_currentSection)->deserialize(&section);
+            JsonObject section = doc[(*_currentSection)->name];
+            (*_currentSection)->deserialize(section);
             _currentSection++;
           }
         });
@@ -53,7 +53,7 @@ namespace Json {
     private:
       const f_withDoc _withDoc;
       Object **_sections;
-      Document *_pDocument;
+      Document & _document;
   };
 };
 

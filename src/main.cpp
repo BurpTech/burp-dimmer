@@ -24,9 +24,7 @@
 #include "Storage.hpp"
 #include "HttpServer.hpp"
 
-#include "Wifi/Config.hpp"
-#include "Wifi/Ap.hpp"
-#include "Wifi/Station.hpp"
+#include "Network.hpp"
 
 #include "Json/Allocator.hpp"
 #include "Json/File.hpp"
@@ -132,43 +130,43 @@ ICACHE_RAM_ATTR void knobInterruptDispatch();
 void knobOnChange(int direction);
 RotaryEncoder knob(D5, D6, knobInterruptDispatch, knobOnChange);
 
-void apOnStateChange(Wifi::Ap::State state);
-void stationOnStateChange(Wifi::Station::State state);
+/* void apOnStateChange(Wifi::Ap::State state); */
+/* void stationOnStateChange(Wifi::Station::State state); */
 void httpServerOnSettings(const char *ssid, const char *password);
 
-Wifi::Config apConfig(
-  WIFI_AP_CONFIG_SECTION,
-  []() {
-    Wifi::Ap::setConfig(apConfig.ssid, apConfig.password);
-    saveConfig();
-  }
-);
+/* Wifi::Config apConfig( */
+  /* WIFI_AP_CONFIG_SECTION, */
+  /* []() { */
+    /* Wifi::Ap::setConfig(apConfig.ssid, apConfig.password); */
+    /* saveConfig(); */
+  /* } */
+/* ); */
 
-Wifi::Config stationConfig(
-  WIFI_STATION_CONFIG_SECTION,
-  []() {
-    Wifi::Station::setConfig(stationConfig.ssid, stationConfig.password);
-    saveConfig();
-  }
-);
+/* Wifi::Config stationConfig( */
+  /* WIFI_STATION_CONFIG_SECTION, */
+  /* []() { */
+    /* Wifi::Station::setConfig(stationConfig.ssid, stationConfig.password); */
+    /* saveConfig(); */
+  /* } */
+/* ); */
 
-Json::File configFile(CONFIG_FILE_PATH);
-Json::Object *configSections[] = {
-  &stationConfig,
-  &apConfig,
-  NULL,
-};
-Json::Config config(
-  Json::Allocator<StaticJsonDocument<256>>::withDoc,
-  configSections,
-  &configFile
-);
-Json::HttpApi api(
-  HTTP_API_PREFIX,
-  Json::Allocator<StaticJsonDocument<256>>::withDoc,
-  configSections,
-  &HttpServer::server
-);
+/* Json::File configFile(CONFIG_FILE_PATH); */
+/* Json::Object *configSections[] = { */
+  /* &stationConfig, */
+  /* &apConfig, */
+  /* NULL, */
+/* }; */
+/* Json::Config config( */
+  /* Json::Allocator<StaticJsonDocument<256>>::withDoc, */
+  /* configSections, */
+  /* &configFile */
+/* ); */
+/* Json::HttpApi api( */
+  /* HTTP_API_PREFIX, */
+  /* Json::Allocator<StaticJsonDocument<256>>::withDoc, */
+  /* configSections, */
+  /* &HttpServer::server */
+/* ); */
 
 void setup() {
   Serial.begin(BAUDRATE);
@@ -181,20 +179,19 @@ void setup() {
   randomSeed(0);
   EEPROM.begin(EEPROM_SIZE);
   FactorySettings::initialize();
-  apConfig.setDefaults(FactorySettings::values.ssid, FactorySettings::values.password);
+  /* apConfig.setDefaults(FactorySettings::values.ssid, FactorySettings::values.password); */
   Storage::begin();
   resetButton.setup();
   statusLight.setup();
   light.setup();
   button.setup();
   knob.setup();
-  Wifi::Ap::setup(apOnStateChange);
-  Wifi::Station::setup(stationOnStateChange);
-  api.setup();
-  HttpServer::setup(httpServerOnSettings);
+  Network::manager.setup();
+  /* api.setup(); */
+  /* HttpServer::setup(httpServerOnSettings); */
 
   // read in the configuration
-  config.deserialize();
+  /* config.deserialize(); */
 
   // Flag set up as complete
   setupComplete = true;
@@ -204,9 +201,8 @@ void loop() {
   resetButton.loop();
   button.loop();
   knob.loop();
-  Wifi::Ap::loop();
-  Wifi::Station::loop();
-  HttpServer::loop();
+  Network::manager.loop();
+  /* HttpServer::loop(); */
 }
 
 void reset() {
@@ -257,22 +253,22 @@ void knobOnChange(int direction) {
   light.changeBrightness(direction);
 }
 
-void apOnStateChange(Wifi::Ap::State state) {
-  DEBUG_PRINT("new state: state: [%d]", static_cast<int>(state));
-}
+/* void apOnStateChange(Wifi::Ap::State state) { */
+  /* DEBUG_PRINT("new state: state: [%d]", static_cast<int>(state)); */
+/* } */
 
-void stationOnStateChange(Wifi::Station::State state) {
-  DEBUG_PRINT("new state: state: [%d]", static_cast<int>(state));
-}
+/* void stationOnStateChange(Wifi::Station::State state) { */
+  /* DEBUG_PRINT("new state: state: [%d]", static_cast<int>(state)); */
+/* } */
 
-void saveConfig() {
-  // only save if setup is complete
-  if (setupComplete) {
-    config.serialize();
-  }
-}
+/* void saveConfig() { */
+  /* // only save if setup is complete */
+  /* if (setupComplete) { */
+    /* config.serialize(); */
+  /* } */
+/* } */
 
-void httpServerOnSettings(const char *ssid, const char *password) {
-  DEBUG_PRINT("new settings: ssid: [%s]: password: [%s]", ssid, password);
-  stationConfig.setConfig(ssid, password);
-}
+/* void httpServerOnSettings(const char *ssid, const char *password) { */
+  /* DEBUG_PRINT("new settings: ssid: [%s]: password: [%s]", ssid, password); */
+  /* stationConfig.setConfig(ssid, password); */
+/* } */
