@@ -12,7 +12,7 @@ My Wemos board seems to not be to spec as it only has 4MB flash memory instead o
 
 ## Components
 
-![breadboard](breadboard.jpeg)
+![breadboard](doc/image/breadboard.jpeg)
 
 - Wemos D1 mini pro* (see note)
 - KY-040 Rotary Encoder (with push button)
@@ -24,7 +24,7 @@ My Wemos board seems to not be to spec as it only has 4MB flash memory instead o
 
 ## Wiring
 
-![breadboard wiring](breadboard_bb.png)
+![breadboard wiring](doc/image/breadboard_bb.png)
 
 Rotary encoder pins should be connected to the Wemos as follows:
 
@@ -74,7 +74,7 @@ platformio run -t erase
 
 ## Updating multiple boards in parallel
 
-The `ports.sh` script can be used to update multiple boards at the same time. It should be configured by creating a `local-ports.sh` file with the following contents:
+The `ports` scripts can be used to update multiple boards at the same time. It should be configured by creating a `ports/config.sh` file with the following contents:
 
 ```bash
 # add ports to the bash array
@@ -97,7 +97,7 @@ export MONITOR_BAUDRATE
 Then run with:
 
 ```
-./ports.sh <TASK>
+./ports/<TASK>
 ```
 
 The following tasks are available:
@@ -113,7 +113,7 @@ The `upload`, `uploadfs` and `monitor` tasks append their output to local log fi
 The `default` task can be used to specify the default port in other commands, eg:
 
 ```
-platformio run -t uploadfs --upload-port $(./ports.sh default)
-platformio run -t upload --upload-port $(./ports.sh default)
-platformio device monitor -p $(./ports.sh default)
+platformio run -t uploadfs --upload-port $(./ports/default)
+platformio run -t upload --upload-port $(./ports/default)
+platformio device monitor -p $(./ports/default)
 ```

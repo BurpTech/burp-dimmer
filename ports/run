@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Read in the local configuration
-. local-ports.sh
+BASEDIR=$(dirname "$0")
+. $BASEDIR/config.sh
 
 TASK=$1
 PRE_COMMAND=""
@@ -17,19 +18,27 @@ DEFAULT_TASK="default"
 
 LOG_FILE_SUFFIX="log"
 
+UPLOAD_PRE_COMMAND="platformio run"
+UPLOAD_COMMAND="platformio run -t nobuild -t upload --upload-port"
+
+UPLOADFS_PRE_COMMAND="platformio run -t buildfs"
+UPLOADFS_COMMAND="platformio run -t uploadfs --upload-port"
+
+MONITOR_COMMAND="$BASEDIR/utils/monitor $MONITOR_BAUDRATE"
+
 case "$TASK" in
   "$UPLOAD_TASK")
-    PRE_COMMAND="platformio run"
-    COMMAND="platformio run -t nobuild -t upload --upload-port"
+    PRE_COMMAND="$UPLOAD_PRE_COMMAND"
+    COMMAND="$UPLOAD_COMMAND"
     LOG_FILE_PREFIX="$UPLOAD_TASK"
     ;;
   "$UPLOADFS_TASK")
-    PRE_COMMAND="platformio run -t buildfs"
-    COMMAND="platformio run -t uploadfs --upload-port"
+    PRE_COMMAND="$UPLOADFS_PRE_COMMAND"
+    COMMAND="$UPLOADFS_COMMAND"
     LOG_FILE_PREFIX="$UPLOADFS_TASK"
     ;;
   "$MONITOR_TASK")
-    COMMAND="./monitor.sh $MONITOR_BAUDRATE"
+    COMMAND="$MONITOR_COMMAND"
     LOG_FILE_PREFIX="$MONITOR_TASK"
     ;;
   "$CLEAN_TASK")
