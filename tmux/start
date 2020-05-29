@@ -24,6 +24,7 @@ if ! tmux has-session -t $SESSION; then
   command "vim README.md"
   tmux split-window -h
   tmux split-window -v
+  command "./ports/monitor"
   quad_window $MONITOR
   quad_window $UPLOAD
   quad_window $UPLOADFS

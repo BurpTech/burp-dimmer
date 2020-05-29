@@ -118,3 +118,19 @@ platformio run -t uploadfs --upload-port $(./ports/default)
 platformio run -t upload --upload-port $(./ports/default)
 platformio device monitor -p $(./ports/default)
 ```
+
+## `tmux` configuration
+
+For those that use `tmux` a tmux configuration is available that creates windows and panes for editing code and tailing logs. It assumes that 4 ports have been configured under `ports`.
+
+To start (or reattach):
+
+```
+./tmux/start
+```
+
+To stop:
+
+```
+./tmux/kill
+```
