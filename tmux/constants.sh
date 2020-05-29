@@ -8,4 +8,6 @@ UPLOAD=upload
 export UPLOAD
 UPLOADFS=uploadfs
 export UPLOADFS
+ERASE=erase
+export ERASE
 SHELL_CMD="bash -i"

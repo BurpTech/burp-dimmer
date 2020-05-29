@@ -13,6 +13,7 @@ LOG_DIR="logs"
 UPLOAD_TASK="upload"
 UPLOADFS_TASK="uploadfs"
 MONITOR_TASK="monitor"
+ERASE_TASK="erase"
 CLEAN_TASK="clean"
 DEFAULT_TASK="default"
 
@@ -25,6 +26,8 @@ UPLOADFS_PRE_COMMAND="platformio run -t buildfs"
 UPLOADFS_COMMAND="platformio run -t uploadfs --upload-port"
 
 MONITOR_COMMAND="$BASEDIR/utils/monitor $MONITOR_BAUDRATE"
+
+ERASE_COMMAND="platformio run -t erase --upload-port"
 
 case "$TASK" in
   "$UPLOAD_TASK")
@@ -40,6 +43,10 @@ case "$TASK" in
   "$MONITOR_TASK")
     COMMAND="$MONITOR_COMMAND"
     LOG_FILE_PREFIX="$MONITOR_TASK"
+    ;;
+  "$ERASE_TASK")
+    COMMAND="$ERASE_COMMAND"
+    LOG_FILE_PREFIX="$ERASE_TASK"
     ;;
   "$CLEAN_TASK")
     rm -rf $LOG_DIR

@@ -105,6 +105,7 @@ The following tasks are available:
 - `upload` - build and upload the firmware
 - `uploadfs` - build and upload the file system
 - `monitor` - monitor the serial ouput
+- `erase` - erase flash memory
 - `clean` - remove all local log files
 - `default` - echos the default port
 
