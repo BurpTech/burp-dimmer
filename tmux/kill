@@ -1,0 +1,6 @@
+#!/bin/sh
+
+BASEDIR=$(dirname "$0")
+. $BASEDIR/constants.sh
+
+tmux kill-session -t $SESSION
