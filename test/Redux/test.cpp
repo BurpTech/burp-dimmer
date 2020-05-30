@@ -51,22 +51,6 @@ class Bar : public State {
     int value;
 };
 
-class Top : public State {
-  public: 
-    Top(f_init init) :
-      foo(static_cast<const Foo *>(init())),
-      bar(static_cast<const Bar *>(init())) {
-    }
-
-    Top(const Top * old, f_reduce reduce) :
-      foo(static_cast<const Foo *>(reduce(old->foo))),
-      bar(static_cast<const Bar *>(reduce(old->bar))) {
-    }
-
-    const Foo * foo;
-    const Bar * bar;
-};
-
 //
 // Reducers
 //
@@ -80,8 +64,7 @@ class FooReducer : public Reducer {
       switch (action.type) {
         case INCREMENT_ALL:
         case INCREMENT_FOO:
-          const Foo * foo = state->as<Foo>();
-          foo = new Foo(foo->value + 1);
+          const Foo * foo = new Foo(state->as<Foo>()->value + 1);
           delete state;
           state = foo;
           break;
@@ -100,8 +83,7 @@ class BarReducer : public Reducer {
       switch (action.type) {
         case INCREMENT_ALL:
         case INCREMENT_BAR:
-          const Bar * bar = state->as<Bar>();
-          bar = new Bar(bar->value + 1);
+          Bar * bar = new Bar(state->as<Bar>()->value + 1);
           delete state;
           state = bar;
           break;
@@ -111,12 +93,12 @@ class BarReducer : public Reducer {
 };
 BarReducer barReducer;
 
-const Reducer * reducers[] = {
-  &fooReducer,
-  &barReducer,
-  NULL
-};
-ReducerMap<Top> reducer(reducers);
+REDUX_REDUCERMAP_STATE_2(
+  Top,
+  Foo, foo, fooReducer,
+  Bar, bar, barReducer
+);
+ReducerMap<Top> reducer;
 
 //
 // Subscribers
