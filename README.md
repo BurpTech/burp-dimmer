@@ -72,6 +72,12 @@ Stop the monitor using `CTRL-C`
 platformio run -t erase
 ```
 
+## Running native tests
+
+```
+platformio test -e native
+```
+
 ## Updating multiple boards in parallel
 
 The `ports` scripts can be used to update multiple boards at the same time. It should be configured by creating a `ports/config.sh` file with the following contents:
@@ -114,6 +120,7 @@ The `upload`, `uploadfs` and `monitor` tasks append their output to local log fi
 The `default` task can be used to specify the default port in other commands, eg:
 
 ```
+platformio run -t erase --upload-port $(./ports/default)
 platformio run -t uploadfs --upload-port $(./ports/default)
 platformio run -t upload --upload-port $(./ports/default)
 platformio device monitor -p $(./ports/default)

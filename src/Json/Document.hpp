@@ -3,10 +3,6 @@
 
 #include <ArduinoJson.h>
 
-#include "../Debug.hpp"
-
-#include "Json.hpp"
-
 namespace Json {
   class Document {
     public:

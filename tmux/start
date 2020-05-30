@@ -26,9 +26,7 @@ if ! tmux has-session -t $SESSION; then
   tmux split-window -v
   command "./ports/monitor"
   quad_window $MONITOR
-  quad_window $UPLOAD
-  quad_window $UPLOADFS
-  quad_window $ERASE
+  quad_window $TASK
   tmux select-window -t $CODE
 fi
 

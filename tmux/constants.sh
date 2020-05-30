@@ -4,10 +4,6 @@ CODE=code
 export CODE
 MONITOR=monitor
 export MONITOR
-UPLOAD=upload
-export UPLOAD
-UPLOADFS=uploadfs
-export UPLOADFS
-ERASE=erase
-export ERASE
+TASK=task
+export TASK
 SHELL_CMD="bash -i"

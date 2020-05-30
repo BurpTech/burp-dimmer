@@ -8,6 +8,9 @@
 #include "Json.hpp"
 
 namespace Json {
+  using f_onDoc = std::function<void(JsonDocument & doc)>;
+  using f_withDoc = std::function<void(f_onDoc onDoc)>;
+
   template <class T>
   class Allocator {
     public:
