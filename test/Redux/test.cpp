@@ -1,3 +1,7 @@
+#ifndef NATIVE
+#include <Arduino.h>
+#endif
+
 #include <unity.h>
 
 #include "../src/Util/List.hpp"
@@ -149,8 +153,15 @@ void test() {
   TEST_ASSERT_EQUAL_INT(2, bar);
 }
 
-int main() {
+void setup() {
   UNITY_BEGIN();
   RUN_TEST(test);
   UNITY_END();
+}
+
+void loop() {
+}
+
+int main() {
+  setup();
 }
