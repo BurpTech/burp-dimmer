@@ -1,4 +1,9 @@
 .DS_Store
 .pio
+.ccls
+.clang_complete
+.gcc-flags.json
+.clangd/
+compile_commands.json
 /local-ports.sh
 /logs/

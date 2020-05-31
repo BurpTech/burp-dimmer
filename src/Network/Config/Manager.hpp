@@ -1,32 +1,35 @@
 #ifndef Network_Config_Manager_hpp
 #define Network_Config_Manager_hpp
 
-#include <Arduino.h>
-#include <ArduinoJson.h>
+// #include <ArduinoJson.h>
 
-#include "../../Debug.hpp"
+#include "../../Util/Debug.hpp"
 
 #include "../../Json/Object.hpp"
+#include "../../Redux/State.hpp"
 
 namespace Network {
   namespace Config {
-    class Manager : public Json::Object {
+    class Manager : public Json::Object, public Redux::State {
       public:
-        static constexpr size_t MODE_BUFFER_SIZE = 20;
-        char mode[Manager::MODE_BUFFER_SIZE];
 
-        Manager(const char * name) :
-          Json::Object(name) {
-        }
+        static constexpr char modeFieldName[] = "mode";
+
+        enum class Mode {
+          NORMAL,
+          ACCESS_POINT,
+          WPS_CONFIG,
+          OFF
+        };
+
+        Mode mode = Mode::NORMAL;
 
         void serialize(JsonObject & object) {
+          object[Manager::modeFieldName] = static_cast<int>(mode);
         }
 
         void deserialize(JsonObject & object) {
-        }
-
-        setConfig(char * newMode) {
-
+          mode = object[Manager::modeFieldName].as<int>();
         }
 
       private:

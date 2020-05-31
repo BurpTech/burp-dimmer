@@ -1,5 +1,5 @@
-#ifndef debug_hpp
-#define debug_hpp
+#ifndef Util_debug_hpp
+#define Util_debug_hpp
 
 /*
  * Uncomment the next line to globally enable
