@@ -6,17 +6,17 @@
 
 namespace Redux {
 
-  template <class T>
-  class ReducerMap : public Reducer {
+  template <class ActionType, class DerivedState>
+  class ReducerMap : public Reducer<ActionType> {
 
     public:
 
-      const State * init() const {
-        return new T;
+      const State * init() const override {
+        return new DerivedState;
       }
 
-      const State * reduce(const State * state, const Action & action) const {
-        return new T(state->as<T>(), action);
+      const State * reduce(const State * state, const Action<ActionType> & action) const override {
+        return new DerivedState(state->as<DerivedState>(), action);
       }
 
   };

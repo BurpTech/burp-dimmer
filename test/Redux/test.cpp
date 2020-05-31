@@ -4,34 +4,37 @@
 
 #include <unity.h>
 
-#include "../src/Util/List.hpp"
-#include "../src/Redux/Action.hpp"
-#include "../src/Redux/State.hpp"
-#include "../src/Redux/ReducerMap.hpp"
-#include "../src/Redux/SubscriberList.hpp"
-#include "../src/Redux/Store.hpp"
+#include "../../src/Redux/Action.hpp"
+#include "../../src/Redux/State.hpp"
+#include "../../src/Redux/ReducerMap.hpp"
+#include "../../src/Redux/SubscriberList.hpp"
+#include "../../src/Redux/Store.hpp"
 
 using namespace Redux;
 
 //
-// Store
+// Action types
 //
 
-Store store;
-
-//
-// Actions
-//
-
-enum {
+enum class TestActionType {
   INCREMENT_ALL,
   INCREMENT_FOO,
   INCREMENT_BAR
 };
 
-const Action incrementAll(INCREMENT_ALL);
-const Action incrementFoo(INCREMENT_FOO);
-const Action incrementBar(INCREMENT_BAR);
+//
+// Store
+//
+
+Store<TestActionType> store;
+
+//
+// Actions
+//
+
+const Action<TestActionType> incrementAll(TestActionType::INCREMENT_ALL);
+const Action<TestActionType> incrementFoo(TestActionType::INCREMENT_FOO);
+const Action<TestActionType> incrementBar(TestActionType::INCREMENT_BAR);
 
 //
 // States
@@ -39,7 +42,7 @@ const Action incrementBar(INCREMENT_BAR);
 
 class Foo : public State {
   public:
-    Foo(int value) :
+    Foo(int value = 0) :
       value(value) {
     }
 
@@ -48,7 +51,7 @@ class Foo : public State {
 
 class Bar : public State {
   public:
-    Bar(int value) :
+    Bar(int value = 0) :
       value(value) {
     }
 
@@ -59,50 +62,52 @@ class Bar : public State {
 // Reducers
 //
 
-class FooReducer : public Reducer {
+class FooReducer : public Reducer<TestActionType> {
   public:
     const State * init() const {
-      return new Foo(0);
+      return new Foo;
     }
-    const State * reduce(const State * state, const Action & action) const {
+    const State * reduce(const State * state, const Action<TestActionType> & action) const {
       switch (action.type) {
-        case INCREMENT_ALL:
-        case INCREMENT_FOO:
+        case TestActionType::INCREMENT_ALL:
+        case TestActionType::INCREMENT_FOO: {
           const Foo * foo = new Foo(state->as<Foo>()->value + 1);
           delete state;
-          state = foo;
-          break;
+          return foo;
+        }
+        default:
+          return state;
       }
-      return state;
     }
 };
 FooReducer fooReducer;
 
-class BarReducer : public Reducer {
+class BarReducer : public Reducer<TestActionType> {
   public:
     const State * init() const {
-      return new Bar(0);
+      return new Bar;
     }
-    const State * reduce(const State * state, const Action & action) const {
+    const State * reduce(const State * state, const Action<TestActionType> & action) const {
       switch (action.type) {
-        case INCREMENT_ALL:
-        case INCREMENT_BAR:
+        case TestActionType::INCREMENT_ALL:
+        case TestActionType::INCREMENT_BAR: {
           Bar * bar = new Bar(state->as<Bar>()->value + 1);
           delete state;
-          state = bar;
-          break;
+          return bar;
+        }
+        default:
+          return state;
       }
-      return state;
     }
 };
 BarReducer barReducer;
 
 REDUX_REDUCERMAP_STATE_2(
-  Top,
+  Top, TestActionType,
   Foo, foo, fooReducer,
   Bar, bar, barReducer
 );
-ReducerMap<Top> reducer;
+ReducerMap<TestActionType, Top> reducer;
 
 //
 // Subscribers
@@ -113,23 +118,23 @@ int bar = 1000;
 
 class FooSubscriber : public Subscriber {
   public:
-    void notify() const {
+    void notify() override {
       const Top * top = store.getState<Top>();
       foo = top->foo->value;
     }
 };
-const FooSubscriber fooSubscriber;
+FooSubscriber fooSubscriber;
 
 class BarSubscriber : public Subscriber {
   public:
-    void notify() const {
+    void notify() override {
       const Top * top = store.getState<Top>();
       bar = top->bar->value;
     }
 };
-const BarSubscriber barSubscriber;
+BarSubscriber barSubscriber;
 
-const Subscriber * subscribers[] = {
+Subscriber * subscribers[] = {
   &fooSubscriber,
   &barSubscriber,
   NULL

@@ -6,31 +6,37 @@
 #include "Action.hpp"
 
 namespace Redux {
+
+  template <class ActionType>
   class Store {
 
     public:
 
-      void setup(Reducer * reducer, Subscriber * subscriber) {
+      Store() :
+        _state(nullptr) {
+      }
+
+      void setup(const Reducer<ActionType> * reducer, Subscriber * subscriber) {
         _reducer = reducer;
         _subscriber = subscriber;
         _state = _reducer->init();
         _subscriber->notify();
       }
 
-      void dispatch(const Action & action) {
+      void dispatch(const Action<ActionType> & action) {
         _state = _reducer->reduce(_state, action);
         _subscriber->notify();
       }
 
-      template <class T>
-      const T * getState() {
-        return _state->as<T>();
+      template <class DerivedState>
+      const DerivedState * getState() const {
+        return _state->as<DerivedState>();
       }
 
     private:
-      const State * _state = NULL;
-      const Reducer * _reducer;
-      const Subscriber * _subscriber;
+      const State * _state;
+      const Reducer<ActionType> * _reducer;
+      Subscriber * _subscriber;
 
   };
 }

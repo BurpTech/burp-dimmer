@@ -9,12 +9,12 @@ namespace Redux {
 
     public:
 
-      SubscriberList(const Subscriber ** subscribers) :
+      SubscriberList(Subscriber ** subscribers) :
         _subscribers(subscribers) {
       }
 
-      void notify() const {
-        const Subscriber ** subscriber = _subscribers;
+      void notify() override {
+        Subscriber ** subscriber = _subscribers;
         while (*subscriber) {
           (*subscriber)->notify();
           subscriber++;
@@ -23,7 +23,7 @@ namespace Redux {
 
     private:
 
-      const Subscriber ** _subscribers;
+      Subscriber ** _subscribers;
 
   };
 
