@@ -12,16 +12,6 @@
 #include "Network/Mode/Off.hpp"
 
 namespace Network {
-  namespace Mode {
-    enum {
-      NORMAL,
-      ACCESS_POINT,
-      WPS_CONFIG,
-      OFF,
-      _LENGTH
-    };
-  }
-
   namespace {
     Mode::Normal _modeNormal("normal", "Normal");
     Mode::AccessPoint _modeAccessPoint("access-point", "Access Point");
