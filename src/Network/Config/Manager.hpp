@@ -1,7 +1,7 @@
 #ifndef Network_Config_Manager_hpp
 #define Network_Config_Manager_hpp
 
-// #include <ArduinoJson.h>
+#include <ArduinoJson.h>
 
 #include "../../Util/Debug.hpp"
 
@@ -13,7 +13,7 @@ namespace Network {
     class Manager : public Json::Object, public Redux::State {
       public:
 
-        static constexpr char modeFieldName[] = "mode";
+        static constexpr char MODE_FIELD[] = "mode";
 
         enum class Mode {
           NORMAL,
@@ -25,15 +25,16 @@ namespace Network {
         Mode mode = Mode::NORMAL;
 
         void serialize(JsonObject & object) {
-          object[Manager::modeFieldName] = static_cast<int>(mode);
+          object[Manager::MODE_FIELD] = static_cast<int>(mode);
         }
 
         void deserialize(JsonObject & object) {
-          mode = object[Manager::modeFieldName].as<int>();
+          mode = static_cast<Mode>(object[Manager::MODE_FIELD].as<int>());
         }
 
-      private:
     };
+
+    constexpr char Manager::MODE_FIELD[];
   }
 }
 

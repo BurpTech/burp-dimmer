@@ -162,6 +162,6 @@ void setup() {
 void loop() {
 }
 
-int main() {
+int main(int argc, char **argv) {
   setup();
 }
