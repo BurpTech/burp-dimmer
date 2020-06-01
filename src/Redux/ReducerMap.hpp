@@ -16,7 +16,7 @@ namespace Redux {
       }
 
       const State * reduce(const State * state, const Action<ActionType> & action) const override {
-        return new DerivedState(state->as<DerivedState>(), action);
+        return State::replace(state, new DerivedState(state->as<DerivedState>(), action));
       }
 
   };
