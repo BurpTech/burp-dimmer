@@ -1,5 +1,4 @@
-#ifndef Redux_State_State_hpp
-#define Redux_State_State_hpp
+#pragma once
 
 namespace Redux {
   class State {
@@ -17,5 +16,3 @@ namespace Redux {
 
   };
 }
-
-#endif

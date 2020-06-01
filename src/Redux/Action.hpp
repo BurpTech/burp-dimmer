@@ -1,5 +1,4 @@
-#ifndef Redux_Action_hpp
-#define Redux_Action_hpp
+#pragma once
 
 namespace Redux {
 
@@ -21,5 +20,3 @@ namespace Redux {
 
   };
 }
-
-#endif

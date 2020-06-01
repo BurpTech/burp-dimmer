@@ -1,5 +1,4 @@
-#ifndef Redux_SubscriberList_hpp
-#define Redux_SubscriberList_hpp
+#pragma once
 
 #include "./Subscriber.hpp"
 
@@ -28,5 +27,3 @@ namespace Redux {
   };
 
 }
-
-#endif

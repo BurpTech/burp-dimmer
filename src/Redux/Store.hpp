@@ -1,5 +1,4 @@
-#ifndef Redux_Store_hpp
-#define Redux_Store_hpp
+#pragma once
 
 #include "Reducer.hpp"
 #include "Subscriber.hpp"
@@ -40,5 +39,3 @@ namespace Redux {
 
   };
 }
-
-#endif

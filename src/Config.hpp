@@ -1,5 +1,4 @@
-#ifndef Config_hpp
-#define Config_hpp
+#pragma once
 
 #include "./Redux/Store.hpp"
 #include "./Redux/ReducerMap.hpp"
@@ -17,5 +16,3 @@ namespace Config {
     Redux::Store<ActionType> store;
 
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef Redux_ReducerMapMacros_hpp
-#define Redux_ReducerMapMacros_hpp
+#pragma once
 
 #include "./State.hpp"
 
@@ -89,5 +88,3 @@
     _REDUX_REDUCERMAP_REDUCE_FIELD(FIELD_CLASS_4, FIELD_4, REDUCER_4)\
     _REDUX_REDUCERMAP_END\
 }
-
-#endif

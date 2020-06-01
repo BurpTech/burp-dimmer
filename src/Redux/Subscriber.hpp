@@ -1,5 +1,4 @@
-#ifndef Redux_Subscriber_hpp
-#define Redux_Subscriber_hpp
+#pragma once
 
 namespace Redux {
   class Subscriber {
@@ -10,5 +9,3 @@ namespace Redux {
 
   };
 }
-
-#endif

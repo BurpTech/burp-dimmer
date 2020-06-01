@@ -1,5 +1,4 @@
-#ifndef Redux_Reducer_hpp
-#define Redux_Reducer_hpp
+#pragma once
 
 #include "./State.hpp"
 #include "./Action.hpp"
@@ -16,5 +15,3 @@ namespace Redux {
 
   };
 }
-
-#endif

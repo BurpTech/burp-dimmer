@@ -1,5 +1,4 @@
-#ifndef Redux_ReducerMap_hpp
-#define Redux_ReducerMap_hpp
+#pragma once
 
 #include "./Reducer.hpp"
 #include "./ReducerMapMacros.hpp"
@@ -22,5 +21,3 @@ namespace Redux {
   };
 
 }
-
-#endif

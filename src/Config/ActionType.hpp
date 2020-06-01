@@ -1,5 +1,4 @@
-#ifndef Config_ActionType_hpp
-#define Config_ActionType_hpp
+#pragma once
 
 namespace Config {
 
@@ -12,5 +11,3 @@ namespace Config {
   };
 
 }
-
-#endif
