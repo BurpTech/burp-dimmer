@@ -30,13 +30,15 @@ namespace Config {
 
   namespace Network {
     namespace Manager {
+      using namespace Actions;
+
       const State * state() {
         return subscriber.state->network->manager;
       }
 
       void testDefaults() {
-        TEST_ASSERT_EQUAL_INT(State::PermMode::NORMAL, State::DEFAULT_PERM_MODE);
-        TEST_ASSERT_EQUAL_INT(State::TempMode::ACCESS_POINT, State::DEFAULT_TEMP_MODE);
+        TEST_ASSERT_EQUAL_INT(PermMode::NORMAL, State::DEFAULT_PERM_MODE);
+        TEST_ASSERT_EQUAL_INT(TempMode::ACCESS_POINT, State::DEFAULT_TEMP_MODE);
         TEST_ASSERT_EQUAL_INT(false, State::DEFAULT_TEMP_MODE_ACTIVE);
         TEST_ASSERT_EQUAL_UINT32(0, State::DEFAULT_ACCESS_POINT_TIMEOUT);
       }
@@ -48,37 +50,37 @@ namespace Config {
 
       void testInitialState() {
         initialize();
-        TEST_ASSERT_EQUAL_INT(State::PermMode::ACCESS_POINT, state()->permMode);
+        TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE_ACTIVE, state()->tempModeActive);
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
       }
 
-      void testDeserializeAction() {
+      void testDeserialize() {
         initialize();
         withObj([&](JsonObject & object) {
-          object[State::MODE_FIELD] = static_cast<int>(State::PermMode::OFF);
+          object[State::MODE_FIELD] = static_cast<int>(PermMode::OFF);
           object[State::ACCESS_POINT_TIMEOUT_FIELD] = 30000;
-          const Actions::Deserialize action(object);
+          const Deserialize action(object);
           store.dispatch(action);
-          TEST_ASSERT_EQUAL_INT(State::PermMode::OFF, state()->permMode);
+          TEST_ASSERT_EQUAL_INT(PermMode::OFF, state()->permMode);
           TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
           TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE_ACTIVE, state()->tempModeActive);
           TEST_ASSERT_EQUAL_UINT32(30000, state()->accessPointTimeout);
         });
       }
 
-      void testSetAccessPointTimeoutAction() {
+      void testSetAccessPointTimeout() {
         initialize();
-        const Actions::SetAccessPointTimeout action(100000);
+        const SetAccessPointTimeout action(100000);
         store.dispatch(action);
-        TEST_ASSERT_EQUAL_INT(State::PermMode::ACCESS_POINT, state()->permMode);
+        TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE_ACTIVE, state()->tempModeActive);
         TEST_ASSERT_EQUAL_UINT32(100000, state()->accessPointTimeout);
       }
 
-      void testNextModeAction() {
+      void testNextMode() {
         initialize();
 
         // set a temp mode to verify that setting a perm mode
@@ -86,22 +88,22 @@ namespace Config {
         store.dispatch(setTempModeWpsConfig);
 
         store.dispatch(nextMode);
-        TEST_ASSERT_EQUAL_INT(State::PermMode::OFF, state()->permMode);
+        TEST_ASSERT_EQUAL_INT(PermMode::OFF, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
         store.dispatch(nextMode);
-        TEST_ASSERT_EQUAL_INT(State::PermMode::NORMAL, state()->permMode);
+        TEST_ASSERT_EQUAL_INT(PermMode::NORMAL, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
         store.dispatch(nextMode);
-        TEST_ASSERT_EQUAL_INT(State::PermMode::ACCESS_POINT, state()->permMode);
+        TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
         store.dispatch(nextMode);
-        TEST_ASSERT_EQUAL_INT(State::PermMode::OFF, state()->permMode);
+        TEST_ASSERT_EQUAL_INT(PermMode::OFF, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
@@ -115,17 +117,17 @@ namespace Config {
         store.dispatch(setTempModeWpsConfig);
 
         store.dispatch(setPermModeOff);
-        TEST_ASSERT_EQUAL_INT(State::PermMode::OFF, state()->permMode);
+        TEST_ASSERT_EQUAL_INT(PermMode::OFF, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
         store.dispatch(setPermModeNormal);
-        TEST_ASSERT_EQUAL_INT(State::PermMode::NORMAL, state()->permMode);
+        TEST_ASSERT_EQUAL_INT(PermMode::NORMAL, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
         store.dispatch(setPermModeAccessPoint);
-        TEST_ASSERT_EQUAL_INT(State::PermMode::ACCESS_POINT, state()->permMode);
+        TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
@@ -139,20 +141,20 @@ namespace Config {
         store.dispatch(setPermModeOff);
 
         store.dispatch(setTempModeWpsConfig);
-        TEST_ASSERT_EQUAL_INT(State::PermMode::OFF, state()->permMode);
-        TEST_ASSERT_EQUAL_INT(State::TempMode::WPS_CONFIG, state()->tempMode);
+        TEST_ASSERT_EQUAL_INT(PermMode::OFF, state()->permMode);
+        TEST_ASSERT_EQUAL_INT(TempMode::WPS_CONFIG, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(true, state()->tempModeActive);
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
         store.dispatch(setTempModeAccessPoint);
-        TEST_ASSERT_EQUAL_INT(State::PermMode::OFF, state()->permMode);
-        TEST_ASSERT_EQUAL_INT(State::TempMode::ACCESS_POINT, state()->tempMode);
+        TEST_ASSERT_EQUAL_INT(PermMode::OFF, state()->permMode);
+        TEST_ASSERT_EQUAL_INT(TempMode::ACCESS_POINT, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(true, state()->tempModeActive);
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
       }
 
       void deserialize() {
         withObj([&](JsonObject & object) {
-          object[State::MODE_FIELD] = static_cast<int>(State::PermMode::ACCESS_POINT);
+          object[State::MODE_FIELD] = static_cast<int>(PermMode::ACCESS_POINT);
           object[State::ACCESS_POINT_TIMEOUT_FIELD] = 60000;
           reducer.deserialize(object);
         });
@@ -162,9 +164,9 @@ namespace Config {
         RUN_TEST(testDefaults);
         RUN_TEST(testFieldNames);
         RUN_TEST(testInitialState);
-        RUN_TEST(testDeserializeAction);
-        RUN_TEST(testSetAccessPointTimeoutAction);
-        RUN_TEST(testNextModeAction);
+        RUN_TEST(testDeserialize);
+        RUN_TEST(testSetAccessPointTimeout);
+        RUN_TEST(testNextMode);
         RUN_TEST(testSetPermMode);
         RUN_TEST(testSetTempMode);
       }

@@ -67,13 +67,14 @@ namespace Config {
 
           static const State * _createNextPermMode(const State & previous) {
             switch (previous.permMode) {
-              case State::PermMode::NORMAL:
-                return new State(previous, State::PermMode::ACCESS_POINT);
-              case State::PermMode::ACCESS_POINT:
-                return new State(previous, State::PermMode::OFF);
-              case State::PermMode::OFF:
-                return new State(previous, State::PermMode::NORMAL);
+              case PermMode::NORMAL:
+                return new State(previous, PermMode::ACCESS_POINT);
+              case PermMode::ACCESS_POINT:
+                return new State(previous, PermMode::OFF);
+              case PermMode::OFF:
+                return new State(previous, PermMode::NORMAL);
             }
+            return nullptr;
           }
 
       };

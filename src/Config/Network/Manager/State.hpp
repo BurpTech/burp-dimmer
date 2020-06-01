@@ -9,19 +9,19 @@ namespace Config {
   namespace Network {
     namespace Manager {
 
+      enum class PermMode {
+        NORMAL,
+        ACCESS_POINT,
+        OFF
+      };
+
+      enum class TempMode {
+        ACCESS_POINT,
+        WPS_CONFIG
+      };
+
       class State : public Json::Serializer, public Redux::State {
         public:
-
-          enum class PermMode {
-            NORMAL,
-            ACCESS_POINT,
-            OFF
-          };
-
-          enum class TempMode {
-            ACCESS_POINT,
-            WPS_CONFIG
-          };
 
           static constexpr char MODE_FIELD[] = "mode";
           static constexpr char ACCESS_POINT_TIMEOUT_FIELD[] = "accessPointTimeout";
@@ -73,8 +73,8 @@ namespace Config {
 
       constexpr char State::MODE_FIELD[];
       constexpr char State::ACCESS_POINT_TIMEOUT_FIELD[];
-      constexpr State::PermMode State::DEFAULT_PERM_MODE;
-      constexpr State::TempMode State::DEFAULT_TEMP_MODE;
+      constexpr PermMode State::DEFAULT_PERM_MODE;
+      constexpr TempMode State::DEFAULT_TEMP_MODE;
       constexpr bool State::DEFAULT_TEMP_MODE_ACTIVE;
       constexpr unsigned long State::DEFAULT_ACCESS_POINT_TIMEOUT;
 

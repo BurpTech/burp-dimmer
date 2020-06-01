@@ -7,14 +7,14 @@
 namespace Config {
   namespace Network {
     namespace Manager {
-
-      Actions::NextMode nextMode;
-      Actions::SetPermMode setPermModeNormal(State::PermMode::NORMAL);
-      Actions::SetPermMode setPermModeAccessPoint(State::PermMode::ACCESS_POINT);
-      Actions::SetPermMode setPermModeOff(State::PermMode::OFF);
-      Actions::SetTempMode setTempModeAccessPoint(State::TempMode::ACCESS_POINT);
-      Actions::SetTempMode setTempModeWpsConfig(State::TempMode::WPS_CONFIG);
-
+      namespace Actions {
+        NextMode nextMode;
+        SetPermMode setPermModeNormal(PermMode::NORMAL);
+        SetPermMode setPermModeAccessPoint(PermMode::ACCESS_POINT);
+        SetPermMode setPermModeOff(PermMode::OFF);
+        SetTempMode setTempModeAccessPoint(TempMode::ACCESS_POINT);
+        SetTempMode setTempModeWpsConfig(TempMode::WPS_CONFIG);
+      }
       Reducer reducer;
 
     }

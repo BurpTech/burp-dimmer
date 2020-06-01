@@ -38,8 +38,8 @@ namespace Config {
 
         class SetPermMode: public Redux::Action<ActionType> {
           public:
-            State::PermMode mode;
-            SetPermMode(State::PermMode mode) : 
+            PermMode mode;
+            SetPermMode(PermMode mode) : 
               Action(ActionType::NETWORK_MANAGER_SET_PERM_MODE),
               mode(mode) {
             }
@@ -47,8 +47,8 @@ namespace Config {
 
         class SetTempMode: public Redux::Action<ActionType> {
           public:
-            State::TempMode mode;
-            SetTempMode(State::TempMode mode) : 
+            TempMode mode;
+            SetTempMode(TempMode mode) : 
               Action(ActionType::NETWORK_MANAGER_SET_TEMP_MODE),
               mode(mode) {
             }
