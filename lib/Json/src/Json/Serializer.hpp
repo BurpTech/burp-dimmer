@@ -1,5 +1,4 @@
-#ifndef Json_Serializer_hpp
-#define Json_Serializer_hpp
+#pragma once
 
 #include <ArduinoJson.h>
 
@@ -9,5 +8,3 @@ namespace Json {
       virtual void serialize(JsonObject & object) const = 0;
   };
 };
-
-#endif

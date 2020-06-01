@@ -33,6 +33,7 @@ namespace Redux {
       }
 
     private:
+
       const State * _state;
       const Reducer<ActionType> * _reducer;
       Subscriber * _subscriber;

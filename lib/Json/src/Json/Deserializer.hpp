@@ -1,5 +1,4 @@
-#ifndef Json_Deserializer_hpp
-#define Json_Deserializer_hpp
+#pragma once
 
 #include <ArduinoJson.h>
 
@@ -9,5 +8,3 @@ namespace Json {
       virtual void deserialize(const JsonObject & object) = 0;
   };
 };
-
-#endif

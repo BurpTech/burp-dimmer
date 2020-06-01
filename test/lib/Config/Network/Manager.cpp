@@ -1,54 +1,35 @@
-#ifndef NATIVE
-#include <Arduino.h>
-#endif
-
 #include <unity.h>
-#include <functional>
 #include <ArduinoJson.h>
-
-#include "../../src/Redux/Subscriber.hpp"
-#include "../../src/Config.hpp"
-
-using f_onObj = std::function<void(JsonObject & obj)>;
-void withObj(f_onObj onObj) {
-  StaticJsonDocument<1024> doc;
-  JsonObject obj = doc.to<JsonObject>();
-  onObj(obj);
-}
+#include <Redux/Subscriber.hpp>
+#include <Config/Network.hpp>
+#include <Config/Network/Manager.hpp>
+#include "../../helpers/util.hpp"
+#include "../../Config.hpp"
+#include "../Network.hpp"
+#include "./Manager.hpp"
 
 namespace Config {
-  void initialize();
-
-  class Subscriber : public Redux::Subscriber {
-    public:
-      const State * state = nullptr;
-      void notify() override {
-        state = store.getState<State>();
-      }
-  };
-  Subscriber subscriber;
-
   namespace Network {
     namespace Manager {
       using namespace Actions;
 
       const State * state() {
-        return subscriber.state->network->manager;
+        return Network::state()->manager;
       }
 
-      void testDefaults() {
+      void Config_Network_Manager_State_should_have_correct_defaults() {
         TEST_ASSERT_EQUAL_INT(PermMode::NORMAL, State::DEFAULT_PERM_MODE);
         TEST_ASSERT_EQUAL_INT(TempMode::ACCESS_POINT, State::DEFAULT_TEMP_MODE);
         TEST_ASSERT_EQUAL_INT(false, State::DEFAULT_TEMP_MODE_ACTIVE);
         TEST_ASSERT_EQUAL_UINT32(0, State::DEFAULT_ACCESS_POINT_TIMEOUT);
       }
 
-      void testFieldNames() {
+      void Config_Network_Manager_State_should_have_correct_field_names_for_serialization() {
         TEST_ASSERT_EQUAL_STRING("mode", State::MODE_FIELD);
         TEST_ASSERT_EQUAL_STRING("accessPointTimeout", State::ACCESS_POINT_TIMEOUT_FIELD);
       }
 
-      void testInitialState() {
+      void Config_Network_Manager_should_initialize_with_the_correct_state() {
         initialize();
         TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
@@ -56,7 +37,7 @@ namespace Config {
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
       }
 
-      void testDeserialize() {
+      void Config_Network_Manager_should_apply_the_deserialization_action() {
         initialize();
         withObj([&](JsonObject & object) {
           object[State::MODE_FIELD] = static_cast<int>(PermMode::OFF);
@@ -70,7 +51,7 @@ namespace Config {
         });
       }
 
-      void testSetAccessPointTimeout() {
+      void Config_Network_Manager_should_apply_the_set_access_point_timeout_action() {
         initialize();
         const SetAccessPointTimeout action(100000);
         store.dispatch(action);
@@ -80,7 +61,7 @@ namespace Config {
         TEST_ASSERT_EQUAL_UINT32(100000, state()->accessPointTimeout);
       }
 
-      void testNextMode() {
+      void Config_Network_Manager_should_apply_the_next_mode_action() {
         initialize();
 
         // set a temp mode to verify that setting a perm mode
@@ -109,7 +90,7 @@ namespace Config {
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
       }
 
-      void testSetPermMode() {
+      void Config_Network_Manager_should_apply_the_set_perm_mode_action() {
         initialize();
 
         // set a temp mode to verify that setting a perm mode
@@ -133,7 +114,7 @@ namespace Config {
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
       }
 
-      void testSetTempMode() {
+      void Config_Network_Manager_should_apply_the_set_temp_mode_action() {
         initialize();
 
         // set a perm mode to verify that setting a temp mode
@@ -161,60 +142,16 @@ namespace Config {
       }
 
       void test() {
-        RUN_TEST(testDefaults);
-        RUN_TEST(testFieldNames);
-        RUN_TEST(testInitialState);
-        RUN_TEST(testDeserialize);
-        RUN_TEST(testSetAccessPointTimeout);
-        RUN_TEST(testNextMode);
-        RUN_TEST(testSetPermMode);
-        RUN_TEST(testSetTempMode);
+        RUN_TEST(Config_Network_Manager_State_should_have_correct_defaults);
+        RUN_TEST(Config_Network_Manager_State_should_have_correct_field_names_for_serialization);
+        RUN_TEST(Config_Network_Manager_should_initialize_with_the_correct_state);
+        RUN_TEST(Config_Network_Manager_should_apply_the_deserialization_action);
+        RUN_TEST(Config_Network_Manager_should_apply_the_set_access_point_timeout_action);
+        RUN_TEST(Config_Network_Manager_should_apply_the_next_mode_action);
+        RUN_TEST(Config_Network_Manager_should_apply_the_set_perm_mode_action);
+        RUN_TEST(Config_Network_Manager_should_apply_the_set_temp_mode_action);
       }
-    }
 
-    void deserialize() {
-      Manager::deserialize();
-    }
-
-    void test() {
-      Manager::test();
     }
   }
-
-  void deserialize() {
-    Network::deserialize();
-  }
-
-  void initialize() {
-    // initialize the reducers
-    deserialize();
-    // initialize the subscriber
-    subscriber.state = nullptr;
-    // initialize the state
-    store.setup(&reducer, &subscriber);
-  }
-
-  void test() {
-    Network::test();
-  }
-}
-
-// // Note the case, this is not an arduino
-// // function, it is the Unity setUp function
-// // that runs before each test
-// void setUp() {
-  // Config::initialize();
-// }
-
-void setup(void) {
-  UNITY_BEGIN();
-  Config::test();
-  UNITY_END();
-}
-
-void loop() {
-}
-
-int main(int argc, char **argv) {
-  setup();
 }

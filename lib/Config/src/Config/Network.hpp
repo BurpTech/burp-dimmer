@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../Redux/ReducerMap.hpp"
+#include <Redux/ReducerMap.hpp>
 
+#include "../ActionType.hpp"
 #include "./Network/Manager.hpp"
-#include "./Config/ActionType.hpp"
 
 namespace Config {
   namespace Network {
@@ -12,7 +12,7 @@ namespace Config {
       State, ActionType,
       Manager::State, manager, Manager::reducer
     );
-    const Redux::ReducerMap<ActionType, State> reducer;
+    extern const Redux::ReducerMap<ActionType, State> reducer;
 
   }
 }
