@@ -6,7 +6,7 @@
 
 namespace Redux {
 
-  template <class ActionType>
+  template <class DerivedState, class ActionType>
   class Store {
 
     public:
@@ -15,10 +15,15 @@ namespace Redux {
         _state(nullptr) {
       }
 
-      void setup(const Reducer<ActionType> * reducer, Subscriber * subscriber) {
+      void setup(const Reducer<DerivedState, ActionType> * reducer, Subscriber * subscriber) {
         _reducer = reducer;
         _subscriber = subscriber;
-        _state = _reducer->init();
+        // Passing the _state to _reducer->init 
+        // allows us to reinitialize the reducer
+        // without leaking memory as the _state
+        // will not be NULL if setup is called
+        // twice
+        _state = _reducer->init(_state);
         _subscriber->notify();
       }
 
@@ -27,7 +32,6 @@ namespace Redux {
         _subscriber->notify();
       }
 
-      template <class DerivedState>
       const DerivedState * getState() const {
         return _state->as<DerivedState>();
       }
@@ -35,7 +39,7 @@ namespace Redux {
     private:
 
       const State * _state;
-      const Reducer<ActionType> * _reducer;
+      const Reducer<DerivedState, ActionType> * _reducer;
       Subscriber * _subscriber;
 
   };

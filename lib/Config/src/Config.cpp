@@ -2,7 +2,7 @@
 
 namespace Config {
 
-  const Redux::ReducerMap<ActionType, State> reducer;
-  Redux::Store<ActionType> store;
+  const Redux::ReducerMap<State, ActionType> reducer;
+  Redux::Store<State, ActionType> store;
 
 }

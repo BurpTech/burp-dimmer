@@ -8,7 +8,7 @@ namespace Config {
     public:
       const State * state = nullptr;
       void notify() override {
-        state = store.getState<State>();
+        state = store.getState();
       }
   };
   Subscriber subscriber;

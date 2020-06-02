@@ -16,7 +16,7 @@ namespace Config {
       Station::State, station, Station::reducer,
       AccessPoint::State, accessPoint, AccessPoint::reducer
     );
-    extern const Redux::ReducerMap<ActionType, State> reducer;
+    extern const Redux::ReducerMap<State, ActionType> reducer;
 
   }
 }

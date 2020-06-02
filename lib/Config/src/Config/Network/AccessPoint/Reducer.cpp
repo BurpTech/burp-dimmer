@@ -9,7 +9,7 @@ namespace Config {
         _initialState = new State(object);
       }
 
-      const Redux::State * Reducer::init() const {
+      const Redux::State * Reducer::init(const Redux::State * state) const {
         return _initialState;
       }
 

@@ -11,7 +11,7 @@ namespace Config {
       State, ActionType,
       Network::State, network, Network::reducer
     );
-    extern const Redux::ReducerMap<ActionType, State> reducer;
-    extern Redux::Store<ActionType> store;
+    extern const Redux::ReducerMap<State, ActionType> reducer;
+    extern Redux::Store<State, ActionType> store;
 
 }

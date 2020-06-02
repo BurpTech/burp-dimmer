@@ -12,12 +12,12 @@ namespace Config {
   namespace Network {
     namespace AccessPoint {
 
-      class Reducer : public Json::Deserializer, public Redux::Reducer<ActionType> {
+      class Reducer : public Json::Deserializer, public Redux::Reducer<State, ActionType> {
 
         public:
 
           void deserialize(const JsonObject & object) override;
-          const Redux::State * init() const override;
+          const Redux::State * init(const Redux::State * state) const override;
           const Redux::State * reduce(const Redux::State *state, const Redux::Action<ActionType> &action) const override;
 
         private:
