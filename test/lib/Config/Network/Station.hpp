@@ -1,9 +1,12 @@
-#include "./Station.hpp"
+#pragma once
 
 namespace Config {
   namespace Network {
     namespace Station {
-      Reducer reducer;
+
+      void deserialize();
+      void test();
+
     }
   }
 }
