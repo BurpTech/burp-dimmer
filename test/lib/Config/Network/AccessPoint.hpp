@@ -1,9 +1,12 @@
-#include "./AccessPoint.hpp"
+#pragma once
 
 namespace Config {
   namespace Network {
     namespace AccessPoint {
-      Reducer reducer;
+
+      void deserialize();
+      void test();
+
     }
   }
 }
