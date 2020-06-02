@@ -5,9 +5,11 @@
  * Uncomment the next line to globally enable
  * debug output to serial
  */
-#define DEBUG
+#define BURP_DEBUG
 
-#ifdef DEBUG
+#ifdef BURP_DEBUG
+
+#include <Arduino.h>
 
 #define DEBUG_PRINT(...) { Serial.printf("%s: %s: %d: ", __FILE__, __func__, __LINE__); Serial.printf(__VA_ARGS__); Serial.print(F("\n")); }
 #define DEBUG_DO(CODE) { CODE; }

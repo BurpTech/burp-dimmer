@@ -21,17 +21,28 @@ namespace Config {
     return subscriber.state;
   }
 
-  void initialize() {
+
+  void _initialize(f_onObj onObj) {
     // initialize the subscriber
     subscriber.state = nullptr;
     // initialize the state
     store.setup(&reducer, &subscriber);
     withObj([&](JsonObject & object) {
-      object["network"]["manager"][Network::Manager::State::MODE_FIELD] = static_cast<int>(Network::Manager::PermMode::ACCESS_POINT);
-      object["network"]["manager"][Network::Manager::State::ACCESS_POINT_TIMEOUT_FIELD] = 60000;
+      onObj(object);
       store.init([&](Redux::Reducer<State, ActionType, JsonObject>::f_doInit doInit) {
         return doInit(&object);
       });
+    });
+  }
+
+  void initializeDefaults() {
+    _initialize([&](JsonObject & object) {});
+  }
+
+  void initialize() {
+    _initialize([&](JsonObject & object) {
+      object["network"]["manager"][Network::Manager::State::MODE_FIELD] = static_cast<int>(Network::Manager::PermMode::ACCESS_POINT);
+      object["network"]["manager"][Network::Manager::State::ACCESS_POINT_TIMEOUT_FIELD] = 60000;
     });
   }
 

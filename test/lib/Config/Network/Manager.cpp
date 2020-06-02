@@ -29,7 +29,15 @@ namespace Config {
         TEST_ASSERT_EQUAL_STRING("accessPointTimeout", State::ACCESS_POINT_TIMEOUT_FIELD);
       }
 
-      void Config_Network_Manager_should_initialize_with_the_correct_state() {
+      void Config_Network_Manager_should_initialize_with_the_default_state() {
+        initializeDefaults();
+        TEST_ASSERT_EQUAL_INT(State::DEFAULT_PERM_MODE, state()->permMode);
+        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
+        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE_ACTIVE, state()->tempModeActive);
+        TEST_ASSERT_EQUAL_UINT32(State::DEFAULT_ACCESS_POINT_TIMEOUT, state()->accessPointTimeout);
+      }
+
+      void Config_Network_Manager_should_initialize_with_the_serialized_state() {
         initialize();
         TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
@@ -136,7 +144,8 @@ namespace Config {
       void test() {
         RUN_TEST(Config_Network_Manager_State_should_have_correct_defaults);
         RUN_TEST(Config_Network_Manager_State_should_have_correct_field_names_for_serialization);
-        RUN_TEST(Config_Network_Manager_should_initialize_with_the_correct_state);
+        RUN_TEST(Config_Network_Manager_should_initialize_with_the_default_state);
+        RUN_TEST(Config_Network_Manager_should_initialize_with_the_serialized_state);
         RUN_TEST(Config_Network_Manager_should_apply_the_deserialization_action);
         RUN_TEST(Config_Network_Manager_should_apply_the_set_access_point_timeout_action);
         RUN_TEST(Config_Network_Manager_should_apply_the_next_mode_action);

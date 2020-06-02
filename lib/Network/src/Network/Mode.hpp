@@ -1,5 +1,4 @@
-#ifndef Network_Mode_hpp
-#define Network_Mode_hpp
+#pragma once
 
 namespace Network {
 
@@ -15,5 +14,3 @@ namespace Network {
   };
 
 }
-
-#endif

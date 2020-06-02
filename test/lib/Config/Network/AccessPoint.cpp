@@ -23,7 +23,11 @@ namespace Config {
       void Config_Network_AccessPoint_State_should_have_correct_field_names_for_serialization() {
       }
 
-      void Config_Network_AccessPoint_should_initialize_with_the_correct_state() {
+      void Config_Network_AccessPoint_should_initialize_with_the_default_state() {
+        initializeDefaults();
+      }
+
+      void Config_Network_AccessPoint_should_initialize_with_the_serialized_state() {
         initialize();
       }
 
@@ -36,7 +40,8 @@ namespace Config {
       void test() {
         RUN_TEST(Config_Network_AccessPoint_State_should_have_correct_defaults);
         RUN_TEST(Config_Network_AccessPoint_State_should_have_correct_field_names_for_serialization);
-        RUN_TEST(Config_Network_AccessPoint_should_initialize_with_the_correct_state);
+        RUN_TEST(Config_Network_AccessPoint_should_initialize_with_the_default_state);
+        RUN_TEST(Config_Network_AccessPoint_should_initialize_with_the_serialized_state);
         RUN_TEST(Config_Network_AccessPoint_should_apply_the_deserialization_action);
       }
 
