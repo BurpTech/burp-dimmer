@@ -2,7 +2,7 @@
 #include <unity.h>
 
 #include <Redux/Action.hpp>
-#include <Redux/State.hpp>
+#include <Redux/Reducer.hpp>
 #include <Redux/ReducerMap.hpp>
 #include <Redux/SubscriberList.hpp>
 #include <Redux/Store.hpp>
@@ -31,7 +31,7 @@ namespace Redux {
   // States
   //
 
-  class Foo : public State {
+  class Foo {
     public:
       Foo(int value) :
         value(value) {
@@ -40,7 +40,7 @@ namespace Redux {
       int value;
   };
 
-  class Bar : public State {
+  class Bar {
     public:
       Bar(int value) :
         value(value) {
@@ -55,30 +55,29 @@ namespace Redux {
 
   class FooReducer : public Reducer<Foo, TestActionType, int> {
     public:
-      const State * init(const State * state, const f_withInit withInit) const {
+      const Foo * init(const Foo * previous, const f_withInit withInit) const {
         return withInit([&](const int * pValue) {
-          return _alloc(
-            state->as<Foo>(),
+          return alloc(
+            previous,
             [&](void * address) {
               return new(address) Foo(*pValue);
             }
           );
         });
       }
-      const State * reduce(const State * state, const Action<TestActionType> & action) const {
+      const Foo * reduce(const Foo * previous, const Action<TestActionType> & action) const {
         switch (action.type) {
           case TestActionType::INCREMENT_ALL:
           case TestActionType::INCREMENT_FOO: {
-            const Foo * foo = state->as<Foo>();
-            return _alloc(
-              foo,
+            return alloc(
+              previous,
               [&](void * address) {
-                return new(address) Foo(foo->value + 1);
+                return new(address) Foo(previous->value + 1);
               }
             );
           }
           default:
-            return state;
+            return previous;
         }
       }
   };
@@ -86,30 +85,29 @@ namespace Redux {
 
   class BarReducer : public Reducer<Bar, TestActionType, int> {
     public:
-      const State * init(const State * state, const f_withInit withInit) const {
+      const Bar * init(const Bar * previous, const f_withInit withInit) const {
         return withInit([&](const int * pValue) {
-          return _alloc(
-            state->as<Bar>(),
+          return alloc(
+            previous,
             [&](void * address) {
               return new(address) Bar(*pValue);
             }
           );
         });
       }
-      const State * reduce(const State * state, const Action<TestActionType> & action) const {
+      const Bar * reduce(const Bar * previous, const Action<TestActionType> & action) const {
         switch (action.type) {
           case TestActionType::INCREMENT_ALL:
           case TestActionType::INCREMENT_BAR: {
-            const Bar * bar = state->as<Bar>();
-            return _alloc(
-              bar,
+            return alloc(
+              previous,
               [&](void * address) {
-                return new(address) Bar(bar->value + 1);
+                return new(address) Bar(previous->value + 1);
               }
             );
           }
           default:
-            return state;
+            return previous;
         }
       }
   };
@@ -120,7 +118,7 @@ namespace Redux {
     int bar;
   };
 
-  class Top : public Redux::State {
+  class Top {
     public:
       const Foo * foo;
       const Bar * bar;
@@ -128,21 +126,21 @@ namespace Redux {
       Top(const Top * previous, const InitialValues * values) :
         foo(fooReducer.init(
           previous ? previous->foo : nullptr,
-          [&](Redux::Reducer<Foo, TestActionType, int>::f_doInit doInit) {
+          [&](Reducer<Foo, TestActionType, int>::f_doInit doInit) {
             return doInit(&(values->foo));
           }
-        )->as<Foo>()),
+        )),
         bar(barReducer.init(
           previous ? previous->bar : nullptr,
-          [&](Redux::Reducer<Bar, TestActionType, int>::f_doInit doInit) {
+          [&](Reducer<Bar, TestActionType, int>::f_doInit doInit) {
             return doInit(&(values->bar));
           }
-        )->as<Bar>()) {
+        )) {
       }
 
-      Top(const Top * previous, const Redux::Action<TestActionType> & action) :
-        foo(fooReducer.reduce(previous->foo, action)->as<Foo>()),
-        bar(barReducer.reduce(previous->bar, action)->as<Bar>()) {
+      Top(const Top * previous, const Action<TestActionType> & action) :
+        foo(fooReducer.reduce(previous->foo, action)),
+        bar(barReducer.reduce(previous->bar, action)) {
       }
   };
   ReducerMap<Top, TestActionType, InitialValues> reducer;
@@ -163,8 +161,7 @@ namespace Redux {
   class FooSubscriber : public Subscriber {
     public:
       void notify() override {
-        const Top * top = store.getState();
-        foo = top->foo->value;
+        foo = store.state->foo->value;
       }
   };
   FooSubscriber fooSubscriber;
@@ -172,8 +169,7 @@ namespace Redux {
   class BarSubscriber : public Subscriber {
     public:
       void notify() override {
-        const Top * top = store.getState();
-        bar = top->bar->value;
+        bar = store.state->bar->value;
       }
   };
   BarSubscriber barSubscriber;
@@ -193,7 +189,7 @@ namespace Redux {
       5, 24
     };
     store.init(
-      [&](Redux::Reducer<Top, TestActionType, InitialValues>::f_doInit doInit) {
+      [&](Reducer<Top, TestActionType, InitialValues>::f_doInit doInit) {
         return doInit(&initialValues);
       }
     );

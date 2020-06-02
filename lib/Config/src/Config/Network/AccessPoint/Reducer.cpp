@@ -5,10 +5,10 @@ namespace Config {
   namespace Network {
     namespace AccessPoint {
 
-      const Redux::State * Reducer::init(const Redux::State * state, const Redux::Reducer<State, ActionType, JsonObject>::f_withInit withInit) const {
+      const State * Reducer::init(const State * previous, const Redux::Reducer<State, ActionType, JsonObject>::f_withInit withInit) const {
         return withInit([&](const JsonObject * pObject) {
-          return Redux::Reducer<State, ActionType, JsonObject>::_alloc(
-            state->as<State>(),
+          return alloc(
+            previous,
             [&](void * address) {
               return new(address) State(*pObject);
             }
@@ -16,11 +16,11 @@ namespace Config {
         });
       }
 
-      const Redux::State * Reducer::reduce(const Redux::State *state, const Redux::Action<ActionType> &action) const {
+      const State * Reducer::reduce(const State *previous, const Redux::Action<ActionType> &action) const {
         switch (action.type) {
           case ActionType::NETWORK_ACCESS_POINT_DESERIALIZE: {
-            return Redux::Reducer<State, ActionType, JsonObject>::_alloc(
-              state->as<State>(),
+            return alloc(
+              previous,
               [&](void * address) {
                 return new(address) State(
                   action.as<Actions::Deserialize>().object
@@ -29,7 +29,7 @@ namespace Config {
             );
           }
           default:
-            return state;
+            return previous;
         }
       }
 

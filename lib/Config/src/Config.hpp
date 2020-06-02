@@ -8,7 +8,7 @@
 
 namespace Config {
 
-    class State : public Redux::State {
+    class State {
       public:
         const Network::State * network;
 
@@ -19,11 +19,11 @@ namespace Config {
               const JsonObject obj = (*object)["network"];
               return doInit(&obj);
             }
-          )->as<Network::State>()) {
+          )) {
         }
 
         State(const State * previous, const Redux::Action<ActionType> & action) :
-          network(Network::reducer.reduce(previous, action)->as<Network::State>()) {
+          network(Network::reducer.reduce(previous->network, action)) {
         }
     };
     extern const Redux::ReducerMap<State, ActionType, JsonObject> reducer;

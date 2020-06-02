@@ -3,7 +3,6 @@
 #include <ArduinoJson.h>
 #include <Json/Deserializer.hpp>
 #include <Redux/Reducer.hpp>
-#include <Redux/State.hpp>
 #include <Redux/Action.hpp>
 #include "../../../ActionType.hpp"
 #include "./State.hpp"
@@ -16,8 +15,8 @@ namespace Config {
 
         public:
 
-          const Redux::State * init(const Redux::State * state, const f_withInit withInit) const override;
-          const Redux::State * reduce(const Redux::State *state, const Redux::Action<ActionType> &action) const override;
+          const State * init(const State * previous, const f_withInit withInit) const override;
+          const State * reduce(const State *previous, const Redux::Action<ActionType> &action) const override;
 
         private:
 

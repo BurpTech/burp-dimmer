@@ -12,7 +12,7 @@ namespace Config {
     public:
       const State * state = nullptr;
       void notify() override {
-        state = store.getState();
+        state = store.state;
       }
   };
   Subscriber subscriber;

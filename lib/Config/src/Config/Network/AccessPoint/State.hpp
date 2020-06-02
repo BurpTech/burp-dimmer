@@ -2,13 +2,12 @@
 
 #include <ArduinoJson.h>
 #include <Json/Serializer.hpp>
-#include <Redux/State.hpp>
 
 namespace Config {
   namespace Network {
     namespace AccessPoint {
 
-      class State : public Json::Serializer, public Redux::State {
+      class State : public Json::Serializer {
         public:
 
           State(const JsonObject & object);

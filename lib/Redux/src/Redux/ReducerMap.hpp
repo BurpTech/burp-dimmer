@@ -1,40 +1,30 @@
 #pragma once
 
 #include "./Reducer.hpp"
-#include "./ReducerMapMacros.hpp"
 
 namespace Redux {
 
-  template <class DerivedState, class ActionType, class InitParams>
-  class ReducerMap : public Reducer<DerivedState, ActionType, InitParams> {
+  template <class State, class ActionType, class InitParams>
+  class ReducerMap : public Reducer<State, ActionType, InitParams> {
 
     public:
 
-      const State * init(const State * state, const typename Reducer<DerivedState, ActionType, InitParams>::f_withInit withInit) const override {
-        if (withInit) {
-          return withInit([&](const InitParams * initParams) {
-            return Reducer<DerivedState, ActionType, InitParams>::_alloc(
-              state->as<DerivedState>(),
-              [&](void * address) {
-                return new(address) DerivedState(state->as<DerivedState>(), initParams);
-              }
-            );
-          });
-        } else {
-          return Reducer<DerivedState, ActionType, InitParams>::_alloc(
-            state->as<DerivedState>(),
+      const State * init(const State * previous, const typename Reducer<State, ActionType, InitParams>::f_withInit withInit) const override {
+        return withInit([&](const InitParams * initParams) {
+          return Reducer<State, ActionType, InitParams>::alloc(
+            previous,
             [&](void * address) {
-              return new(address) DerivedState(state->as<DerivedState>(), nullptr);
+              return new(address) State(previous, initParams);
             }
           );
-        }
+        });
       }
 
-      const State * reduce(const State * state, const Action<ActionType> & action) const override {
-        return Reducer<DerivedState, ActionType, InitParams>::_alloc(
-          state->as<DerivedState>(),
+      const State * reduce(const State * previous, const Action<ActionType> & action) const override {
+        return Reducer<State, ActionType, InitParams>::alloc(
+          previous,
           [&](void * address) {
-            return new(address) DerivedState(state->as<DerivedState>(), action);
+            return new(address) State(previous, action);
           }
         );
       }

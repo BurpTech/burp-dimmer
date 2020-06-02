@@ -2,7 +2,6 @@
 
 #include <ArduinoJson.h>
 #include <Json/Serializer.hpp>
-#include <Redux/State.hpp>
 
 namespace Config {
   namespace Network {
@@ -19,7 +18,7 @@ namespace Config {
         WPS_CONFIG
       };
 
-      class State : public Json::Serializer, public Redux::State {
+      class State : public Json::Serializer {
         public:
 
           static constexpr char MODE_FIELD[] = "mode";
