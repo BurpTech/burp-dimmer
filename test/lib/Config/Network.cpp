@@ -11,12 +11,6 @@ namespace Config {
       return Config::state()->network;
     }
 
-    void deserialize() {
-      Manager::deserialize();
-      Station::deserialize();
-      AccessPoint::deserialize();
-    }
-
     void test() {
       Manager::test();
       Station::test();

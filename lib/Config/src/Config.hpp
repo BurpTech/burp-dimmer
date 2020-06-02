@@ -4,14 +4,29 @@
 #include <Redux/ReducerMap.hpp>
 #include "./ActionType.hpp"
 #include "./Config/Network.hpp"
+#include "ArduinoJson.hpp"
 
 namespace Config {
 
-    REDUX_REDUCERMAP_STATE_1(
-      State, ActionType,
-      Network::State, network, Network::reducer
-    );
-    extern const Redux::ReducerMap<State, ActionType> reducer;
-    extern Redux::Store<State, ActionType> store;
+    class State : public Redux::State {
+      public:
+        const Network::State * network;
+
+        State(const State * previous, const JsonObject * object) :
+          network(Network::reducer.init(
+            previous ? previous->network : nullptr,
+            [&](const Redux::Reducer<Network::State, ActionType, JsonObject>::f_doInit doInit) {
+              const JsonObject obj = (*object)["network"];
+              return doInit(&obj);
+            }
+          )->as<Network::State>()) {
+        }
+
+        State(const State * previous, const Redux::Action<ActionType> & action) :
+          network(Network::reducer.reduce(previous, action)->as<Network::State>()) {
+        }
+    };
+    extern const Redux::ReducerMap<State, ActionType, JsonObject> reducer;
+    extern Redux::Store<State, ActionType, JsonObject> store;
 
 }

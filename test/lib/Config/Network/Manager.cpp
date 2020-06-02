@@ -133,14 +133,6 @@ namespace Config {
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
       }
 
-      void deserialize() {
-        withObj([&](JsonObject & object) {
-          object[State::MODE_FIELD] = static_cast<int>(PermMode::ACCESS_POINT);
-          object[State::ACCESS_POINT_TIMEOUT_FIELD] = 60000;
-          reducer.deserialize(object);
-        });
-      }
-
       void test() {
         RUN_TEST(Config_Network_Manager_State_should_have_correct_defaults);
         RUN_TEST(Config_Network_Manager_State_should_have_correct_field_names_for_serialization);

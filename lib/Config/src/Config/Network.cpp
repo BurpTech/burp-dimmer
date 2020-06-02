@@ -3,7 +3,7 @@
 namespace Config {
   namespace Network {
 
-    const Redux::ReducerMap<State, ActionType> reducer;
+    const Redux::ReducerMap<State, ActionType, JsonObject> reducer;
 
   }
 }

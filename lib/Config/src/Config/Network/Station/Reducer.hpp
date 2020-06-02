@@ -12,17 +12,12 @@ namespace Config {
   namespace Network {
     namespace Station {
 
-      class Reducer : public Json::Deserializer, public Redux::Reducer<State, ActionType> {
+      class Reducer : public Redux::Reducer<State, ActionType, JsonObject> {
 
         public:
 
-          void deserialize(const JsonObject & object) override;
-          const Redux::State * init(const Redux::State * state) const override;
+          const Redux::State * init(const Redux::State * state, const Redux::Reducer<State, ActionType, JsonObject>::f_withInit withInit) const override;
           const Redux::State * reduce(const Redux::State *state, const Redux::Action<ActionType> &action) const override;
-
-        private:
-
-          const State * _initialState = nullptr;
 
       };
 

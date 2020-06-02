@@ -33,12 +33,6 @@ namespace Config {
         });
       }
 
-      void deserialize() {
-        withObj([&](JsonObject & object) {
-          reducer.deserialize(object);
-        });
-      }
-
       void test() {
         RUN_TEST(Config_Network_AccessPoint_State_should_have_correct_defaults);
         RUN_TEST(Config_Network_AccessPoint_State_should_have_correct_field_names_for_serialization);
