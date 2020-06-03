@@ -6,6 +6,7 @@
 #include <Redux/Action.hpp>
 #include "../../../ActionType.hpp"
 #include "./State.hpp"
+#include "ArduinoJson.hpp"
 
 namespace Config {
   namespace Network {
@@ -15,7 +16,7 @@ namespace Config {
 
         public:
 
-          const State * init(const State * previous, const f_withInit withInit) const override;
+          const State * init(const State * previous, const JsonObject & object) const override;
           const State * reduce(const State *previous, const Redux::Action<ActionType> &action) const override;
 
         private:

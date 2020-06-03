@@ -1,19 +1,18 @@
 #include "./Reducer.hpp"
 #include "./Actions.hpp"
+#include "ArduinoJson.hpp"
 
 namespace Config {
   namespace Network {
     namespace AccessPoint {
 
-      const State * Reducer::init(const State * previous, const Redux::Reducer<State, ActionType, JsonObject>::f_withInit withInit) const {
-        return withInit([&](const JsonObject * pObject) {
-          return alloc(
-            previous,
-            [&](void * address) {
-              return new(address) State(*pObject);
-            }
-          );
-        });
+      const State * Reducer::init(const State * previous, const JsonObject & object) const {
+        return alloc(
+          previous,
+          [&](void * address) {
+            return new(address) State(object);
+          }
+        );
       }
 
       const State * Reducer::reduce(const State *previous, const Redux::Action<ActionType> &action) const {

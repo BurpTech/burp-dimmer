@@ -9,6 +9,11 @@
 
 namespace Redux {
 
+  struct InitialValues {
+    int foo;
+    int bar;
+  };
+
   //
   // Action types
   //
@@ -55,15 +60,13 @@ namespace Redux {
 
   class FooReducer : public Reducer<Foo, TestActionType, int> {
     public:
-      const Foo * init(const Foo * previous, const f_withInit withInit) const {
-        return withInit([&](const int * pValue) {
-          return alloc(
-            previous,
-            [&](void * address) {
-              return new(address) Foo(*pValue);
-            }
-          );
-        });
+      const Foo * init(const Foo * previous, const int & value) const {
+        return alloc(
+          previous,
+          [&](void * address) {
+            return new(address) Foo(value);
+          }
+        );
       }
       const Foo * reduce(const Foo * previous, const Action<TestActionType> & action) const {
         switch (action.type) {
@@ -85,15 +88,13 @@ namespace Redux {
 
   class BarReducer : public Reducer<Bar, TestActionType, int> {
     public:
-      const Bar * init(const Bar * previous, const f_withInit withInit) const {
-        return withInit([&](const int * pValue) {
-          return alloc(
-            previous,
-            [&](void * address) {
-              return new(address) Bar(*pValue);
-            }
-          );
-        });
+      const Bar * init(const Bar * previous, const int & value) const {
+        return alloc(
+          previous,
+          [&](void * address) {
+            return new(address) Bar(value);
+          }
+        );
       }
       const Bar * reduce(const Bar * previous, const Action<TestActionType> & action) const {
         switch (action.type) {
@@ -113,28 +114,19 @@ namespace Redux {
   };
   BarReducer barReducer;
 
-  using InitialValues = struct {
-    int foo;
-    int bar;
-  };
-
   class Top {
     public:
       const Foo * foo;
       const Bar * bar;
 
-      Top(const Top * previous, const InitialValues * values) :
+      Top(const Top * previous, const InitialValues & values) :
         foo(fooReducer.init(
           previous ? previous->foo : nullptr,
-          [&](Reducer<Foo, TestActionType, int>::f_doInit doInit) {
-            return doInit(&(values->foo));
-          }
+          values.foo
         )),
         bar(barReducer.init(
           previous ? previous->bar : nullptr,
-          [&](Reducer<Bar, TestActionType, int>::f_doInit doInit) {
-            return doInit(&(values->bar));
-          }
+          values.bar
         )) {
       }
 
@@ -188,11 +180,7 @@ namespace Redux {
     InitialValues initialValues = {
       5, 24
     };
-    store.init(
-      [&](Reducer<Top, TestActionType, InitialValues>::f_doInit doInit) {
-        return doInit(&initialValues);
-      }
-    );
+    store.init(initialValues);
     TEST_ASSERT_EQUAL_INT(5, foo);
     TEST_ASSERT_EQUAL_INT(24, bar);
     store.dispatch(incrementAll);

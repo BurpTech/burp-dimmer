@@ -22,13 +22,13 @@ namespace Redux {
         _subscriber = subscriber;
       }
 
-      void init(const typename Reducer<State, ActionType, InitParams>::f_withInit withInit) {
+      void init(const InitParams & initParams) {
         // Passing the state to _reducer->init 
         // allows us to reinitialize the reducer
         // without leaking memory as the state
-        // will not be NULL if setup is called
+        // will not be nullptr if init is called
         // twice
-        state = _reducer->init(state, withInit);
+        state = _reducer->init(state, initParams);
         _subscriber->notify();
       }
 

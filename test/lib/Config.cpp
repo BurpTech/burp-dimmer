@@ -29,9 +29,7 @@ namespace Config {
     store.setup(&reducer, &subscriber);
     withObj([&](JsonObject & object) {
       onObj(object);
-      store.init([&](Redux::Reducer<State, ActionType, JsonObject>::f_doInit doInit) {
-        return doInit(&object);
-      });
+      store.init(object);
     });
   }
 
