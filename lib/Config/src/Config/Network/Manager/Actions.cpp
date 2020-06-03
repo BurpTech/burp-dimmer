@@ -1,33 +1,26 @@
 #include "./Actions.hpp"
+#include "ActionType.hpp"
+#include "Config/Network/Manager/State.hpp"
 
 namespace Config {
   namespace Network {
     namespace Manager {
       namespace Actions {
 
-        Deserialize::Deserialize(const JsonObject & object) : 
-          Redux::Action<ActionType>(ActionType::NETWORK_MANAGER_DESERIALIZE),
-          object(object) {
+        namespace {
+          const PermMode _permModeNormal = PermMode::NORMAL;
+          const PermMode _permModeAccessPoint = PermMode::ACCESS_POINT;
+          const PermMode _permModeOff = PermMode::OFF;
+          const TempMode _tempModeAccessPoint = TempMode::ACCESS_POINT;
+          const TempMode _tempModeWpsConfig = TempMode::WPS_CONFIG;
         }
 
-        SetAccessPointTimeout::SetAccessPointTimeout(const unsigned long timeout) : 
-          Redux::Action<ActionType>(ActionType::NETWORK_MANAGER_SET_ACCESS_POINT_TIMEOUT),
-          timeout(timeout) {
-        }
-
-        NextMode::NextMode() : 
-          Redux::Action<ActionType>(ActionType::NETWORK_MANAGER_NEXT_PERM_MODE) {
-        }
-
-        SetPermMode::SetPermMode(PermMode mode) : 
-          Redux::Action<ActionType>(ActionType::NETWORK_MANAGER_SET_PERM_MODE),
-          mode(mode) {
-        }
-
-        SetTempMode::SetTempMode(TempMode mode) : 
-          Redux::Action<ActionType>(ActionType::NETWORK_MANAGER_SET_TEMP_MODE),
-          mode(mode) {
-        }
+        const Redux::Action<ActionType> nextPermMode(ActionType::NETWORK_MANAGER_NEXT_PERM_MODE);
+        const Redux::Action<ActionType> setPermModeNormal(ActionType::NETWORK_MANAGER_SET_PERM_MODE, &_permModeNormal);
+        const Redux::Action<ActionType> setPermModeAccessPoint(ActionType::NETWORK_MANAGER_SET_PERM_MODE, &_permModeAccessPoint);
+        const Redux::Action<ActionType> setPermModeOff(ActionType::NETWORK_MANAGER_SET_PERM_MODE, &_permModeOff);
+        const Redux::Action<ActionType> setTempModeAccessPoint(ActionType::NETWORK_MANAGER_SET_TEMP_MODE, &_tempModeAccessPoint);
+        const Redux::Action<ActionType> setTempModeWpsConfig(ActionType::NETWORK_MANAGER_SET_TEMP_MODE, &_tempModeWpsConfig);
 
       }
     }

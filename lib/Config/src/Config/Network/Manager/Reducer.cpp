@@ -22,7 +22,7 @@ namespace Config {
               previous,
               [&](void * address) {
                 return new(address) State(
-                  action.as<Actions::Deserialize>().object
+                  *(action.payload<JsonObject>())
                 );
               }
             );
@@ -33,7 +33,7 @@ namespace Config {
               [&](void * address) {
                 return new(address) State(
                   *previous,
-                  action.as<Actions::SetAccessPointTimeout>().timeout
+                  *(action.payload<unsigned long>())
                 );
               }
             );
@@ -55,7 +55,7 @@ namespace Config {
               [&](void * address) {
                 return new(address) State(
                   *previous,
-                  action.as<Actions::SetPermMode>().mode
+                  *(action.payload<PermMode>())
                 );
               }
             );
@@ -66,7 +66,7 @@ namespace Config {
               [&](void * address) {
                 return new(address) State(
                   *previous,
-                  action.as<Actions::SetTempMode>().mode
+                  *(action.payload<TempMode>())
                 );
               }
             );

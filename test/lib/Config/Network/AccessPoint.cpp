@@ -7,6 +7,7 @@
 #include "../../Config.hpp"
 #include "../Network.hpp"
 #include "./AccessPoint.hpp"
+#include "ActionType.hpp"
 
 namespace Config {
   namespace Network {
@@ -34,6 +35,7 @@ namespace Config {
       void Config_Network_AccessPoint_should_apply_the_deserialization_action() {
         initialize();
         withObj([&](JsonObject & object) {
+          store.dispatch(Redux::Action<ActionType>(ActionType::NETWORK_ACCESS_POINT_DESERIALIZE, &object));
         });
       }
 

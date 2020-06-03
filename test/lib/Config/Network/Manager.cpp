@@ -7,6 +7,7 @@
 #include "../../Config.hpp"
 #include "../Network.hpp"
 #include "./Manager.hpp"
+#include "ActionType.hpp"
 
 namespace Config {
   namespace Network {
@@ -50,8 +51,7 @@ namespace Config {
         withObj([&](JsonObject & object) {
           object[State::MODE_FIELD] = static_cast<int>(PermMode::OFF);
           object[State::ACCESS_POINT_TIMEOUT_FIELD] = 30000;
-          const Deserialize action(object);
-          store.dispatch(action);
+          store.dispatch(Redux::Action<ActionType>(ActionType::NETWORK_MANAGER_DESERIALIZE, &object));
           TEST_ASSERT_EQUAL_INT(PermMode::OFF, state()->permMode);
           TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
           TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE_ACTIVE, state()->tempModeActive);
@@ -61,12 +61,12 @@ namespace Config {
 
       void Config_Network_Manager_should_apply_the_set_access_point_timeout_action() {
         initialize();
-        const SetAccessPointTimeout action(100000);
-        store.dispatch(action);
+        unsigned long timeout = 100000;
+        store.dispatch(Redux::Action<ActionType>(ActionType::NETWORK_MANAGER_SET_ACCESS_POINT_TIMEOUT, &timeout));
         TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE_ACTIVE, state()->tempModeActive);
-        TEST_ASSERT_EQUAL_UINT32(100000, state()->accessPointTimeout);
+        TEST_ASSERT_EQUAL_UINT32(timeout, state()->accessPointTimeout);
       }
 
       void Config_Network_Manager_should_apply_the_next_mode_action() {
@@ -76,22 +76,22 @@ namespace Config {
         // turns it off
         store.dispatch(setTempModeWpsConfig);
 
-        store.dispatch(nextMode);
+        store.dispatch(nextPermMode);
         TEST_ASSERT_EQUAL_INT(PermMode::OFF, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
-        store.dispatch(nextMode);
+        store.dispatch(nextPermMode);
         TEST_ASSERT_EQUAL_INT(PermMode::NORMAL, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
-        store.dispatch(nextMode);
+        store.dispatch(nextPermMode);
         TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
         TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
-        store.dispatch(nextMode);
+        store.dispatch(nextPermMode);
         TEST_ASSERT_EQUAL_INT(PermMode::OFF, state()->permMode);
         TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
         TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);

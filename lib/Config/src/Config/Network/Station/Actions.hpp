@@ -10,12 +10,6 @@ namespace Config {
     namespace Station {
       namespace Actions {
 
-        class Deserialize: public Redux::Action<ActionType> {
-          public:
-            const JsonObject & object;
-            Deserialize(const JsonObject & object);
-        };
-
       }
     }
   }

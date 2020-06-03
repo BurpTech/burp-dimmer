@@ -34,6 +34,7 @@ namespace Config {
       void Config_Network_Station_should_apply_the_deserialization_action() {
         initialize();
         withObj([&](JsonObject & object) {
+          store.dispatch(Redux::Action<ActionType>(ActionType::NETWORK_STATION_DESERIALIZE, &object));
         });
       }
 

@@ -24,7 +24,7 @@ namespace Config {
               previous,
               [&](void * address) {
                 return new(address) State(
-                  action.as<Actions::Deserialize>().object
+                  *(action.payload<JsonObject>())
                 );
               }
             );

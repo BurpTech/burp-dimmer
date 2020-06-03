@@ -7,16 +7,21 @@ namespace Redux {
 
     public:
 
-      ActionType type;
+      const ActionType type;
 
-      Action(ActionType type) :
-        type(type) {
+      Action(const ActionType type, const void * payload = nullptr) :
+        type(type),
+        _payload(payload) {
       }
 
       template <class T>
-      const T & as() const {
-        return static_cast<const T &>(*this);
+      const T * payload() const {
+        return static_cast<const T *>(_payload);
       }
+
+    private:
+
+      const void * _payload;
 
   };
 }

@@ -10,34 +10,12 @@ namespace Config {
     namespace Manager {
       namespace Actions {
 
-        class Deserialize: public Redux::Action<ActionType> {
-          public:
-            const JsonObject & object;
-            Deserialize(const JsonObject & object);
-        };
-
-        class SetAccessPointTimeout: public Redux::Action<ActionType> {
-          public:
-            const unsigned long timeout;
-            SetAccessPointTimeout(const unsigned long timeout);
-        };
-
-        class NextMode: public Redux::Action<ActionType> {
-          public:
-            NextMode();
-        };
-
-        class SetPermMode: public Redux::Action<ActionType> {
-          public:
-            PermMode mode;
-            SetPermMode(PermMode mode);
-        };
-
-        class SetTempMode: public Redux::Action<ActionType> {
-          public:
-            TempMode mode;
-            SetTempMode(TempMode mode);
-        };
+        extern const Redux::Action<ActionType> nextPermMode;
+        extern const Redux::Action<ActionType> setPermModeNormal;
+        extern const Redux::Action<ActionType> setPermModeAccessPoint;
+        extern const Redux::Action<ActionType> setPermModeOff;
+        extern const Redux::Action<ActionType> setTempModeAccessPoint;
+        extern const Redux::Action<ActionType> setTempModeWpsConfig;
 
       }
     }

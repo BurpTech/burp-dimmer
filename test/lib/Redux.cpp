@@ -21,7 +21,8 @@ namespace Redux {
   enum class TestActionType {
     INCREMENT_ALL,
     INCREMENT_FOO,
-    INCREMENT_BAR
+    INCREMENT_BAR,
+    INCREASE_ALL
   };
 
   //
@@ -79,6 +80,13 @@ namespace Redux {
               }
             );
           }
+          case TestActionType::INCREASE_ALL:
+            return alloc(
+              previous,
+              [&](void * address) {
+                return new(address) Foo(previous->value + *(action.payload<int>()));
+              }
+            );
           default:
             return previous;
         }
@@ -107,6 +115,13 @@ namespace Redux {
               }
             );
           }
+          case TestActionType::INCREASE_ALL:
+            return alloc(
+              previous,
+              [&](void * address) {
+                return new(address) Bar(previous->value + *(action.payload<int>()));
+              }
+            );
           default:
             return previous;
         }
@@ -192,6 +207,10 @@ namespace Redux {
     store.dispatch(incrementBar);
     TEST_ASSERT_EQUAL_INT(7, foo);
     TEST_ASSERT_EQUAL_INT(26, bar);
+    int increase = 5;
+    store.dispatch(Action<TestActionType>(TestActionType::INCREASE_ALL, &increase));
+    TEST_ASSERT_EQUAL_INT(12, foo);
+    TEST_ASSERT_EQUAL_INT(31, bar);
   }
 
   void test() {
