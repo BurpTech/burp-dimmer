@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Util/Debug.hpp>
 #include "Reducer.hpp"
 #include "Subscriber.hpp"
 #include "Action.hpp"
@@ -33,14 +34,25 @@ namespace Redux {
       }
 
       void dispatch(const Action<ActionType> & action) {
-        state = _reducer->reduce(state, action);
-        _subscriber->notify();
+        if (_notifying) {
+          BURP_DEBUG_ERROR("Cannot dispatch an action while notifying a changed state, you should probably wait for the next loop: Action.type: [%d]", action.type);
+        } else {
+          state = _reducer->reduce(state, action);
+          _subscriber->notify();
+        }
       }
 
     private:
 
       const Reducer<State, ActionType, InitParams> * _reducer;
       Subscriber * _subscriber;
+      bool _notifying = false;
+
+      void _notify() {
+        _notifying = true;
+        _subscriber->notify();
+        _notifying = false;
+      }
 
   };
 }

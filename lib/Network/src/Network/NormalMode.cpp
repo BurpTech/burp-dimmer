@@ -5,15 +5,15 @@
 namespace Network {
 
   void NormalMode::start() {
-    DEBUG_PRINT("TODO");
+    BURP_DEBUG_ERROR("TODO");
   }
 
   void NormalMode::stop() {
-    DEBUG_PRINT("TODO");
+    BURP_DEBUG_ERROR("TODO");
   }
 
   void NormalMode::setup() {
-    DEBUG_PRINT("TODO");
+    BURP_DEBUG_ERROR("TODO");
   }
 
   void NormalMode::loop() {

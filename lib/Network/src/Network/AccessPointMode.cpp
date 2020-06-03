@@ -5,15 +5,15 @@
 namespace Network {
 
   void AccessPointMode::start() {
-    DEBUG_PRINT("TODO");
+    BURP_DEBUG_ERROR("TODO");
   }
 
   void AccessPointMode::stop() {
-    DEBUG_PRINT("TODO");
+    BURP_DEBUG_ERROR("TODO");
   }
 
   void AccessPointMode::setup() {
-    DEBUG_PRINT("TODO");
+    BURP_DEBUG_ERROR("TODO");
   }
 
   void AccessPointMode::loop() {

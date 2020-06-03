@@ -1,4 +1,5 @@
 #include "./Manager.hpp"
+#include "Util/Debug.hpp"
 
 namespace Network {
 
@@ -52,6 +53,8 @@ namespace Network {
           return &offMode;
       }
     }
+    BURP_DEBUG_ERROR("IMPOSSIBLE MODE!!");
+    return nullptr;
   }
 
 }

@@ -5,15 +5,15 @@
 namespace Network {
 
   void WpsConfigMode::start() {
-    DEBUG_PRINT("TODO");
+    BURP_DEBUG_ERROR("TODO");
   }
 
   void WpsConfigMode::stop() {
-    DEBUG_PRINT("TODO");
+    BURP_DEBUG_ERROR("TODO");
   }
 
   void WpsConfigMode::setup() {
-    DEBUG_PRINT("TODO");
+    BURP_DEBUG_ERROR("TODO");
   }
 
   void WpsConfigMode::loop() {

@@ -5,15 +5,15 @@
 namespace Network {
 
   void OffMode::start() {
-    DEBUG_PRINT("TODO");
+    BURP_DEBUG_ERROR("TODO");
   }
 
   void OffMode::stop() {
-    DEBUG_PRINT("TODO");
+    BURP_DEBUG_ERROR("TODO");
   }
 
   void OffMode::setup() {
-    DEBUG_PRINT("TODO");
+    BURP_DEBUG_ERROR("TODO");
   }
 
   void OffMode::loop() {

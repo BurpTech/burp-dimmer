@@ -40,6 +40,14 @@ This is the PlatformIO version currently being used:
 
 - PlatformIO Core 4.3.4 - https://docs.platformio.org/en/latest/core/installation.html
 
+The current version of `espressif8266` is 2.5.1
+
+Install the `espressif8266` platform with
+
+```
+platformio install espressif8266
+```
+
 ### Flashing the SPIFFS file system
 
 The `sketch/data` directory contains files that are required at run time and need to be flashed onto the board.
