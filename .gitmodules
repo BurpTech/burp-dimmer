@@ -7,3 +7,6 @@
 [submodule "lib/ArduinoFake"]
 	path = lib/ArduinoFake
 	url = https://github.com/FabioBatSilva/ArduinoFake.git
+[submodule "lib/BddUnity"]
+	path = lib/BddUnity
+	url = https://github.com/pghalliday/BddUnity.git

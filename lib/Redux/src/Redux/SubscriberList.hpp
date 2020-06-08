@@ -4,16 +4,28 @@
 
 namespace Redux {
 
-  class SubscriberList : public Subscriber {
+  template <class State>
+  class SubscriberList : public Subscriber<State> {
 
     public:
 
-      SubscriberList(Subscriber ** subscribers);
-      void notify() override;
+      SubscriberList(Subscriber<State> ** subscribers)
+        : _subscribers(subscribers)
+      {}
+
+      void notify(const State * state) override
+      {
+        Subscriber<State> ** subscriber = _subscribers;
+        while (*subscriber)
+        {
+          (*subscriber)->notify(state);
+          subscriber++;
+        }
+      }
 
     private:
 
-      Subscriber ** _subscribers;
+      Subscriber<State> ** _subscribers;
 
   };
 

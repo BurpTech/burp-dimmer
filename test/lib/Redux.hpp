@@ -1,5 +1,8 @@
 #pragma once
 
+#include <BddUnity.hpp>
+extern Memory memory;
+
 namespace Redux {
-  void test();
+  extern Module tests;
 }

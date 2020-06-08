@@ -19,4 +19,8 @@ namespace Network {
   void OffMode::loop() {
   }
 
+  void OffMode::notify() {
+    BURP_DEBUG_ERROR("TODO");
+  }
+
 }

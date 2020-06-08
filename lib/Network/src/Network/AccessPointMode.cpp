@@ -19,4 +19,8 @@ namespace Network {
   void AccessPointMode::loop() {
   }
 
+  void AccessPointMode::notify() {
+    BURP_DEBUG_ERROR("TODO");
+  }
+
 }

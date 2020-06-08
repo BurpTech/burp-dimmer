@@ -12,6 +12,7 @@ namespace Network {
       void stop() override;
       void setup() override;
       void loop() override;
+      void notify() override;
 
   };
 

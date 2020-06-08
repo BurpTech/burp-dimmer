@@ -19,4 +19,8 @@ namespace Network {
   void WpsConfigMode::loop() {
   }
 
+  void WpsConfigMode::notify() {
+    BURP_DEBUG_ERROR("TODO");
+  }
+
 }

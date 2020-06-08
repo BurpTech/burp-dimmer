@@ -12,15 +12,25 @@ namespace Redux {
 
     public:
 
-      const State * state;
-
       Store() :
-        state(nullptr) {
+        _state(nullptr),
+        _lastState(nullptr) {
       }
 
-      void setup(const Reducer<State, ActionType, InitParams> * reducer, Subscriber * subscriber) {
+      void setup(const Reducer<State, ActionType, InitParams> * reducer, Subscriber<State> * subscriber) {
         _reducer = reducer;
         _subscriber = subscriber;
+      }
+
+      void loop() {
+        // Notify asynchronously so that 
+        // actions can be batched synchronously.
+        // State reduction is always synchronous
+        if (_state != _lastState) {
+          _notifying = true;
+          _subscriber->notify(_state);
+          _notifying = false;
+        }
       }
 
       void init(const InitParams & initParams) {
@@ -29,30 +39,36 @@ namespace Redux {
         // without leaking memory as the state
         // will not be nullptr if init is called
         // twice
-        state = _reducer->init(state, initParams);
-        _subscriber->notify();
+        _reducing = true;
+        _state = _reducer->init(_state, initParams);
+        _reducing = false;
       }
 
       void dispatch(const Action<ActionType> & action) {
-        if (_notifying) {
-          BURP_DEBUG_ERROR("Cannot dispatch an action while notifying a changed state, you should probably wait for the next loop: Action.type: [%d]", action.type);
+        if (_reducing) {
+          BURP_DEBUG_ERROR("Reducers cannot dispatch actions!!: Action.type: [%d]", action.type);
         } else {
-          state = _reducer->reduce(state, action);
-          _subscriber->notify();
+          if (_notifying) {
+            BURP_DEBUG_WARN("Are you sure you meant to dispatch an action during notification, it's possible that not all subscribers will have seen the previous state: Action.type: [%d]", action.type);
+          }
+          _reducing = true;
+          _state = _reducer->reduce(_state, action);
+          _reducing = false;
         }
+      }
+
+      State getState() {
+        return _state;
       }
 
     private:
 
-      const Reducer<State, ActionType, InitParams> * _reducer;
-      Subscriber * _subscriber;
+      const State * _state = nullptr;
+      const State * _lastState = nullptr;
+      const Reducer<State, ActionType, InitParams> * _reducer = nullptr;
+      Subscriber<State> * _subscriber = nullptr;
+      bool _reducing = false;
       bool _notifying = false;
-
-      void _notify() {
-        _notifying = true;
-        _subscriber->notify();
-        _notifying = false;
-      }
 
   };
 }

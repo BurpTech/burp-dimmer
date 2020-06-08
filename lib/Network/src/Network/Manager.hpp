@@ -3,33 +3,28 @@
 #include <Redux/Subscriber.hpp>
 #include <Config.hpp>
 
-#include "./NormalMode.hpp"
-#include "./AccessPointMode.hpp"
-#include "./OffMode.hpp"
-#include "./WpsConfigMode.hpp"
+#include "./Normal.hpp"
+#include "./AccessPoint.hpp"
+#include "./Off.hpp"
+#include "./WpsConfig.hpp"
 
 namespace Network {
 
-  class Manager : Redux::Subscriber {
+  class Manager : Redux::Subscriber<Config::State> {
 
     public:
 
-      NormalMode  normalMode;
-      AccessPointMode accessPointMode;
-      OffMode offMode;
-      WpsConfigMode wpsConfigMode;
-
       void setup();
       void loop();
-      void notify() override;
+      void notify(const Config::State * state) override;
 
     private:
 
-      Mode * _mode = &offMode;
-      const Config::Network::Manager::State * _config = nullptr;
-
-      void _update();
-      Mode * _getMode();
+      Normal _normal;
+      AccessPoint _accessPoint;
+      Off _off;
+      WpsConfigMode _wpsConfig;
+      const Config::Network::State * _config;
 
   };
 };

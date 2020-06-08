@@ -19,5 +19,9 @@ namespace Network {
   void NormalMode::loop() {
   }
 
+  void NormalMode::notify() {
+    BURP_DEBUG_ERROR("TODO");
+  }
+
 }
 

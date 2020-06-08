@@ -1,4 +1,5 @@
 #include "./Manager.hpp"
+#include "Config.hpp"
 #include "Util/Debug.hpp"
 
 namespace Network {
@@ -18,8 +19,10 @@ namespace Network {
     wpsConfigMode.loop();
   }
 
-  void Manager::notify() {
-    const Config::Network::Manager::State * config = Config::store.state->network->manager;
+  void Manager::notify(const Config::State * state) {
+    const Config::Network::Station::State * stationConfig = state->station->manager;
+    const Config::Network::Manager::State * accessPointConfig = state->accessPoint->manager;
+    const Config::Network::Manager::State * managerConfig = state->network->manager;
     if (config != _config) {
       _config = config;
       _update();

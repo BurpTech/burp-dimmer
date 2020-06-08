@@ -167,16 +167,16 @@ namespace Redux {
 
   class FooSubscriber : public Subscriber {
     public:
-      void notify() override {
-        foo = store.state->foo->value;
+      void notify(Top * state) override {
+        foo = state->foo->value;
       }
   };
   FooSubscriber fooSubscriber;
 
   class BarSubscriber : public Subscriber {
     public:
-      void notify() override {
-        bar = store.state->bar->value;
+      void notify(Top * state) override {
+        bar = state->bar->value;
       }
   };
   BarSubscriber barSubscriber;
@@ -188,32 +188,40 @@ namespace Redux {
   };
   SubscriberList subscriber(subscribers);
 
-  void Redux_should_notify_subscribers_with_new_state_after_dispatching_actions_to_reducers() {
-    TEST_ASSERT_EQUAL_INT(1000, foo);
-    TEST_ASSERT_EQUAL_INT(1000, bar);
-    store.setup(&reducer, &subscriber);
-    InitialValues initialValues = {
-      5, 24
-    };
-    store.init(initialValues);
-    TEST_ASSERT_EQUAL_INT(5, foo);
-    TEST_ASSERT_EQUAL_INT(24, bar);
-    store.dispatch(incrementAll);
-    TEST_ASSERT_EQUAL_INT(6, foo);
-    TEST_ASSERT_EQUAL_INT(25, bar);
-    store.dispatch(incrementFoo);
-    TEST_ASSERT_EQUAL_INT(7, foo);
-    TEST_ASSERT_EQUAL_INT(25, bar);
-    store.dispatch(incrementBar);
-    TEST_ASSERT_EQUAL_INT(7, foo);
-    TEST_ASSERT_EQUAL_INT(26, bar);
-    int increase = 5;
-    store.dispatch(Action<TestActionType>(TestActionType::INCREASE_ALL, &increase));
-    TEST_ASSERT_EQUAL_INT(12, foo);
-    TEST_ASSERT_EQUAL_INT(31, bar);
-  }
+  Module tests(memory, "Redux", [](Describe & describe) {
 
-  void test() {
-    RUN_TEST(Redux_should_notify_subscribers_with_new_state_after_dispatching_actions_to_reducers);
-  }
+    describe.loop([]() {
+      store.loop();
+    });
+
+    describe.before([]() {
+      store.setup(&reducer, &subscriber);
+    });
+
+    describe.it("should work", []() {
+      TEST_ASSERT_EQUAL_INT(1000, foo);
+      TEST_ASSERT_EQUAL_INT(1000, bar);
+      InitialValues initialValues = {
+        5, 24
+      };
+      store.init(initialValues);
+      TEST_ASSERT_EQUAL_INT(5, foo);
+      TEST_ASSERT_EQUAL_INT(24, bar);
+      store.dispatch(incrementAll);
+      TEST_ASSERT_EQUAL_INT(6, foo);
+      TEST_ASSERT_EQUAL_INT(25, bar);
+      store.dispatch(incrementFoo);
+      TEST_ASSERT_EQUAL_INT(7, foo);
+      TEST_ASSERT_EQUAL_INT(25, bar);
+      store.dispatch(incrementBar);
+      TEST_ASSERT_EQUAL_INT(7, foo);
+      TEST_ASSERT_EQUAL_INT(26, bar);
+      int increase = 5;
+      store.dispatch(Action<TestActionType>(TestActionType::INCREASE_ALL, &increase));
+      TEST_ASSERT_EQUAL_INT(12, foo);
+      TEST_ASSERT_EQUAL_INT(31, bar);
+    });
+
+  });
+
 }

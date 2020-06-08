@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Redux/Subscriber.hpp>
 #include "./Mode.hpp"
 
 namespace Network {
@@ -12,6 +13,7 @@ namespace Network {
       void stop() override;
       void setup() override;
       void loop() override;
+      void notify() override;
 
   };
 
