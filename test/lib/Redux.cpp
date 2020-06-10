@@ -165,28 +165,28 @@ namespace Redux {
   int foo = 1000;
   int bar = 1000;
 
-  class FooSubscriber : public Subscriber {
+  class FooSubscriber : public Subscriber<Top> {
     public:
-      void notify(Top * state) override {
+      void notify(const Top * state) override {
         foo = state->foo->value;
       }
   };
   FooSubscriber fooSubscriber;
 
-  class BarSubscriber : public Subscriber {
+  class BarSubscriber : public Subscriber<Top> {
     public:
-      void notify(Top * state) override {
+      void notify(const Top * state) override {
         bar = state->bar->value;
       }
   };
   BarSubscriber barSubscriber;
 
-  Subscriber * subscribers[] = {
+  Subscriber<Top> * subscribers[] = {
     &fooSubscriber,
     &barSubscriber,
     nullptr
   };
-  SubscriberList subscriber(subscribers);
+  SubscriberList<Top> subscriber(subscribers);
 
   Module tests(memory, "Redux", [](Describe & describe) {
 

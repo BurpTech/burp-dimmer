@@ -10,9 +10,9 @@
 
 bool running = true;
 Memory memory;
-Module ** modules = {
-  Redux::tests,
-  config,
+Module * modules[] = {
+  &(Redux::tests),
+  // config,
   nullptr
 };
 Runner runner(modules);

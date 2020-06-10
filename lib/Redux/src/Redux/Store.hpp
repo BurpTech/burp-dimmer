@@ -57,7 +57,7 @@ namespace Redux {
         }
       }
 
-      State getState() {
+      const State * getState() {
         return _state;
       }
 

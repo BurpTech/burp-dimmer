@@ -8,11 +8,11 @@
 
 namespace Config {
 
-  class Subscriber : public Redux::Subscriber {
+  class Subscriber : public Redux::Subscriber<State> {
     public:
       const State * state = nullptr;
-      void notify() override {
-        state = store.state;
+      void notify(const State * s) override {
+        state = s;
       }
   };
   Subscriber subscriber;
