@@ -1,157 +1,228 @@
+#include "Manager.hpp"
 #include <unity.h>
-#include <ArduinoJson.h>
-#include <Redux/Subscriber.hpp>
-#include <Config/Network.hpp>
-#include <Config/Network/Manager.hpp>
-#include "../../helpers/util.hpp"
-#include "../../Config.hpp"
-#include "../Network.hpp"
-#include "./Manager.hpp"
-#include "ActionType.hpp"
+#include <Config.hpp>
+#include "../../helpers/TestSubscriber.hpp"
+#include "../../helpers/withObj.hpp"
 
 namespace Config {
   namespace Network {
     namespace Manager {
       using namespace Actions;
 
-      const State * state() {
-        return Network::state()->manager;
-      }
+      TestSubscriber<Config::State> subscriber;
 
-      void Config_Network_Manager_State_should_have_correct_defaults() {
-        TEST_ASSERT_EQUAL_INT(PermMode::NORMAL, State::DEFAULT_PERM_MODE);
-        TEST_ASSERT_EQUAL_INT(TempMode::ACCESS_POINT, State::DEFAULT_TEMP_MODE);
-        TEST_ASSERT_EQUAL_INT(false, State::DEFAULT_TEMP_MODE_ACTIVE);
-        TEST_ASSERT_EQUAL_UINT32(0, State::DEFAULT_ACCESS_POINT_TIMEOUT);
-      }
+      Module tests("Manager", [](Describe & describe) {
 
-      void Config_Network_Manager_State_should_have_correct_field_names_for_serialization() {
-        TEST_ASSERT_EQUAL_STRING("mode", State::MODE_FIELD);
-        TEST_ASSERT_EQUAL_STRING("accessPointTimeout", State::ACCESS_POINT_TIMEOUT_FIELD);
-      }
-
-      void Config_Network_Manager_should_initialize_with_the_default_state() {
-        initializeDefaults();
-        TEST_ASSERT_EQUAL_INT(State::DEFAULT_PERM_MODE, state()->permMode);
-        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
-        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE_ACTIVE, state()->tempModeActive);
-        TEST_ASSERT_EQUAL_UINT32(State::DEFAULT_ACCESS_POINT_TIMEOUT, state()->accessPointTimeout);
-      }
-
-      void Config_Network_Manager_should_initialize_with_the_serialized_state() {
-        initialize();
-        TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state()->permMode);
-        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
-        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE_ACTIVE, state()->tempModeActive);
-        TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
-      }
-
-      void Config_Network_Manager_should_apply_the_deserialization_action() {
-        initialize();
-        withObj([&](JsonObject & object) {
-          object[State::MODE_FIELD] = static_cast<int>(PermMode::OFF);
-          object[State::ACCESS_POINT_TIMEOUT_FIELD] = 30000;
-          store.dispatch(Redux::Action<ActionType>(ActionType::NETWORK_MANAGER_DESERIALIZE, &object));
-          TEST_ASSERT_EQUAL_INT(PermMode::OFF, state()->permMode);
-          TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
-          TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE_ACTIVE, state()->tempModeActive);
-          TEST_ASSERT_EQUAL_UINT32(30000, state()->accessPointTimeout);
+        describe.setup([]() {
+          store.setSubscriber(&subscriber);
         });
-      }
 
-      void Config_Network_Manager_should_apply_the_set_access_point_timeout_action() {
-        initialize();
-        unsigned long timeout = 100000;
-        store.dispatch(Redux::Action<ActionType>(ActionType::NETWORK_MANAGER_SET_ACCESS_POINT_TIMEOUT, &timeout));
-        TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state()->permMode);
-        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
-        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE_ACTIVE, state()->tempModeActive);
-        TEST_ASSERT_EQUAL_UINT32(timeout, state()->accessPointTimeout);
-      }
+        describe.loop([]() {
+          store.loop();
+          subscriber.loop();
+        });
 
-      void Config_Network_Manager_should_apply_the_next_mode_action() {
-        initialize();
+        describe.it("should have the correct defaults", []() {
+          TEST_ASSERT_EQUAL_INT(PermMode::NORMAL, State::DEFAULT_PERM_MODE);
+          TEST_ASSERT_EQUAL_INT(TempMode::ACCESS_POINT, State::DEFAULT_TEMP_MODE);
+          TEST_ASSERT_EQUAL_INT(false, State::DEFAULT_TEMP_MODE_ACTIVE);
+          TEST_ASSERT_EQUAL_UINT32(0, State::DEFAULT_ACCESS_POINT_TIMEOUT);
+        });
 
-        // set a temp mode to verify that setting a perm mode
-        // turns it off
-        store.dispatch(setTempModeWpsConfig);
+        describe.it("should have the correct field names for serialization", []() {
+          TEST_ASSERT_EQUAL_STRING("mode", State::MODE_FIELD);
+          TEST_ASSERT_EQUAL_STRING("accessPointTimeout", State::ACCESS_POINT_TIMEOUT_FIELD);
+        });
 
-        store.dispatch(nextPermMode);
-        TEST_ASSERT_EQUAL_INT(PermMode::OFF, state()->permMode);
-        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
-        TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
-        TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
-        store.dispatch(nextPermMode);
-        TEST_ASSERT_EQUAL_INT(PermMode::NORMAL, state()->permMode);
-        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
-        TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
-        TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
-        store.dispatch(nextPermMode);
-        TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state()->permMode);
-        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
-        TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
-        TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
-        store.dispatch(nextPermMode);
-        TEST_ASSERT_EQUAL_INT(PermMode::OFF, state()->permMode);
-        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
-        TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
-        TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
-      }
+        describe.describe("when initialised with an empty object", [](Describe & describe) {
+          describe.beforeEach([](f_done & done) {
+            withObj([](JsonObject & obj) {
+              store.init(obj);
+            });
+            subscriber.callbackOnce(done);
+          });
 
-      void Config_Network_Manager_should_apply_the_set_perm_mode_action() {
-        initialize();
+          describe.it("should have the default state", []() {
+            auto state = store.getState()->network->manager;
+            TEST_ASSERT_EQUAL_INT(State::DEFAULT_PERM_MODE, state->permMode);
+            TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state->tempMode);
+            TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE_ACTIVE, state->tempModeActive);
+            TEST_ASSERT_EQUAL_UINT32(State::DEFAULT_ACCESS_POINT_TIMEOUT, state->accessPointTimeout);
+          });
 
-        // set a temp mode to verify that setting a perm mode
-        // turns it off
-        store.dispatch(setTempModeWpsConfig);
+        });
 
-        store.dispatch(setPermModeOff);
-        TEST_ASSERT_EQUAL_INT(PermMode::OFF, state()->permMode);
-        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
-        TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
-        TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
-        store.dispatch(setPermModeNormal);
-        TEST_ASSERT_EQUAL_INT(PermMode::NORMAL, state()->permMode);
-        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
-        TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
-        TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
-        store.dispatch(setPermModeAccessPoint);
-        TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state()->permMode);
-        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state()->tempMode);
-        TEST_ASSERT_EQUAL_INT(false, state()->tempModeActive);
-        TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
-      }
+        describe.describe("when initialised with a serialized state", [](Describe & describe) {
+          describe.beforeEach([](f_done & done) {
+            withObj([](JsonObject & obj) {
+              obj[Config::State::NETWORK_FIELD][Network::State::MANAGER_FIELD][State::MODE_FIELD] = static_cast<int>(PermMode::ACCESS_POINT);
+              obj[Config::State::NETWORK_FIELD][Network::State::MANAGER_FIELD][State::ACCESS_POINT_TIMEOUT_FIELD] = 60000;
+              store.init(obj);
+            });
+            subscriber.callbackOnce(done);
+          });
 
-      void Config_Network_Manager_should_apply_the_set_temp_mode_action() {
-        initialize();
+          describe.it("should have the deserialized state", []() {
+            auto state = store.getState()->network->manager;
+            TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state->permMode);
+            TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state->tempMode);
+            TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE_ACTIVE, state->tempModeActive);
+            TEST_ASSERT_EQUAL_UINT32(60000, state->accessPointTimeout);
+          });
 
-        // set a perm mode to verify that setting a temp mode
-        // switches the temp mode on
-        store.dispatch(setPermModeOff);
+          describe.describe("then dispatch a deserialization action", [](Describe & describe) {
+            describe.beforeEach([](f_done & done) {
+              withObj([](JsonObject & obj) {
+                obj[State::MODE_FIELD] = static_cast<int>(PermMode::OFF);
+                obj[State::ACCESS_POINT_TIMEOUT_FIELD] = 30000;
+                store.dispatch(Redux::Action<ActionType>(ActionType::NETWORK_MANAGER_DESERIALIZE, &obj));
+              });
+              subscriber.callbackOnce(done);
+            });
+            describe.it("should deserialize the state", []() {
+              auto state = store.getState()->network->manager;
+              TEST_ASSERT_EQUAL_INT(PermMode::OFF, state->permMode);
+              TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state->tempMode);
+              TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE_ACTIVE, state->tempModeActive);
+              TEST_ASSERT_EQUAL_UINT32(30000, state->accessPointTimeout);
+            });
+          });
 
-        store.dispatch(setTempModeWpsConfig);
-        TEST_ASSERT_EQUAL_INT(PermMode::OFF, state()->permMode);
-        TEST_ASSERT_EQUAL_INT(TempMode::WPS_CONFIG, state()->tempMode);
-        TEST_ASSERT_EQUAL_INT(true, state()->tempModeActive);
-        TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
-        store.dispatch(setTempModeAccessPoint);
-        TEST_ASSERT_EQUAL_INT(PermMode::OFF, state()->permMode);
-        TEST_ASSERT_EQUAL_INT(TempMode::ACCESS_POINT, state()->tempMode);
-        TEST_ASSERT_EQUAL_INT(true, state()->tempModeActive);
-        TEST_ASSERT_EQUAL_UINT32(60000, state()->accessPointTimeout);
-      }
+          describe.describe("then dispatch a set access point timeout action", [](Describe & describe) {
+            describe.beforeEach([](f_done & done) {
+              unsigned long timeout = 100000;
+              store.dispatch(Redux::Action<ActionType>(ActionType::NETWORK_MANAGER_SET_ACCESS_POINT_TIMEOUT, &timeout));
+              subscriber.callbackOnce(done);
+            });
+            describe.it("should apply the setting", []() {
+              auto state = store.getState()->network->manager;
+              TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state->permMode);
+              TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state->tempMode);
+              TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE_ACTIVE, state->tempModeActive);
+              TEST_ASSERT_EQUAL_UINT32(100000, state->accessPointTimeout);
+            });
+          });
 
-      void test() {
-        RUN_TEST(Config_Network_Manager_State_should_have_correct_defaults);
-        RUN_TEST(Config_Network_Manager_State_should_have_correct_field_names_for_serialization);
-        RUN_TEST(Config_Network_Manager_should_initialize_with_the_default_state);
-        RUN_TEST(Config_Network_Manager_should_initialize_with_the_serialized_state);
-        RUN_TEST(Config_Network_Manager_should_apply_the_deserialization_action);
-        RUN_TEST(Config_Network_Manager_should_apply_the_set_access_point_timeout_action);
-        RUN_TEST(Config_Network_Manager_should_apply_the_next_mode_action);
-        RUN_TEST(Config_Network_Manager_should_apply_the_set_perm_mode_action);
-        RUN_TEST(Config_Network_Manager_should_apply_the_set_temp_mode_action);
-      }
+          describe.async("then dispatch next mode actions", [](Async & async, f_done & done) {
+            // set a temp mode to verify that setting a perm mode
+            // turns it off
+            store.dispatch(setTempModeWpsConfig);
+            subscriber.callbackOnce([&]() {
+              store.dispatch(nextPermMode);
+              subscriber.callbackOnce([&]() {
+                async.it("should switch to the OFF mode", []() {
+                  auto state = store.getState()->network->manager;
+                  TEST_ASSERT_EQUAL_INT(PermMode::OFF, state->permMode);
+                  TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state->tempMode);
+                  TEST_ASSERT_EQUAL_INT(false, state->tempModeActive);
+                  TEST_ASSERT_EQUAL_UINT32(60000, state->accessPointTimeout);
+                });
+                store.dispatch(nextPermMode);
+                subscriber.callbackOnce([&]() {
+                  async.it("should switch to the NORMAL mode", []() {
+                    auto state = store.getState()->network->manager;
+                    TEST_ASSERT_EQUAL_INT(PermMode::NORMAL, state->permMode);
+                    TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state->tempMode);
+                    TEST_ASSERT_EQUAL_INT(false, state->tempModeActive);
+                    TEST_ASSERT_EQUAL_UINT32(60000, state->accessPointTimeout);
+                  });
+                  store.dispatch(nextPermMode);
+                  subscriber.callbackOnce([&]() {
+                    async.it("should switch to the ACCESS_POINT mode", []() {
+                      auto state = store.getState()->network->manager;
+                      TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state->permMode);
+                      TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state->tempMode);
+                      TEST_ASSERT_EQUAL_INT(false, state->tempModeActive);
+                      TEST_ASSERT_EQUAL_UINT32(60000, state->accessPointTimeout);
+                    });
+                    store.dispatch(nextPermMode);
+                    subscriber.callbackOnce([&]() {
+                      async.it("should switch to the OFF mode", []() {
+                        auto state = store.getState()->network->manager;
+                        TEST_ASSERT_EQUAL_INT(PermMode::OFF, state->permMode);
+                        TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state->tempMode);
+                        TEST_ASSERT_EQUAL_INT(false, state->tempModeActive);
+                        TEST_ASSERT_EQUAL_UINT32(60000, state->accessPointTimeout);
+                      });
+                      done();
+                    });
+                  });
+                });
+              });
+            });
+          });
+
+          describe.async("then dispatch set perm mode actions", [](Async & async, f_done & done) {
+            // set a temp mode to verify that setting a perm mode
+            // turns it off
+            store.dispatch(setTempModeWpsConfig);
+            subscriber.callbackOnce([&]() {
+              store.dispatch(setPermModeOff);
+              subscriber.callbackOnce([&]() {
+                async.it("should switch to the OFF mode", []() {
+                  auto state = store.getState()->network->manager;
+                  TEST_ASSERT_EQUAL_INT(PermMode::OFF, state->permMode);
+                  TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state->tempMode);
+                  TEST_ASSERT_EQUAL_INT(false, state->tempModeActive);
+                  TEST_ASSERT_EQUAL_UINT32(60000, state->accessPointTimeout);
+                });
+                store.dispatch(setPermModeNormal);
+                subscriber.callbackOnce([&]() {
+                  async.it("should switch to the NORMAL mode", []() {
+                    auto state = store.getState()->network->manager;
+                    TEST_ASSERT_EQUAL_INT(PermMode::NORMAL, state->permMode);
+                    TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state->tempMode);
+                    TEST_ASSERT_EQUAL_INT(false, state->tempModeActive);
+                    TEST_ASSERT_EQUAL_UINT32(60000, state->accessPointTimeout);
+                  });
+                  store.dispatch(setPermModeAccessPoint);
+                  subscriber.callbackOnce([&]() {
+                    async.it("should switch to the ACCESS_POINT mode", []() {
+                      auto state = store.getState()->network->manager;
+                      TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state->permMode);
+                      TEST_ASSERT_EQUAL_INT(State::DEFAULT_TEMP_MODE, state->tempMode);
+                      TEST_ASSERT_EQUAL_INT(false, state->tempModeActive);
+                      TEST_ASSERT_EQUAL_UINT32(60000, state->accessPointTimeout);
+                    });
+                    done();
+                  });
+                });
+              });
+            });
+          });
+
+          describe.async("then dispatch set temp mode actions", [](Async & async, f_done & done) {
+            // set a perm mode to verify that setting a temp mode
+            // turns it off
+            store.dispatch(setPermModeOff);
+            subscriber.callbackOnce([&]() {
+              store.dispatch(setTempModeWpsConfig);
+              subscriber.callbackOnce([&]() {
+                async.it("should switch to the WPS_CONFIG mode", []() {
+                  auto state = store.getState()->network->manager;
+                  TEST_ASSERT_EQUAL_INT(PermMode::OFF, state->permMode);
+                  TEST_ASSERT_EQUAL_INT(TempMode::WPS_CONFIG, state->tempMode);
+                  TEST_ASSERT_EQUAL_INT(true, state->tempModeActive);
+                  TEST_ASSERT_EQUAL_UINT32(60000, state->accessPointTimeout);
+                });
+                store.dispatch(setTempModeAccessPoint);
+                subscriber.callbackOnce([&]() {
+                  async.it("should switch to the ACCESS_POINT mode", []() {
+                    auto state = store.getState()->network->manager;
+                    TEST_ASSERT_EQUAL_INT(PermMode::OFF, state->permMode);
+                    TEST_ASSERT_EQUAL_INT(TempMode::ACCESS_POINT, state->tempMode);
+                    TEST_ASSERT_EQUAL_INT(true, state->tempModeActive);
+                    TEST_ASSERT_EQUAL_UINT32(60000, state->accessPointTimeout);
+                  });
+                  done();
+                });
+              });
+            });
+          });
+
+        });
+
+      });
 
     }
   }

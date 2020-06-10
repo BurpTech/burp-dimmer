@@ -7,9 +7,11 @@
 #include <BddUnity.hpp>
 
 #include "lib/Redux.hpp"
+#include "lib/Config.hpp"
 
 Runnable * runnables[] = {
   &Redux::tests,
+  &Config::tests,
   nullptr
 };
 

@@ -1,13 +1,9 @@
 #pragma once
 
-#include <Config/Network.hpp>
+#include <BddUnity.hpp>
 
 namespace Config {
   namespace Network {
-
-    const State * state();
-    void deserialize();
-    void test();
-
+    extern Module tests;
   }
 }

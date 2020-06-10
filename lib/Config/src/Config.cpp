@@ -3,10 +3,12 @@
 
 namespace Config {
 
+  constexpr char State::NETWORK_FIELD[];
+
   State::State(const State * previous, const JsonObject & object) :
     network(Network::reducer.init(
       previous ? previous->network : nullptr,
-      object["network"].as<JsonObject>()
+      object[NETWORK_FIELD].as<JsonObject>()
     )) {
   }
 
@@ -15,6 +17,6 @@ namespace Config {
   }
 
   const Redux::ReducerMap<State, ActionType, JsonObject> reducer;
-  Redux::Store<State, ActionType, JsonObject> store;
+  Redux::Store<State, ActionType, JsonObject> store(reducer);
 
 }

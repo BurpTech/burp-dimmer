@@ -10,6 +10,7 @@ namespace Config {
 
     class State {
       public:
+        static constexpr char NETWORK_FIELD[] = "network";
         const Network::State * network;
         State(const State * previous, const JsonObject & object);
         State(const State * previous, const Redux::Action<ActionType> & action);

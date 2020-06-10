@@ -1,12 +1,7 @@
 #pragma once
 
-#include <Config.hpp>
+#include <BddUnity.hpp>
 
 namespace Config {
-
-  const State * state();
-  void initializeDefaults();
-  void initialize();
-  void test();
-
+  extern Module tests;
 }

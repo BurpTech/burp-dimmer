@@ -1,12 +1,11 @@
 #pragma once
 
+#include <BddUnity.hpp>
+
 namespace Config {
   namespace Network {
     namespace AccessPoint {
-
-      void deserialize();
-      void test();
-
+      extern Module tests;
     }
   }
 }

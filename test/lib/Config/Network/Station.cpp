@@ -1,50 +1,59 @@
+#include "Station.hpp"
 #include <unity.h>
-#include <ArduinoJson.h>
-#include <Redux/Subscriber.hpp>
-#include <Config/Network.hpp>
-#include <Config/Network/Station.hpp>
-#include "../../helpers/util.hpp"
-#include "../../Config.hpp"
-#include "../Network.hpp"
-#include "./Station.hpp"
+#include <Config.hpp>
+#include "../../helpers/TestSubscriber.hpp"
 
 namespace Config {
   namespace Network {
     namespace Station {
       using namespace Actions;
 
-      const State * state() {
-        return Network::state()->station;
-      }
+      TestSubscriber<Config::State> subscriber;
 
-      void Config_Network_Station_State_should_have_correct_defaults() {
-      }
+      Module tests("Station", [](Describe & describe) {
 
-      void Config_Network_Station_State_should_have_correct_field_names_for_serialization() {
-      }
-
-      void Config_Network_Station_should_initialize_with_the_default_state() {
-        initializeDefaults();
-      }
-
-      void Config_Network_Station_should_initialize_with_the_serialized_state() {
-        initialize();
-      }
-
-      void Config_Network_Station_should_apply_the_deserialization_action() {
-        initialize();
-        withObj([&](JsonObject & object) {
-          store.dispatch(Redux::Action<ActionType>(ActionType::NETWORK_STATION_DESERIALIZE, &object));
+        describe.setup([]() {
+          store.setSubscriber(&subscriber);
         });
-      }
 
-      void test() {
-        RUN_TEST(Config_Network_Station_State_should_have_correct_defaults);
-        RUN_TEST(Config_Network_Station_State_should_have_correct_field_names_for_serialization);
-        RUN_TEST(Config_Network_Station_should_initialize_with_the_default_state);
-        RUN_TEST(Config_Network_Station_should_initialize_with_the_serialized_state);
-        RUN_TEST(Config_Network_Station_should_apply_the_deserialization_action);
-      }
+        describe.loop([]() {
+          store.loop();
+        });
+
+      });
+
+      // const State * state() {
+        // return Network::state()->station;
+      // }
+
+      // void Config_Network_Station_State_should_have_correct_defaults() {
+      // }
+
+      // void Config_Network_Station_State_should_have_correct_field_names_for_serialization() {
+      // }
+
+      // void Config_Network_Station_should_initialize_with_the_default_state() {
+        // initializeDefaults();
+      // }
+
+      // void Config_Network_Station_should_initialize_with_the_serialized_state() {
+        // initialize();
+      // }
+
+      // void Config_Network_Station_should_apply_the_deserialization_action() {
+        // initialize();
+        // withObj([&](JsonObject & object) {
+          // store.dispatch(Redux::Action<ActionType>(ActionType::NETWORK_STATION_DESERIALIZE, &object));
+        // });
+      // }
+
+      // void test() {
+        // RUN_TEST(Config_Network_Station_State_should_have_correct_defaults);
+        // RUN_TEST(Config_Network_Station_State_should_have_correct_field_names_for_serialization);
+        // RUN_TEST(Config_Network_Station_should_initialize_with_the_default_state);
+        // RUN_TEST(Config_Network_Station_should_initialize_with_the_serialized_state);
+        // RUN_TEST(Config_Network_Station_should_apply_the_deserialization_action);
+      // }
 
     }
   }

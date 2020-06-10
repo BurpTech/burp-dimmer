@@ -1,6 +1,7 @@
 #include "./Redux.hpp"
 #include <functional>
 #include <unity.h>
+#include "helpers/TestSubscriber.hpp"
 
 #include <Redux/Action.hpp>
 #include <Redux/Reducer.hpp>
@@ -157,7 +158,7 @@ namespace Redux {
   // Store
   //
 
-  Store<Top, TestActionType, InitialValues> store;
+  Store<Top, TestActionType, InitialValues> store(reducer);
 
   //
   // Subscribers
@@ -182,29 +183,7 @@ namespace Redux {
   };
   BarSubscriber barSubscriber;
 
-  class TestSubscriber : public Subscriber<Top> {
-    public:
-      using f_cb = std::function<void(const Top * state)>;
-
-      TestSubscriber() :
-        _cb(nullptr)
-      {}
-
-      void notify(const Top * state) override {
-        if (_cb) {
-          _cb(state);
-          _cb = nullptr;
-        }
-      }
-
-      void callback(f_cb cb) {
-        _cb = cb;
-      }
-
-    private:
-      f_cb _cb;
-  };
-  TestSubscriber testSubscriber;
+  TestSubscriber<Top> testSubscriber;
 
   Subscriber<Top> * subscribers[] = {
     &fooSubscriber,
@@ -216,12 +195,13 @@ namespace Redux {
 
   Module tests("Redux", [](Describe & describe) {
 
-    describe.loop([]() {
-      store.loop();
+    describe.setup([]() {
+      store.setSubscriber(&subscriber);
     });
 
-    describe.before([]() {
-      store.setup(&reducer, &subscriber);
+    describe.loop([]() {
+      store.loop();
+      testSubscriber.loop();
     });
 
     describe.it("should have the correct start values", []() {
@@ -234,12 +214,12 @@ namespace Redux {
         5, 24
       };
       store.init(initialValues);
-      testSubscriber.callback([&](const Top * state) {
+      testSubscriber.callbackOnce([&]() {
         async.it("should notify the correct state", [&]() {
-          TEST_ASSERT_EQUAL_INT(5, state->foo->value);
-          TEST_ASSERT_EQUAL_INT(24, state->bar->value);
+          TEST_ASSERT_EQUAL_INT(5, store.getState()->foo->value);
+          TEST_ASSERT_EQUAL_INT(24, store.getState()->bar->value);
         });
-        async.it("should have notified the subscribers in order", [&]() {
+        async.it("should have notified all the subscribers", [&]() {
           TEST_ASSERT_EQUAL_INT(5, foo);
           TEST_ASSERT_EQUAL_INT(24, bar);
         });
@@ -249,12 +229,12 @@ namespace Redux {
 
     describe.async("after increment all", [](Async & async, f_done & done) {
       store.dispatch(incrementAll);
-      testSubscriber.callback([&](const Top * state) {
+      testSubscriber.callbackOnce([&]() {
         async.it("should notify the correct state", [&]() {
-          TEST_ASSERT_EQUAL_INT(6, state->foo->value);
-          TEST_ASSERT_EQUAL_INT(25, state->bar->value);
+          TEST_ASSERT_EQUAL_INT(6, store.getState()->foo->value);
+          TEST_ASSERT_EQUAL_INT(25, store.getState()->bar->value);
         });
-        async.it("should have notified the subscribers in order", [&]() {
+        async.it("should have notified all the subscribers", [&]() {
           TEST_ASSERT_EQUAL_INT(6, foo);
           TEST_ASSERT_EQUAL_INT(25, bar);
         });
@@ -264,12 +244,12 @@ namespace Redux {
 
     describe.async("after increment foo", [](Async & async, f_done & done) {
       store.dispatch(incrementFoo);
-      testSubscriber.callback([&](const Top * state) {
+      testSubscriber.callbackOnce([&]() {
         async.it("should notify the correct state", [&]() {
-          TEST_ASSERT_EQUAL_INT(7, state->foo->value);
-          TEST_ASSERT_EQUAL_INT(25, state->bar->value);
+          TEST_ASSERT_EQUAL_INT(7, store.getState()->foo->value);
+          TEST_ASSERT_EQUAL_INT(25, store.getState()->bar->value);
         });
-        async.it("should have notified the subscribers in order", [&]() {
+        async.it("should have notified all the subscribers", [&]() {
           TEST_ASSERT_EQUAL_INT(7, foo);
           TEST_ASSERT_EQUAL_INT(25, bar);
         });
@@ -279,12 +259,12 @@ namespace Redux {
 
     describe.async("after increment bar", [](Async & async, f_done & done) {
       store.dispatch(incrementBar);
-      testSubscriber.callback([&](const Top * state) {
+      testSubscriber.callbackOnce([&]() {
         async.it("should notify the correct state", [&]() {
-          TEST_ASSERT_EQUAL_INT(7, state->foo->value);
-          TEST_ASSERT_EQUAL_INT(26, state->bar->value);
+          TEST_ASSERT_EQUAL_INT(7, store.getState()->foo->value);
+          TEST_ASSERT_EQUAL_INT(26, store.getState()->bar->value);
         });
-        async.it("should have notified the subscribers in order", [&]() {
+        async.it("should have notified all the subscribers", [&]() {
           TEST_ASSERT_EQUAL_INT(7, foo);
           TEST_ASSERT_EQUAL_INT(26, bar);
         });
@@ -295,12 +275,12 @@ namespace Redux {
     describe.async("after increase all", [](Async & async, f_done & done) {
       int increase = 5;
       store.dispatch(Action<TestActionType>(TestActionType::INCREASE_ALL, &increase));
-      testSubscriber.callback([&](const Top * state) {
+      testSubscriber.callbackOnce([&]() {
         async.it("should notify the correct state", [&]() {
-          TEST_ASSERT_EQUAL_INT(12, state->foo->value);
-          TEST_ASSERT_EQUAL_INT(31, state->bar->value);
+          TEST_ASSERT_EQUAL_INT(12, store.getState()->foo->value);
+          TEST_ASSERT_EQUAL_INT(31, store.getState()->bar->value);
         });
-        async.it("should have notified the subscribers in order", [&]() {
+        async.it("should have notified all the subscribers", [&]() {
           TEST_ASSERT_EQUAL_INT(12, foo);
           TEST_ASSERT_EQUAL_INT(31, bar);
         });

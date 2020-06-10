@@ -3,18 +3,22 @@
 namespace Config {
   namespace Network {
 
+    constexpr char State::MANAGER_FIELD[];
+    constexpr char State::STATION_FIELD[];
+    constexpr char State::ACCESS_POINT_FIELD[];
+
     State::State(const State * previous, const JsonObject & object) :
       manager(Manager::reducer.init(
         previous ? previous->manager : nullptr,
-        object["manager"].as<JsonObject>()
+        object[MANAGER_FIELD].as<JsonObject>()
       )),
       station(Station::reducer.init(
         previous ? previous->station : nullptr,
-        object["station"].as<JsonObject>()
+        object[STATION_FIELD].as<JsonObject>()
       )),
       accessPoint(AccessPoint::reducer.init(
         previous ? previous->accessPoint : nullptr,
-        object["accessPoint"].as<JsonObject>()
+        object[ACCESS_POINT_FIELD].as<JsonObject>()
       )) {
     }
 

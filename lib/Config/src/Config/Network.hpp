@@ -13,6 +13,9 @@ namespace Config {
 
     class State {
       public:
+        static constexpr char MANAGER_FIELD[] = "manager";
+        static constexpr char STATION_FIELD[] = "station";
+        static constexpr char ACCESS_POINT_FIELD[] = "accessPoint";
         const Manager::State * manager;
         const Station::State * station;
         const AccessPoint::State * accessPoint;
