@@ -188,7 +188,7 @@ namespace Redux {
   };
   SubscriberList<Top> subscriber(subscribers);
 
-  Module tests(memory, "Redux", [](Describe & describe) {
+  Module tests("Redux", [](Describe & describe) {
 
     describe.loop([]() {
       store.loop();

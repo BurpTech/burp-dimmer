@@ -149,11 +149,3 @@ To stop:
 ```
 ./tmux/kill
 ```
-
-## `vim` configuration
-
-Run the following to generate `compile_commands.json` in the root directory so `clangd` can find it
-
-```
-platformio run -t compiledb
-```
