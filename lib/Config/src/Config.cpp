@@ -1,5 +1,4 @@
-#include "./Config.hpp"
-#include "ArduinoJson.hpp"
+#include "Config.hpp"
 
 namespace Config {
 
@@ -16,7 +15,12 @@ namespace Config {
     network(Network::reducer.reduce(previous->network, action)) {
   }
 
-  const Redux::ReducerMap<State, ActionType, JsonObject> reducer;
-  Redux::Store<State, ActionType, JsonObject> store(reducer);
+  void State::serialize(JsonObject & object) const {
+    JsonObject networkObject = object[NETWORK_FIELD].as<JsonObject>();
+    network->serialize(networkObject);
+  }
+
+  const Reducer reducer;
+  Store store(reducer);
 
 }

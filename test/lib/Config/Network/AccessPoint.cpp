@@ -8,7 +8,7 @@ namespace Config {
     namespace AccessPoint {
       using namespace Actions;
 
-      TestHelpers::TestSubscriber<Config::State> subscriber;
+      TestHelpers::TestSubscriber subscriber;
 
       Module tests("AccessPoint", [](Describe & describe) {
 

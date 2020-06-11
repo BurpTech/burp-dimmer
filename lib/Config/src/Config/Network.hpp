@@ -1,17 +1,18 @@
 #pragma once
 
 #include <Redux/ReducerMap.hpp>
+#include <ArduinoJson.h>
+#include <Json/Serializer.hpp>
 
 #include "../ActionType.hpp"
 #include "./Network/Manager.hpp"
 #include "./Network/Station.hpp"
 #include "./Network/AccessPoint.hpp"
-#include "ArduinoJson.hpp"
 
 namespace Config {
   namespace Network {
 
-    class State {
+    class State : public Json::Serializer {
       public:
         static constexpr char MANAGER_FIELD[] = "manager";
         static constexpr char STATION_FIELD[] = "station";
@@ -21,6 +22,7 @@ namespace Config {
         const AccessPoint::State * accessPoint;
         State(const State * previous, const JsonObject & object);
         State(const State * previous, const Redux::Action<ActionType> & action);
+        void serialize(JsonObject & object) const override;
     };
     extern const Redux::ReducerMap<State, ActionType, JsonObject> reducer;
 

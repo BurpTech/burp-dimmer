@@ -5,8 +5,7 @@
 
 namespace TestHelpers {
 
-  template <class State>
-  class TestSubscriber : public Redux::Subscriber<State> {
+  class TestSubscriber : public Redux::Subscriber {
 
     public:
 
@@ -17,7 +16,7 @@ namespace TestHelpers {
         _callback(false)
       {}
 
-      void notify(const State * state) override {
+      void notify() override {
         _callback = true;
       }
 

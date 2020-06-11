@@ -8,7 +8,7 @@ namespace Config {
     namespace Station {
       using namespace Actions;
 
-      TestHelpers::TestSubscriber<Config::State> subscriber;
+      TestHelpers::TestSubscriber subscriber;
 
       Module tests("Station", [](Describe & describe) {
 

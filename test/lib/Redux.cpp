@@ -167,31 +167,31 @@ namespace Redux {
   int foo = 1000;
   int bar = 1000;
 
-  class FooSubscriber : public Subscriber<Top> {
+  class FooSubscriber : public Subscriber {
     public:
-      void notify(const Top * state) override {
-        foo = state->foo->value;
+      void notify() override {
+        foo = store.getState()->foo->value;
       }
   };
   FooSubscriber fooSubscriber;
 
-  class BarSubscriber : public Subscriber<Top> {
+  class BarSubscriber : public Subscriber {
     public:
-      void notify(const Top * state) override {
-        bar = state->bar->value;
+      void notify() override {
+        bar = store.getState()->bar->value;
       }
   };
   BarSubscriber barSubscriber;
 
-  TestHelpers::TestSubscriber<Top> testSubscriber;
+  TestHelpers::TestSubscriber testSubscriber;
 
-  Subscriber<Top> * subscribers[] = {
+  Subscriber * subscribers[] = {
     &fooSubscriber,
     &barSubscriber,
     &testSubscriber,
     nullptr
   };
-  SubscriberList<Top> subscriber(subscribers);
+  SubscriberList subscriber(subscribers);
 
   Module tests("Redux", [](Describe & describe) {
 
@@ -209,21 +209,14 @@ namespace Redux {
       TEST_ASSERT_EQUAL_INT(1000, bar);
     });
 
-    describe.async("after init", [](Async & async, f_done & done) {
-      InitialValues initialValues = {
-        5, 24
-      };
-      store.init(initialValues);
-      testSubscriber.callbackOnce([&]() {
-        async.it("should notify the correct state", [&]() {
-          TEST_ASSERT_EQUAL_INT(5, store.getState()->foo->value);
-          TEST_ASSERT_EQUAL_INT(24, store.getState()->bar->value);
-        });
-        async.it("should have notified all the subscribers", [&]() {
-          TEST_ASSERT_EQUAL_INT(5, foo);
-          TEST_ASSERT_EQUAL_INT(24, bar);
-        });
-        done();
+    describe.describe("after init", [](Describe & describe) {
+      describe.it("should have the correct initial state", []() {
+        InitialValues initialValues = {
+          5, 24
+        };
+        store.init(initialValues);
+        TEST_ASSERT_EQUAL_INT(5, store.getState()->foo->value);
+        TEST_ASSERT_EQUAL_INT(24, store.getState()->bar->value);
       });
     });
 

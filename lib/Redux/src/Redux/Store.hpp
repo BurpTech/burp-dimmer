@@ -21,7 +21,7 @@ namespace Redux {
         _notifying(false)
       {}
 
-      void setSubscriber(Subscriber<State> * subscriber) {
+      void setSubscriber(Subscriber * subscriber) {
         _subscriber = subscriber;
       }
 
@@ -32,8 +32,9 @@ namespace Redux {
         if (_state != _lastState) {
           _notifying = true;
           if (_subscriber) {
-            _subscriber->notify(_state);
+            _subscriber->notify();
           }
+          _lastState = _state;
           _notifying = false;
         }
       }
@@ -46,6 +47,10 @@ namespace Redux {
         // twice
         _reducing = true;
         _state = _reducer.init(_state, initParams);
+        // prevent notification from init as subscribers
+        // should be added afterwards anyway and they should
+        // also be init'd if required to read the state
+        _lastState = _state;
         _reducing = false;
       }
 
@@ -71,7 +76,7 @@ namespace Redux {
       const State * _state;
       const State * _lastState;
       const Reducer<State, ActionType, InitParams> & _reducer;
-      Subscriber<State> * _subscriber;
+      Subscriber * _subscriber;
       bool _reducing;
       bool _notifying;
 

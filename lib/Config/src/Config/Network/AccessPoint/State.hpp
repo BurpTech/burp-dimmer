@@ -8,6 +8,7 @@ namespace Config {
     namespace AccessPoint {
 
       class State : public Json::Serializer {
+
         public:
 
           State(const JsonObject & object);

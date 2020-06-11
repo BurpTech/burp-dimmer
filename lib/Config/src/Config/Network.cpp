@@ -1,4 +1,4 @@
-#include "./Network.hpp"
+#include "Network.hpp"
 
 namespace Config {
   namespace Network {
@@ -26,6 +26,15 @@ namespace Config {
       manager(Manager::reducer.reduce(previous->manager, action)),
       station(Station::reducer.reduce(previous->station, action)),
       accessPoint(AccessPoint::reducer.reduce(previous->accessPoint, action)) {
+    }
+
+    void State::serialize(JsonObject & object) const {
+      JsonObject managerObject = object[MANAGER_FIELD].as<JsonObject>();
+      manager->serialize(managerObject);
+      JsonObject stationObject = object[STATION_FIELD].as<JsonObject>();
+      station->serialize(stationObject);
+      JsonObject accessPointObject = object[ACCESS_POINT_FIELD].as<JsonObject>();
+      accessPoint->serialize(accessPointObject);
     }
 
     const Redux::ReducerMap<State, ActionType, JsonObject> reducer;

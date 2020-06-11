@@ -9,7 +9,7 @@ namespace Config {
     namespace Manager {
       using namespace Actions;
 
-      TestHelpers::TestSubscriber<Config::State> subscriber;
+      TestHelpers::TestSubscriber subscriber;
 
       Module tests("Manager", [](Describe & describe) {
 
@@ -35,11 +35,10 @@ namespace Config {
         });
 
         describe.describe("when initialised with an empty object", [](Describe & describe) {
-          describe.beforeEach([](f_done & done) {
+          describe.beforeEach([]() {
             TestHelpers::withObj([](JsonObject & obj) {
               store.init(obj);
             });
-            subscriber.callbackOnce(done);
           });
 
           describe.it("should have the default state", []() {
@@ -53,13 +52,12 @@ namespace Config {
         });
 
         describe.describe("when initialised with a serialized state", [](Describe & describe) {
-          describe.beforeEach([](f_done & done) {
+          describe.beforeEach([]() {
             TestHelpers::withObj([](JsonObject & obj) {
               obj[Config::State::NETWORK_FIELD][Network::State::MANAGER_FIELD][State::MODE_FIELD] = static_cast<int>(PermMode::ACCESS_POINT);
               obj[Config::State::NETWORK_FIELD][Network::State::MANAGER_FIELD][State::ACCESS_POINT_TIMEOUT_FIELD] = 60000;
               store.init(obj);
             });
-            subscriber.callbackOnce(done);
           });
 
           describe.it("should have the deserialized state", []() {

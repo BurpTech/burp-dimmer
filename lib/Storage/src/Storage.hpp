@@ -1,27 +1,22 @@
-#ifndef Storage_hpp
-#define Storage_hpp
+#pragma once
 
-#include "Debug.hpp"
-
-#include <FS.h>
+#include <LittleFS.h>
 
 class Storage {
   public:
     static void begin() {
-      SPIFFS.begin();
+      LittleFS.begin();
     }
 
     static File open(String path, const char *mode) {
-      return SPIFFS.open(path, mode);
+      return LittleFS.open(path, mode);
     }
 
     static bool exists(String path) {
-      return SPIFFS.exists(path);
+      return LittleFS.exists(path);
     }
 
     static bool remove(String path) {
-      return SPIFFS.remove(path);
+      return LittleFS.remove(path);
     }
 };
-
-#endif
