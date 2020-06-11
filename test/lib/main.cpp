@@ -1,4 +1,3 @@
-#include <cstdio>
 #ifndef NATIVE
 #include <Arduino.h>
 #endif
@@ -6,8 +5,8 @@
 #include <unity.h>
 #include <BddUnity.hpp>
 
-#include "lib/Redux.hpp"
-#include "lib/Config.hpp"
+#include "Redux.hpp"
+#include "Config.hpp"
 
 Runnable * runnables[] = {
   &Redux::tests,
