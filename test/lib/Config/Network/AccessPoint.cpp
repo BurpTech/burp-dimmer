@@ -1,14 +1,14 @@
 #include "AccessPoint.hpp"
 #include <unity.h>
 #include <Config.hpp>
-#include "../../helpers/TestSubscriber.hpp"
+#include <TestHelpers/TestSubscriber.hpp>
 
 namespace Config {
   namespace Network {
     namespace AccessPoint {
       using namespace Actions;
 
-      TestSubscriber<Config::State> subscriber;
+      TestHelpers::TestSubscriber<Config::State> subscriber;
 
       Module tests("AccessPoint", [](Describe & describe) {
 

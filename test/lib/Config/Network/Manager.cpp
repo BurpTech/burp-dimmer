@@ -1,15 +1,15 @@
 #include "Manager.hpp"
 #include <unity.h>
 #include <Config.hpp>
-#include "../../helpers/TestSubscriber.hpp"
-#include "../../helpers/withObj.hpp"
+#include <TestHelpers/TestSubscriber.hpp>
+#include <TestHelpers/withObj.hpp>
 
 namespace Config {
   namespace Network {
     namespace Manager {
       using namespace Actions;
 
-      TestSubscriber<Config::State> subscriber;
+      TestHelpers::TestSubscriber<Config::State> subscriber;
 
       Module tests("Manager", [](Describe & describe) {
 
@@ -36,7 +36,7 @@ namespace Config {
 
         describe.describe("when initialised with an empty object", [](Describe & describe) {
           describe.beforeEach([](f_done & done) {
-            withObj([](JsonObject & obj) {
+            TestHelpers::withObj([](JsonObject & obj) {
               store.init(obj);
             });
             subscriber.callbackOnce(done);
@@ -54,7 +54,7 @@ namespace Config {
 
         describe.describe("when initialised with a serialized state", [](Describe & describe) {
           describe.beforeEach([](f_done & done) {
-            withObj([](JsonObject & obj) {
+            TestHelpers::withObj([](JsonObject & obj) {
               obj[Config::State::NETWORK_FIELD][Network::State::MANAGER_FIELD][State::MODE_FIELD] = static_cast<int>(PermMode::ACCESS_POINT);
               obj[Config::State::NETWORK_FIELD][Network::State::MANAGER_FIELD][State::ACCESS_POINT_TIMEOUT_FIELD] = 60000;
               store.init(obj);
@@ -72,7 +72,7 @@ namespace Config {
 
           describe.describe("then dispatch a deserialization action", [](Describe & describe) {
             describe.beforeEach([](f_done & done) {
-              withObj([](JsonObject & obj) {
+              TestHelpers::withObj([](JsonObject & obj) {
                 obj[State::MODE_FIELD] = static_cast<int>(PermMode::OFF);
                 obj[State::ACCESS_POINT_TIMEOUT_FIELD] = 30000;
                 store.dispatch(Redux::Action<ActionType>(ActionType::NETWORK_MANAGER_DESERIALIZE, &obj));

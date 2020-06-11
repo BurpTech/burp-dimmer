@@ -1,7 +1,7 @@
 #include "./Redux.hpp"
 #include <functional>
 #include <unity.h>
-#include "helpers/TestSubscriber.hpp"
+#include <TestHelpers/TestSubscriber.hpp>
 
 #include <Redux/Action.hpp>
 #include <Redux/Reducer.hpp>
@@ -183,7 +183,7 @@ namespace Redux {
   };
   BarSubscriber barSubscriber;
 
-  TestSubscriber<Top> testSubscriber;
+  TestHelpers::TestSubscriber<Top> testSubscriber;
 
   Subscriber<Top> * subscribers[] = {
     &fooSubscriber,
