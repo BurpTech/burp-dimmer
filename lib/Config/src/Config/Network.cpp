@@ -3,9 +3,9 @@
 namespace Config {
   namespace Network {
 
-    constexpr char State::MANAGER_FIELD[];
-    constexpr char State::STATION_FIELD[];
-    constexpr char State::ACCESS_POINT_FIELD[];
+    constexpr char MANAGER_FIELD[] = "manager";
+    constexpr char STATION_FIELD[] = "station";
+    constexpr char ACCESS_POINT_FIELD[] = "accessPoint";
 
     State::State(const State * previous, const JsonObject & object) :
       manager(Manager::reducer.init(
@@ -37,7 +37,7 @@ namespace Config {
       accessPoint->serialize(accessPointObject);
     }
 
-    const Redux::ReducerMap<State, ActionType, JsonObject> reducer;
+    const Reducer reducer;
 
   }
 }

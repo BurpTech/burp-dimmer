@@ -1,8 +1,4 @@
-#include "./Reducer.hpp"
-#include "./Actions.hpp"
-#include "ActionType.hpp"
-#include "ArduinoJson.hpp"
-#include "Config/Network/Station/State.hpp"
+#include "Reducer.hpp"
 
 namespace Config {
   namespace Network {

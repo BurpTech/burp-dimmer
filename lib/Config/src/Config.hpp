@@ -4,17 +4,18 @@
 #include <Redux/ReducerMap.hpp>
 #include <ArduinoJson.h>
 #include <Json/Serializer.hpp>
-#include "ActionType.hpp"
+#include "Config/ActionType.hpp"
 #include "Config/Network.hpp"
+#include "Config/Light.hpp"
 
 namespace Config {
 
     class State : public Json::Serializer {
       public:
-        static constexpr char NETWORK_FIELD[] = "network";
         const Network::State * network;
+        const Light::State * light;
         State(const State * previous, const JsonObject & object);
-        State(const State * previous, const Redux::Action<ActionType> & action);
+        State(const State * previous, const Action & action);
         void serialize(JsonObject & object) const override;
     };
     

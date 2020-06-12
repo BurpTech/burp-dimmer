@@ -1,6 +1,5 @@
-#include "./Actions.hpp"
-#include "ActionType.hpp"
-#include "Config/Network/Manager/State.hpp"
+#include "Actions.hpp"
+#include "State.hpp"
 
 namespace Config {
   namespace Network {
@@ -15,23 +14,27 @@ namespace Config {
           const TempMode _tempModeWpsConfig = TempMode::WPS_CONFIG;
         }
 
-        const Redux::Action<ActionType> nextPermMode
-          (ActionType::NETWORK_MANAGER_NEXT_PERM_MODE);
-        const Redux::Action<ActionType> setPermModeNormal
-          (ActionType::NETWORK_MANAGER_SET_PERM_MODE,
-           &_permModeNormal);
-        const Redux::Action<ActionType> setPermModeAccessPoint
-          (ActionType::NETWORK_MANAGER_SET_PERM_MODE,
-           &_permModeAccessPoint);
-        const Redux::Action<ActionType> setPermModeOff
-          (ActionType::NETWORK_MANAGER_SET_PERM_MODE,
-           &_permModeOff);
-        const Redux::Action<ActionType> setTempModeAccessPoint
-          (ActionType::NETWORK_MANAGER_SET_TEMP_MODE,
-           &_tempModeAccessPoint);
-        const Redux::Action<ActionType> setTempModeWpsConfig
-          (ActionType::NETWORK_MANAGER_SET_TEMP_MODE,
-           &_tempModeWpsConfig);
+        const Action nextPermMode(ActionType::NETWORK_MANAGER_NEXT_PERM_MODE);
+        const Action setPermModeNormal(
+          ActionType::NETWORK_MANAGER_SET_PERM_MODE,
+          &_permModeNormal
+        );
+        const Action setPermModeAccessPoint(
+          ActionType::NETWORK_MANAGER_SET_PERM_MODE,
+          &_permModeAccessPoint
+        );
+        const Action setPermModeOff(
+          ActionType::NETWORK_MANAGER_SET_PERM_MODE,
+          &_permModeOff
+        );
+        const Action setTempModeAccessPoint(
+          ActionType::NETWORK_MANAGER_SET_TEMP_MODE,
+          &_tempModeAccessPoint
+        );
+        const Action setTempModeWpsConfig(
+          ActionType::NETWORK_MANAGER_SET_TEMP_MODE,
+          &_tempModeWpsConfig
+        );
 
       }
     }

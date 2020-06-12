@@ -1,7 +1,6 @@
 #pragma once
 
-#include "./AccessPoint/Reducer.hpp"
-#include "./AccessPoint/Actions.hpp"
+#include "AccessPoint/Reducer.hpp"
 
 namespace Config {
   namespace Network {

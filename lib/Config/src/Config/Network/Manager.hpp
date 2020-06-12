@@ -1,7 +1,7 @@
 #pragma once
 
-#include "./Manager/Reducer.hpp"
-#include "./Manager/Actions.hpp"
+#include "Manager/Reducer.hpp"
+#include "Manager/Actions.hpp"
 
 namespace Config {
   namespace Network {

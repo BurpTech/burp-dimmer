@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Redux/Action.hpp>
+
 namespace Config {
 
   enum class ActionType {
@@ -9,7 +11,10 @@ namespace Config {
     NETWORK_MANAGER_SET_PERM_MODE,
     NETWORK_MANAGER_SET_TEMP_MODE,
     NETWORK_STATION_DESERIALIZE,
-    NETWORK_ACCESS_POINT_DESERIALIZE
+    NETWORK_ACCESS_POINT_DESERIALIZE,
+    LIGHT_DESERIALIZE
   };
+
+  using Action = Redux::Action<ActionType>;
 
 }
