@@ -1,0 +1,55 @@
+#include "State.hpp"
+
+namespace BurpDimmer {
+  namespace Config {
+    namespace Light {
+
+      Memory::Pair<State, Levels> memory;
+
+      constexpr Levels defaultLevels = {
+        10,
+        20,
+        31,
+        41,
+        51,
+        61,
+        71,
+        82,
+        92,
+        102,
+        112,
+        122,
+        133,
+        143,
+        153,
+        163,
+        173,
+        184,
+        194,
+        204,
+        214,
+        224,
+        235,
+        245,
+        255
+      };
+
+      State::State(const Levels * levels) :
+        levels(levels ? *levels : defaultLevels)
+      {}
+
+      void State::serialize(JsonObject & object) const {
+        JsonArray array = object[levelsField].as<JsonArray>();
+        for (unsigned char i = 0; i < maxLevels; i++) {
+          // break out at the first zero as this
+          // will be the end of the levels
+          if (levels[i] == 0) {
+            return;
+          }
+          array.add(levels[i]);
+        }
+      }
+
+    }
+  }
+}

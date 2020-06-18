@@ -1,7 +1,3 @@
-#ifndef NATIVE
-#include <Arduino.h>
-#endif
-
 #include <unity.h>
 #include <BddUnity.hpp>
 

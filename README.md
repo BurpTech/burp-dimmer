@@ -40,7 +40,7 @@ This is the PlatformIO version currently being used:
 
 - PlatformIO Core 4.3.4 - https://docs.platformio.org/en/latest/core/installation.html
 
-The current version of `espressif8266` is 2.5.1
+The current version of `espressif8266` is 2.5.3
 
 Install the `espressif8266` platform with
 

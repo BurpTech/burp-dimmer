@@ -10,3 +10,6 @@
 [submodule "lib/BddUnity"]
 	path = lib/BddUnity
 	url = https://github.com/pghalliday/BddUnity.git
+[submodule "lib/CppRedux"]
+	path = lib/CppRedux
+	url = https://github.com/pghalliday/CppRedux.git
