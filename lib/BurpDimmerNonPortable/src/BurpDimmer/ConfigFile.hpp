@@ -2,9 +2,9 @@
 
 #include <functional>
 #include <CppRedux/Subscriber.hpp>
+#include <BurpDimmer/Json/withDoc.hpp>
+#include <BurpDimmer/Config.hpp>
 #include "Json/File.hpp"
-#include "Json/withDoc.hpp"
-#include "Config.hpp"
 
 namespace BurpDimmer {
 
@@ -13,11 +13,11 @@ namespace BurpDimmer {
 
     public:
 
-      Instance(const char * path) :
+      ConfigFile(const char * path) :
         _file(path)
       {}
 
-      void init(f_init onInit) {
+      void init() {
         Json::withDoc<JsonDocumentClass>([&](JsonDocument & doc) {
           _file.read(doc);
           Config::init(doc.as<JsonObject>());

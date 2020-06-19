@@ -1,31 +1,24 @@
 #pragma once
 
-#include <Redux/Subscriber.hpp>
-#include <Config.hpp>
-
-#include "./Normal.hpp"
-#include "./AccessPoint.hpp"
-#include "./Off.hpp"
-#include "./WpsConfig.hpp"
+#include <CppRedux/Subscriber.hpp>
+#include <CppRedux/Selector.hpp>
+#include <BurpDimmer/Config.hpp>
 
 namespace BurpDimmer {
   namespace Network {
 
-    class Manager : Redux::Subscriber<Config::State> {
+    class Manager : CppRedux::Subscriber {
 
       public:
 
-        void setup();
-        void loop();
-        void notify(const Config::State * state) override;
+        Manager();
+        void notify() override;
 
       private:
 
-        Normal _normal;
-        AccessPoint _accessPoint;
-        Off _off;
-        WpsConfigMode _wpsConfig;
-        const Config::Network::State * _config;
+        using State = Config::Network::Manager::State;
+        CppRedux::Selector<Config::State, State> _selector;
+        static const State * _select(const Config::State * state);
 
     };
 

@@ -1,7 +1,7 @@
 #include "Light.hpp"
 
 #include <Arduino.h>
-#include "../Util/Debug.hpp"
+#include <BurpDimmer/Util/Debug.hpp>
 
 #define _COMPONENTS_LIGHT_DEFAULT_BRIGHTNESS COMPONENTS_LIGHT_MAX_BRIGHTNESS
 #define _COMPONENTS_LIGHT_DEFAULT_ON false

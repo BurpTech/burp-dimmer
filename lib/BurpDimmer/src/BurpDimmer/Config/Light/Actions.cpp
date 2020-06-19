@@ -19,7 +19,6 @@ namespace BurpDimmer {
                 BURP_DEBUG_INFO("Error::minLevels");
                 return onParams(Error::minLevels, nullptr);
               }
-              auto levelCount = size;
               auto index = 0;
               Levels levels;
               for(JsonVariant v : array) {

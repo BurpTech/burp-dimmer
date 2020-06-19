@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <Arduino.h>
 
 #define BURP_DIMMER_ROTARY_ENCODER_LEFT (-1)
 #define BURP_DIMMER_ROTARY_ENCODER_RIGHT 1

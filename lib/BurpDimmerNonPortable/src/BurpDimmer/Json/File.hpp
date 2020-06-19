@@ -2,8 +2,8 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <BurpDimmer/Util/Debug.hpp>
 #include "../Storage.hpp"
-#include "../Util/Debug.hpp"
 
 namespace BurpDimmer {
   namespace Json {

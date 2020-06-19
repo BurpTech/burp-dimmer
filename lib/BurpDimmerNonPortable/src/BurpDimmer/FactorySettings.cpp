@@ -4,7 +4,7 @@
 #include <EEPROM.h>
 #include <CRC32.h>
 
-#include <Util/Debug.hpp>
+#include <BurpDimmer/Util/Debug.hpp>
 
 namespace BurpDimmer {
   namespace FactorySettings {

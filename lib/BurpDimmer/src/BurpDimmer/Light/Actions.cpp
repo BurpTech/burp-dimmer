@@ -19,7 +19,7 @@ namespace BurpDimmer {
       // and turn the light off
       auto on = false;
       unsigned char level = 0;
-      for (int i = 0; i < levels.size(); i++) {
+      for (unsigned char i = 0; i < levels.size(); i++) {
         auto pwm = levels[i];
         if (pwm == 0) {
           // no more levels
@@ -138,12 +138,13 @@ namespace BurpDimmer {
       auto lightConfig = Config::store.getState()->light;
       auto levels = lightConfig->levels;
       std::function<unsigned char()> maxLevel = [&]() {
-        for (unsigned char i = 0; i < levels.size(); i++) {
+        unsigned char i = 0;
+        for (; i < levels.size(); i++) {
           if (levels[i] == 0) {
             break;
           }
-          return i - 1;
         }
+        return i - 1;
       };
       bool on;
       unsigned char level;
