@@ -1,0 +1,27 @@
+#pragma once
+
+#include <ArduinoJson.h>
+#include <functional>
+#include "State.hpp"
+
+namespace BurpDimmer {
+  namespace Config {
+    namespace Light {
+
+      enum class Error {
+        noError,
+        noObject,
+        noLevels,
+        notAnArray,
+        minLevels,
+        maxLevels,
+        invalidLevels,
+        levelZero
+      };
+
+      using f_onParams = std::function<void(const Error error, const Params * params)>;
+      void deserialize(const JsonObject & object, f_onParams onParams);
+
+    }
+  }
+}

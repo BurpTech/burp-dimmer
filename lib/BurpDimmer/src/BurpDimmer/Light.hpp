@@ -2,15 +2,16 @@
 
 #include <Redux/Store.hpp>
 #include <ArduinoJson.h>
-#include "Light/Reducer.hpp"
+#include "Light/ActionType.hpp"
 
 namespace BurpDimmer {
   namespace Light {
 
-      using Store = Redux::Store<State, ActionType, JsonObject>;
+      using Store = Redux::Store<State, ActionType>;
 
-      extern const Reducer reducer;
       extern Store store;
+
+      void init(const JsonObject & object);
 
   }
 }

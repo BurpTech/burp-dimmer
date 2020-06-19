@@ -1,8 +1,7 @@
 #pragma once
 
-#include <ArduinoJson.h>
 #include <Json/Serializer.hpp>
-#include <Redux/State.hpp>
+#include <Memory/Pair.hpp>
 
 namespace BurpDimmer {
   namespace Light {
@@ -11,21 +10,26 @@ namespace BurpDimmer {
     constexpr char levelField[] = "level";
     constexpr char pwmField[] = "pwm";
 
-    class State : public Redux::State, public Json::Serializer {
+    struct Params {
+      const bool on;
+      const unsigned char level;
+      const unsigned char pwm;
+    };
+
+    class State : public Json::Serializer {
+
       public:
 
-        bool on;
-        unsigned char level;
-        unsigned char pwm;
+        const bool on;
+        const unsigned char level;
+        const unsigned char pwm;
 
-        State();
-        State(const bool on, const unsigned char level, const unsigned char pwm);
-        State(const State & state);
-        State(const State * previous, const State & next);
-        State(const State * previous, const bool on, const unsigned char level, const unsigned char pwm);
+        State(const Params * params);
         void serialize(JsonObject & object) const override;
 
     };
+
+    extern Memory::Pair<State, Params> memory;
 
   }
 }
