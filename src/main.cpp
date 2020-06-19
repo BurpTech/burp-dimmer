@@ -1,7 +1,5 @@
 #include <Arduino.h>
-#include <Util/Debug.hpp>
 #include <EEPROM.h>
-#include <stddef.h>
 
 #define _STR(VAL) #VAL
 #define STR(VAL) _STR(VAL)
@@ -20,12 +18,11 @@
 #define BAUDRATE 9600
 #endif
 
-constexpr size_t configFileDocumentSize = 1024;
-constexpr char configFilePath[] = "/config.json";
+#include <BurpDimmer/FactorySettings.hpp>
+#include <BurpDimmer/ConfigFile.hpp>
+#include <BurpDimmer/Config.hpp>
 
-#include <FactorySettings.hpp>
-#include <ConfigFile.hpp>
-#include <Config.hpp>
+using namespace BurpDimmer;
 
 void setup() {
   // Initialise the serial output
