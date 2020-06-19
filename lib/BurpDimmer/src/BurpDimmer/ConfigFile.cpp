@@ -1,10 +1,8 @@
-#include "ConfigFile.hpp"
+#include "Instance.hpp"
 
 namespace BurpDimmer {
-  namespace ConfigFile {
 
-    constexpr char path[] = "/config.json";
-    Instance<StaticJsonDocument<jsonDocumentSize>> instance(path);
+  constexpr char configFilePath[] = "/config.json";
+  ConfigFile<ConfigFileDocumentClass> configFile(configFilePath);
 
-  }
 }

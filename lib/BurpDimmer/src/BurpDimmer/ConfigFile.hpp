@@ -1,12 +1,44 @@
 #pragma once
 
-#include "ConfigFile/Instance.hpp"
+#include <functional>
+#include <Redux/Subscriber.hpp>
+#include "Json/File.hpp"
+#include "Json/withDoc.hpp"
+#include "Config.hpp"
 
 namespace BurpDimmer {
-  namespace ConfigFile {
 
-    constexpr size_t jsonDocumentSize = 1024;
-    extern Instance<StaticJsonDocument<jsonDocumentSize>> instance;
+  template <class JsonDocumentClass>
+  class ConfigFile : public Redux::Subscriber {
 
-  }
+    public:
+
+      Instance(const char * path) :
+        _file(path)
+      {}
+
+      void init(f_init onInit) {
+        Json::withDoc<JsonDocumentClass>([&](JsonDocument & doc) {
+          _file.read(doc);
+          Config::init(doc.as<JsonObject>());
+        });
+      }
+
+      void notify() override {
+        Json::withDoc<JsonDocumentClass>([&](JsonDocument & doc) {
+          JsonObject object = doc.as<JsonObject>();
+          Config::store.getState()->serialize(object);
+          _file.write(doc);
+        });
+      }
+
+    private:
+
+      const Json::File _file;
+
+  };
+
+  using ConfigFileDocumentClass = StaticJsonDocument<1024>;
+  extern ConfigFile<ConfigFileDocumentClass> configFile;
+
 }

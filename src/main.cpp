@@ -48,11 +48,11 @@ void setup() {
   FactorySettings::instance.init();
   
   // Load the config state from the config file
-  ConfigFile::instance.init(&(Config::store));
+  configFile.init();
 
   // The config file instance should subscribe to config
   // state changes so that they will be saved
-  Config::store.setSubscriber(&(ConfigFile::instance));
+  Config::store.setSubscriber(&configFile);
 }
 
 void loop() {
