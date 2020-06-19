@@ -18,11 +18,7 @@
 #define BAUDRATE 9600
 #endif
 
-#include <BurpDimmer/FactorySettings.hpp>
-#include <BurpDimmer/ConfigFile.hpp>
-#include <BurpDimmer/Config.hpp>
-
-using namespace BurpDimmer;
+#include <BurpDimmer.hpp>
 
 void setup() {
   // Initialise the serial output
@@ -41,18 +37,10 @@ void setup() {
   // Initialise the EEPROM library
   EEPROM.begin(EEPROM_SIZE);
 
-  // Initialise the factory settings
-  FactorySettings::instance.init();
-  
-  // Load the config state from the config file
-  configFile.init();
-
-  // The config file instance should subscribe to config
-  // state changes so that they will be saved
-  Config::store.setSubscriber(&configFile);
+  // Start the app
+  BurpDimmer::setup();
 }
 
 void loop() {
-  // loop the config redux store to notify subscribers
-  Config::store.loop();
+  BurpDimmer::loop();
 }
