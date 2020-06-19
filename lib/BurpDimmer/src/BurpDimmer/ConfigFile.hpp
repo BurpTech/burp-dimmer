@@ -1,7 +1,7 @@
 #pragma once
 
 #include <functional>
-#include <Redux/Subscriber.hpp>
+#include <CppRedux/Subscriber.hpp>
 #include "Json/File.hpp"
 #include "Json/withDoc.hpp"
 #include "Config.hpp"
@@ -9,7 +9,7 @@
 namespace BurpDimmer {
 
   template <class JsonDocumentClass>
-  class ConfigFile : public Redux::Subscriber {
+  class ConfigFile : public CppRedux::Subscriber {
 
     public:
 
