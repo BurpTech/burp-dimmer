@@ -46,7 +46,7 @@ namespace BurpDimmerTest {
               });
 
               describe.it("should provide a pointer to a persistent state", []() {
-                  TEST_ASSERT_EQUAL_STRING("This is a test", first->strData);
+                  TEST_ASSERT_EQUAL_STRING("This is a", first->strData);
                   TEST_ASSERT_EQUAL(1234, first->intData);
               });
 
@@ -77,8 +77,8 @@ namespace BurpDimmerTest {
                       describe.it("should reuse the first pointer for the persistent state", []() {
                           TEST_ASSERT_FALSE(third == second);
                           TEST_ASSERT_TRUE(third == first);
-                          TEST_ASSERT_EQUAL_STRING("apple", third->strData);
-                          TEST_ASSERT_EQUAL(4321, third->intData);
+                          TEST_ASSERT_EQUAL_STRING("banana", third->strData);
+                          TEST_ASSERT_EQUAL(5555, third->intData);
                       });
                   });
               });

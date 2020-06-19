@@ -10,10 +10,12 @@ namespace BurpDimmerTest {
     namespace Network {
       Module tests("Network", [](Describe & describe) {
 
+        using namespace BurpDimmer::Config::Network;
+
         describe.it("should have the correct field names for serialization", []() {
-          TEST_ASSERT_EQUAL_STRING("manager", State::MANAGER_FIELD);
-          TEST_ASSERT_EQUAL_STRING("station", State::STATION_FIELD);
-          TEST_ASSERT_EQUAL_STRING("accessPoint", State::ACCESS_POINT_FIELD);
+          TEST_ASSERT_EQUAL_STRING("manager", managerField);
+          TEST_ASSERT_EQUAL_STRING("station", stationField);
+          TEST_ASSERT_EQUAL_STRING("accessPoint", accessPointField);
         });
 
         describe.include(AccessPoint::tests);

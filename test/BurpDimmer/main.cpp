@@ -45,7 +45,7 @@ void loop() {
     runner.loop();
     if (runner.isFinished()) {
       // BddUnity::Usage::printUsage(memory, runner);
-      BddUnity::Usage::printUsageDefines(memory, runner);
+      // BddUnity::Usage::printUsageDefines(memory, runner);
       status = UNITY_END();
       running = false;
     }
