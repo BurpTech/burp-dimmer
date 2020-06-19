@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Redux/Reducer.hpp>
+#include <CppRedux/Reducer.hpp>
 #include "../ActionType.hpp"
 #include "State.hpp"
 
@@ -8,7 +8,7 @@ namespace BurpDimmer {
   namespace Config {
     namespace Network {
 
-      class Reducer : public Redux::Reducer<State, ActionType> {
+      class Reducer : public CppRedux::Reducer<State, Action> {
 
         public:
 

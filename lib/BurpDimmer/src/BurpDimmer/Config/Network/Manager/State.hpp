@@ -1,9 +1,9 @@
 #pragma once
 
 #include <array>
-#include <Json/Serializer.hpp>
-#include <Memory/Pair.hpp>
 #include <cstddef>
+#include "../../../Json/Serializer.hpp"
+#include "../../../Memory/Pair.hpp"
 
 namespace BurpDimmer {
   namespace Config {

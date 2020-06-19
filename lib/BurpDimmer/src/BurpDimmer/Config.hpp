@@ -1,13 +1,14 @@
 #pragma once
 
-#include <Redux/Store.hpp>
+#include <CppRedux/Store.hpp>
 #include <ArduinoJson.h>
 #include "Config/ActionType.hpp"
+#include "Config/State.hpp"
 
 namespace BurpDimmer {
   namespace Config {
 
-      using Store = Redux::Store<State, ActionType>;
+      using Store = CppRedux::Store<State, Action>;
 
       extern Store store;
 

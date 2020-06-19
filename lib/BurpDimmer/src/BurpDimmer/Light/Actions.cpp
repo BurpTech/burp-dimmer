@@ -5,9 +5,44 @@
 namespace BurpDimmer {
   namespace Light {
 
+    void applyConfig(const Params & previous, f_onParams onParams) {
+      auto lightConfig = Config::store.getState()->light;
+      auto levels = lightConfig->levels;
+      // check if the pwm and level matches the current config levels
+      if (previous.level < Config::Light::maxLevels) {
+        if (previous.pwm == levels[previous.level]) {
+          return onParams(Error::noError, &previous);
+        }
+      }
+      // pick the largest pwm less than or equal to the current pwm
+      // if no level found then pick the maximum level
+      // and turn the light off
+      auto on = false;
+      unsigned char level = 0;
+      for (int i = 0; i < levels.size(); i++) {
+        auto pwm = levels[i];
+        if (pwm == 0) {
+          // no more levels
+          break;
+        }
+        if (pwm <= previous.pwm) {
+          on = previous.on;
+          level = i;
+        } else {
+          break;
+        }
+      }
+      auto pwm = levels[level];
+      const Params params = {
+        on,
+        level,
+        pwm
+      };
+      return onParams(Error::noError, &params);
+    }
+
     void deserialize(const JsonObject & object, f_onParams onParams) {
       auto lightConfig = Config::store.getState()->light;
-      auto maxLevel = lightConfig->levelCount - 1;
       auto levels = lightConfig->levels;
       if (!object.isNull()) {
         // deserialize
@@ -39,11 +74,15 @@ namespace BurpDimmer {
           return applyConfig(params, onParams);
         }
         // pwm is not set so validate the level
-        if (level > maxLevel) {
-          BURP_DEBUG_INFO("Error::outOfRange");
+        if (level >= levels.size()) {
+          BURP_DEBUG_INFO("Error::maxLevels");
           return onParams(Error::outOfRange, nullptr);
         }
         auto pwm = levels[level];
+        if (pwm == 0) {
+          BURP_DEBUG_INFO("Error::outOfRange");
+          return onParams(Error::outOfRange, nullptr);
+        }
         const Params params = {
           on,
           level,
@@ -53,38 +92,6 @@ namespace BurpDimmer {
       }
       BURP_DEBUG_INFO("Error::noObject");
       return onParams(Error::noObject, nullptr);
-    }
-
-    void applyConfig(const Params & previous, f_onParams onParams) {
-      auto lightConfig = Config::store.getState()->light;
-      auto levelCount = lightConfig->levelCount;
-      auto levels = lightConfig->levels;
-      // check if the pwm and level matches the current config levels
-      if (previous.level < levelCount) {
-        if (previous.pwm == levels[previous.level]) {
-          return onParams(Error::noError, &previous);
-        }
-      }
-      // pick the largest pwm less than or equal to the current pwm
-      // if no level found then pick the maximum level
-      // and turn the light off
-      auto on = false;
-      auto level = levelCount - 1;
-      for (int i = 0; i < levelCount; i++) {
-        if (levels[i] <= previous.pwm) {
-          on = previous.on;
-          level = i;
-        } else {
-          break;
-        }
-      }
-      auto pwm = levels[level];
-      const Params params = {
-        on,
-        level,
-        pwm
-      };
-      return onParams(Error::noError, &params);
     }
 
     void applyConfig(const State * previous, f_onParams onParams) {
@@ -107,12 +114,11 @@ namespace BurpDimmer {
 
     void increaseBrightness(const State * previous, f_onParams onParams) {
       auto lightConfig = Config::store.getState()->light;
-      auto maxLevel = lightConfig->levelCount - 1;
       auto levels = lightConfig->levels;
       unsigned char level;
       if (previous->on) {
         level = previous->level + 1;
-        if (level > maxLevel) {
+        if (level >= Config::Light::maxLevels || levels[level] == 0) {
           BURP_DEBUG_INFO("Error::maxBrightness");
           return onParams(Error::maxBrightness, nullptr);
         }
@@ -120,14 +126,25 @@ namespace BurpDimmer {
         level = 0;
       }
       auto pwm = levels[level];
-      const Params params = {true, level, pwm};
+      const Params params = {
+        true,
+        level,
+        pwm
+      };
       return onParams(Error::noError, &params);
     }
 
     void decreaseBrightness(const State * previous, f_onParams onParams) {
       auto lightConfig = Config::store.getState()->light;
-      auto maxLevel = lightConfig->levelCount - 1;
       auto levels = lightConfig->levels;
+      std::function<unsigned char()> maxLevel = [&]() {
+        for (unsigned char i = 0; i < levels.size(); i++) {
+          if (levels[i] == 0) {
+            break;
+          }
+          return i - 1;
+        }
+      };
       bool on;
       unsigned char level;
       if (!previous->on) {
@@ -136,7 +153,7 @@ namespace BurpDimmer {
       }
       if (previous->level == 0) {
         on = false;
-        level = maxLevel;
+        level = maxLevel();
       } else {
         on = true;
         level = previous->level - 1;

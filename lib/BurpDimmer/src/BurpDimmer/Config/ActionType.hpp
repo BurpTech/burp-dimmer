@@ -1,16 +1,18 @@
 #pragma once
 
-#include <Redux/Action.hpp>
+#include <CppRedux/Action.hpp>
 
-namespace Config {
+namespace BurpDimmer {
+  namespace Config {
 
-  enum class ActionType {
-    NETWORK_MANAGER_SET_STATE,
-    NETWORK_STATION_SET_STATE,
-    NETWORK_ACCESS_POINT_SET_STATE,
-    LIGHT_SET_STATE
-  };
+    enum class ActionType {
+      NETWORK_MANAGER_SET_STATE,
+      NETWORK_STATION_SET_STATE,
+      NETWORK_ACCESS_POINT_SET_STATE,
+      LIGHT_SET_STATE
+    };
 
-  using Action = Redux::Action<ActionType>;
+    using Action = CppRedux::Action<ActionType>;
 
+  }
 }

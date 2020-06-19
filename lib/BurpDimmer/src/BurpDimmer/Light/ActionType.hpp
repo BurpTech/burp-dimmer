@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Redux/Action.hpp>
+#include <CppRedux/Action.hpp>
 
 namespace BurpDimmer {
   namespace Light {
@@ -9,7 +9,7 @@ namespace BurpDimmer {
       SET_STATE
     };
 
-    using Action = Redux::Action<ActionType>;
+    using Action = CppRedux::Action<ActionType>;
 
   }
 }

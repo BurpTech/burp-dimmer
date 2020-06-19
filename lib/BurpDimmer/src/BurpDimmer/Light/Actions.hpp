@@ -10,6 +10,7 @@ namespace BurpDimmer {
     enum class Error {
       noError,
       noObject,
+      maxLevels,
       outOfRange,
       invalidOn,
       invalidLevel,

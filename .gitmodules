@@ -4,9 +4,6 @@
 [submodule "lib/ArduinoJson"]
 	path = lib/ArduinoJson
 	url = https://github.com/bblanchon/ArduinoJson.git
-[submodule "lib/ArduinoFake"]
-	path = lib/ArduinoFake
-	url = https://github.com/FabioBatSilva/ArduinoFake.git
 [submodule "lib/BddUnity"]
 	path = lib/BddUnity
 	url = https://github.com/pghalliday/BddUnity.git

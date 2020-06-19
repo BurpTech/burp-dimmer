@@ -10,10 +10,10 @@ namespace BurpDimmer {
 
       public:
 
-        const State * create(Params * params) {
+        const State * create(const Params * params) {
           _current++;
           _current %= 2;
-          return new(_pair[_current]) State(params);
+          return new(&(_pair[_current])) State(params);
         }
 
       private:

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Json/Serializer.hpp>
-#include <Memory/Pair.hpp>
+#include "../../Json/Serializer.hpp"
+#include "../../Memory/Pair.hpp"
 #include "AccessPoint/State.hpp"
 #include "Manager/State.hpp"
 #include "Station/State.hpp"

@@ -6,12 +6,6 @@ namespace BurpDimmer {
     namespace Network {
       namespace Station {
 
-        void deserialize(const JsonObject & object, f_onState onState) {
-          deserialize(object, [&](const Error error, const Params * params) {
-              onState(memory.create(params));
-          });
-        }
-
         void deserialize(const JsonObject & object, f_onParams onParams) {
           if (!object.isNull()) {
             if (object.containsKey(testField)) {

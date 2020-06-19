@@ -1,11 +1,11 @@
 #pragma once
 
-#include <Redux/Subscriber.hpp>
+#include <CppRedux/Subscriber.hpp>
 #include <functional>
 
 namespace TestHelpers {
 
-  class TestSubscriber : public Redux::Subscriber {
+  class TestSubscriber : public CppRedux::Subscriber {
 
     public:
 
