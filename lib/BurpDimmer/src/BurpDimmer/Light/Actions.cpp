@@ -103,7 +103,7 @@ namespace BurpDimmer {
       applyConfig(params, onParams);
     }
 
-    void toggle(State * previous, f_onParams onParams) {
+    void toggle(const State * previous, f_onParams onParams) {
       const Params params = {
         !previous->on,
         previous->level,

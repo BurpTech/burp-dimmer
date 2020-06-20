@@ -1,33 +1,21 @@
 #pragma once
 
-#include <functional>
-
-#define COMPONENTS_LIGHT_MAX_BRIGHTNESS 25
+#include <CppRedux/Subscriber.hpp>
 
 namespace BurpDimmer {
   namespace Components {
 
-    class Light {
+    class Light : public CppRedux::Subscriber {
 
       public:
 
-        using f_onUpdate = std::function<void(bool on, int brightness)>;
-
-        Light(int pin, f_onUpdate onUpdate);
+        Light(int pin);
         void setup();
-        void toggle();
-        void setOn(bool on);
-        void setBrightness(int brightness);
-        void changeBrightness(int change);
+        void notify() override;
 
       private:
 
         int _pin;
-        bool _on;
-        int _brightness;
-        f_onUpdate _onUpdate;
-
-        void _update();
 
     };
 
