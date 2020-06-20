@@ -15,15 +15,18 @@ namespace BurpDimmer {
 
     public:
 
-      LightFile(const char * path) :
+      using f_withObj = std::function<void(const JsonObject & object)>;
+
+      LightFile(Light::Store & store, const char * path) :
+        _store(store),
         _file(path),
         _lastChange(0)
       {}
 
-      void init() {
+      void init(f_withObj withObj) {
         Json::withDoc<JsonDocumentClass>([&](JsonDocument & doc) {
           _file.read(doc);
-          Light::init(doc.as<JsonObject>());
+          withObj(doc.as<JsonObject>());
         });
       }
 
@@ -41,7 +44,7 @@ namespace BurpDimmer {
               JsonObject object = doc.as<JsonObject>();
               BURP_DEBUG_INFO("Document capacity: %u", doc.capacity());
               BURP_DEBUG_INFO("Document memory used: %u", doc.memoryUsage());
-              Light::store.getState()->serialize(object);
+              _store.getState()->serialize(object);
               _file.write(doc);
             });
           }
@@ -50,6 +53,7 @@ namespace BurpDimmer {
 
     private:
 
+      Light::Store & _store;
       const Json::File _file;
       unsigned long _lastChange;
 

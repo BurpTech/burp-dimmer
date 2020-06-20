@@ -24,11 +24,12 @@ namespace BurpDimmer {
     void init(Store & store, const Reducer & reducer, const JsonObject & object) {
       deserialize(object, [&](const State * initialState) {
           store.setReducer(&reducer, initialState);
+          lightSelector.init();
+          networkSelector.init();
+          networkAccessPointSelector.init();
+          networkManagerSelector.init();
+          networkStationSelector.init();
       });
-    }
-
-    void init(const JsonObject & object) {
-      init(store, reducer, object);
     }
 
   }

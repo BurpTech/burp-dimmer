@@ -3,6 +3,6 @@
 namespace BurpDimmer {
 
   constexpr char lightFilePath[] = "/light.json";
-  LightFile<LightFileDocumentClass> lightFile(lightFilePath);
+  LightFile<LightFileDocumentClass> lightFile(Light::store, lightFilePath);
 
 }

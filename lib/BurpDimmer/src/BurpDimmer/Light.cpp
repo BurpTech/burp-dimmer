@@ -13,9 +13,5 @@ namespace BurpDimmer {
       });
     }
 
-    void init(const JsonObject & object) {
-      init(store, reducer, object);
-    }
-
   }
 }

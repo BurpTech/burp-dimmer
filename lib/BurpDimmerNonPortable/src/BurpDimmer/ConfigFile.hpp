@@ -30,7 +30,7 @@ namespace BurpDimmer {
       void notify() override {
         Json::withDoc<JsonDocumentClass>([&](JsonDocument & doc) {
           JsonObject object = doc.as<JsonObject>();
-          Config::store.getState()->serialize(object);
+          _store.getState()->serialize(object);
           _file.write(doc);
         });
       }

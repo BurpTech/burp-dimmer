@@ -7,10 +7,11 @@
 namespace BurpDimmer {
   namespace Components {
 
-    using namespace BurpDimmer::Light;
+    using State = BurpDimmer::Light::State;
 
-    Light::Light(int pin) :
-      _pin(pin)
+    Light::Light(int pin, const Light::Store & store) :
+      _pin(pin),
+      _store(store)
     {}
 
     void Light::setup() {
@@ -19,7 +20,7 @@ namespace BurpDimmer {
     }
 
     void Light::notify() {
-      const State * state = store.getState();
+      const State * state = _store.getState();
       if (state->on) {
         analogWrite(_pin, state->pwm);
       } else {

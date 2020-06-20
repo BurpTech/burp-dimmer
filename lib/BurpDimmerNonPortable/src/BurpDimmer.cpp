@@ -1,25 +1,37 @@
+#include <functional>
 #include <CppRedux/SubscriberList.hpp>
 #include <BurpDimmer/Config.hpp>
 #include <BurpDimmer/Light.hpp>
-#include <BurpDimmer/Light/Subscriber.hpp>
+#include <BurpDimmer/Light/ConfigSubscriber.hpp>
 #include "BurpDimmer/FactorySettings.hpp"
 #include "BurpDimmer/Storage.hpp"
 #include "BurpDimmer/ConfigFile.hpp"
 #include "BurpDimmer/LightFile.hpp"
 #include "BurpDimmer/Components/Light.hpp"
 #include "BurpDimmer/LightControls.hpp"
+#include "BurpDimmer/Network.hpp"
 #include "BurpDimmer/defines.hpp"
 #include "BurpDimmer.hpp"
 
 namespace BurpDimmer {
 
-  Components::Light light(BURP_DIMMER_LIGHT_PIN);
+  using namespace std::placeholders;
 
-  CppRedux::Subscribers<2> configSubscribers = {
+  Components::Light light(BURP_DIMMER_LIGHT_PIN, Light::store);
+
+  CppRedux::Subscribers<3> configSubscribers = {
     &configFile,
-    &Light::subscriber
+    &Config::lightSelector,
+    &Config::networkSelector
   };
-  CppRedux::SubscriberList<2> configSubscriberList(configSubscribers);
+  CppRedux::SubscriberList<3> configSubscriberList(configSubscribers);
+
+  CppRedux::Subscribers<3> configNetworkSubscribers = {
+    &Config::networkAccessPointSelector,
+    &Config::networkManagerSelector,
+    &Config::networkStationSelector
+  };
+  CppRedux::SubscriberList<3> configNetworkSubscriberList(configNetworkSubscribers);
 
   CppRedux::Subscribers<2> lightSubscribers = {
     &light,
@@ -35,16 +47,23 @@ namespace BurpDimmer {
     Storage::begin();
 
     // Load the config state from the config file
-    configFile.init();
+    configFile.init([](const JsonObject & obj) {
+        Config::init(Config::store, Config::reducer, obj);
+    });
 
     // load the light state from the light file
-    lightFile.init();
+    lightFile.init([](const JsonObject & obj) {
+        Light::init(Light::store, Light::reducer, obj);
+    });
     
     // setup the light as soon as we can
     light.setup();
     
     // set the config subscribers
     Config::store.setSubscriber(&configSubscriberList);
+    Config::lightSelector.setSubscriber(&Light::configSubscriber);
+    Config::networkSelector.setSubscriber(&configNetworkSubscriberList);
+    Config::networkManagerSelector.setSubscriber(&Network::manager);
 
     // set the light subscribers
     Light::store.setSubscriber(&lightSubscriberList);

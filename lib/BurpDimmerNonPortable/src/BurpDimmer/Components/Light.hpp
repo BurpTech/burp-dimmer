@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CppRedux/Subscriber.hpp>
+#include <BurpDimmer/Light.hpp>
 
 namespace BurpDimmer {
   namespace Components {
@@ -9,13 +10,16 @@ namespace BurpDimmer {
 
       public:
 
-        Light(int pin);
+        using Store = BurpDimmer::Light::Store;
+
+        Light(int pin, const Store & store);
         void setup();
         void notify() override;
 
       private:
 
         int _pin;
+        const Store & _store;
 
     };
 

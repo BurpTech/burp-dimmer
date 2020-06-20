@@ -13,7 +13,6 @@ namespace BurpDimmer {
   namespace Config {
 
       void init(Store & store, const Reducer & reducer, const JsonObject & object);
-      void init(const JsonObject & object);
       extern Store store;
       extern Light::Selector lightSelector;
       extern Network::Selector networkSelector;

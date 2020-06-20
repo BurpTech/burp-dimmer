@@ -5,18 +5,17 @@
 namespace BurpDimmer {
   namespace Network {
 
-    Manager::Manager() :
-      _selector(_select)
+    Manager manager(Config::networkManagerSelector);
+
+    using namespace Config::Network::Manager;
+
+    Manager::Manager(const Manager::Selector & selector) :
+      _selector(selector)
     {}
 
-    const Manager::State * Manager::_select(const Config::State * state) {
-      return state->network->manager;
-    }
-
     void Manager::notify() {
-      _selector.check(Config::store.getState(), [&](const State * state) {
-        BURP_DEBUG_INFO("BurpDimmer::Network::Manager::notify");
-      });
+      const State * state = _selector.getState();
+      BURP_DEBUG_INFO("state: %p", state);
     }
 
   }
