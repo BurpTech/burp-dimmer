@@ -1,5 +1,6 @@
 #include <unity.h>
 #include <TestHelpers/withObj.hpp>
+#include <TestHelpers/TestAsync.hpp>
 #include <BurpDimmer/Light/State.hpp>
 #include "State.hpp"
 
@@ -10,7 +11,14 @@ namespace BurpDimmerTest {
       using namespace TestHelpers;
       using namespace BurpDimmer::Light;
 
+      TestAsync testAsync;
+      const class State * persistentState = nullptr;
+
       Module tests("State", [](Describe & describe) {
+
+          describe.loop([]() {
+              testAsync.loop();
+          });
 
           describe.it("should use the correct field names for serialization", []() {
               TEST_ASSERT_EQUAL_STRING("on", onField);
@@ -34,6 +42,24 @@ namespace BurpDimmerTest {
                   });
               });
           });
+
+          describe.async("memory", [](Async & async, f_done & done) {
+              const Params params = {
+                false,
+                15,
+                78
+              };
+              persistentState = memory.create(&params);
+              testAsync.callbackOnce([&]() {
+                  async.it("should persist the state", [&]() {
+                      TEST_ASSERT_EQUAL(false, persistentState->on);
+                      TEST_ASSERT_EQUAL(15, persistentState->level);
+                      TEST_ASSERT_EQUAL(78, persistentState->pwm);
+                  });
+                  done();
+              });
+          });
+
       });
 
     }
