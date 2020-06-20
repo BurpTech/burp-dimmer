@@ -22,10 +22,21 @@ namespace BurpDimmer {
     {}
 
     void State::serialize(JsonObject & object) const {
-      BURP_DEBUG_INFO("Serializing light state: %d: %u: %u", on, level, pwm);
-      object[onField] = on;
+      BURP_DEBUG_INFO(
+        "Serializing light state: %s: %d: %s: %u: %s: %u",
+        onField,
+        on,
+        levelField,
+        level,
+        pwmField,
+        pwm
+      );
+      auto ret = object[onField].set(on);
+      BURP_DEBUG_INFO("Set on field: %d", ret);
       object[levelField] = level;
       object[pwmField] = pwm;
+      // serializeJson(object, Serial);
+      // Serial.println("");
     }
 
   }

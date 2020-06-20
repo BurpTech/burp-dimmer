@@ -25,10 +25,12 @@
 
 #include "Config.hpp"
 #include "Memory.hpp"
+#include "Light.hpp"
 
-Runner<2> runner({
+Runner<3> runner({
   &BurpDimmerTest::Config::tests,
   &BurpDimmerTest::Memory::tests,
+  &BurpDimmerTest::Light::tests,
 });
 Memory memory;
 bool running = true;

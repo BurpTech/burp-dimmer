@@ -9,8 +9,8 @@ namespace BurpDimmer {
 
     template <class JsonDocumentClass>
     void withDoc(f_onDoc onDoc) {
-      BURP_DEBUG_INFO("creating JSON document");
       JsonDocumentClass doc;
+      BURP_DEBUG_INFO("created JSON document with size: %u", doc.capacity());
       onDoc(doc);
     }
 

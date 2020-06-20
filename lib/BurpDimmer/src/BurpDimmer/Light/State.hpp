@@ -16,7 +16,7 @@ namespace BurpDimmer {
       const unsigned char pwm;
     };
 
-    class State : public Json::Serializer {
+    class State {
 
       public:
 
@@ -25,7 +25,7 @@ namespace BurpDimmer {
         const unsigned char pwm;
 
         State(const Params * params);
-        void serialize(JsonObject & object) const override;
+        void serialize(JsonObject & object) const;
 
     };
 

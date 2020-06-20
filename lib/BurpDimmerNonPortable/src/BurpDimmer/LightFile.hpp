@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <CppRedux/Subscriber.hpp>
+#include <BurpDimmer/Util/Debug.hpp>
 #include <BurpDimmer/Json/withDoc.hpp>
 #include <BurpDimmer/Config.hpp>
 #include <BurpDimmer/Light.hpp>
@@ -38,6 +39,8 @@ namespace BurpDimmer {
             _lastChange = 0;
             Json::withDoc<JsonDocumentClass>([&](JsonDocument & doc) {
               JsonObject object = doc.as<JsonObject>();
+              BURP_DEBUG_INFO("Document capacity: %u", doc.capacity());
+              BURP_DEBUG_INFO("Document memory used: %u", doc.memoryUsage());
               Light::store.getState()->serialize(object);
               _file.write(doc);
             });
@@ -52,7 +55,7 @@ namespace BurpDimmer {
 
   };
 
-  using LightFileDocumentClass = StaticJsonDocument<1024>;
+  using LightFileDocumentClass = StaticJsonDocument<256>;
   extern LightFile<LightFileDocumentClass> lightFile;
 
 }

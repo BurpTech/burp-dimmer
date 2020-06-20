@@ -8,6 +8,7 @@ namespace BurpDimmer {
     void applyConfig(const Params & previous, f_onParams onParams) {
       auto lightConfig = Config::store.getState()->light;
       auto levels = lightConfig->levels;
+      auto offLevel = lightConfig->offLevel;
       // check if the pwm and level matches the current config levels
       if (previous.level < Config::Light::maxLevels) {
         if (previous.pwm == levels[previous.level]) {
@@ -18,16 +19,17 @@ namespace BurpDimmer {
       // if no level found then pick the maximum level
       // and turn the light off
       auto on = false;
-      unsigned char level = 0;
-      for (unsigned char i = 0; i < levels.size(); i++) {
-        auto pwm = levels[i];
+      unsigned char level = offLevel;
+      unsigned char count = 0;
+      for (auto pwm : levels) {
         if (pwm == 0) {
           // no more levels
           break;
         }
         if (pwm <= previous.pwm) {
           on = previous.on;
-          level = i;
+          level = count;
+          count++;
         } else {
           break;
         }
