@@ -3,6 +3,7 @@
 #include <BurpDimmer/Light.hpp>
 #include <BurpDimmer/Light/Subscriber.hpp>
 #include "BurpDimmer/FactorySettings.hpp"
+#include "BurpDimmer/Storage.hpp"
 #include "BurpDimmer/ConfigFile.hpp"
 #include "BurpDimmer/LightFile.hpp"
 #include "BurpDimmer/Components/Light.hpp"
@@ -34,6 +35,9 @@ namespace BurpDimmer {
     // Initialise the factory settings
     FactorySettings::instance.init();
 
+    // Initialise the file system
+    Storage::begin();
+
     // Load the config state from the config file
     configFile.init();
 
@@ -60,6 +64,9 @@ namespace BurpDimmer {
 
     // loop the light controls
     LightControls::loop();
+
+    // loop the lightFile for delayed saves
+    lightFile.loop();
   }
 
 }

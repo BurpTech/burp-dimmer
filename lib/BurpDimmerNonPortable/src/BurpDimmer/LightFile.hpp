@@ -3,6 +3,7 @@
 #include <functional>
 #include <CppRedux/Subscriber.hpp>
 #include <BurpDimmer/Json/withDoc.hpp>
+#include <BurpDimmer/Config.hpp>
 #include <BurpDimmer/Light.hpp>
 #include "Json/File.hpp"
 
@@ -14,7 +15,8 @@ namespace BurpDimmer {
     public:
 
       LightFile(const char * path) :
-        _file(path)
+        _file(path),
+        _lastChange(0)
       {}
 
       void init() {
@@ -25,17 +27,28 @@ namespace BurpDimmer {
       }
 
       void notify() override {
-        // TODO: serialize the file occasionally not on every change
-        Json::withDoc<JsonDocumentClass>([&](JsonDocument & doc) {
-          JsonObject object = doc.as<JsonObject>();
-          Light::store.getState()->serialize(object);
-          _file.write(doc);
-        });
+        // Wait for inactivity before saving the state
+        _lastChange = millis();
+      }
+
+      void loop() {
+        if (_lastChange > 0) {
+          // There has been a change so check for inactivity
+          if (millis() - _lastChange > Config::store.getState()->light->saveStateDelay) {
+            _lastChange = 0;
+            Json::withDoc<JsonDocumentClass>([&](JsonDocument & doc) {
+              JsonObject object = doc.as<JsonObject>();
+              Light::store.getState()->serialize(object);
+              _file.write(doc);
+            });
+          }
+        }
       }
 
     private:
 
       const Json::File _file;
+      unsigned long _lastChange;
 
   };
 

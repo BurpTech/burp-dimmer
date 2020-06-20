@@ -4,7 +4,7 @@ namespace BurpDimmer {
   namespace Config {
     namespace Light {
 
-      Memory::Pair<State, Levels> memory;
+      Memory::Pair<State, Params> memory;
 
       constexpr Levels defaultLevels = {
         10,
@@ -33,9 +33,13 @@ namespace BurpDimmer {
         245,
         255
       };
+      constexpr unsigned long defaultSaveStateDelay = 5000;
+      constexpr unsigned char defaultOffLevel = 24;
 
-      State::State(const Levels * levels) :
-        levels(levels ? *levels : defaultLevels)
+      State::State(const Params * params) :
+        levels(params ? params->levels : defaultLevels),
+        saveStateDelay(params ? params->saveStateDelay : defaultSaveStateDelay),
+        offLevel(params ? params->offLevel : defaultOffLevel)
       {}
 
       void State::serialize(JsonObject & object) const {
@@ -48,6 +52,8 @@ namespace BurpDimmer {
           }
           array.add(levels[i]);
         }
+        object[saveStateDelayField] = saveStateDelay;
+        object[offLevelField] = offLevel;
       }
 
     }

@@ -12,10 +12,15 @@ namespace BurpDimmer {
         noError,
         noObject,
         noLevels,
+        noSaveStateDelay,
+        noOffLevel,
         notAnArray,
         minLevels,
         maxLevels,
         invalidLevels,
+        invalidSaveStateDelay,
+        invalidOffLevel,
+        offLevelOutOfRange,
         levelZero
       };
 

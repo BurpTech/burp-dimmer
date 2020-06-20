@@ -73,11 +73,10 @@ namespace BurpDimmer {
           };
           return applyConfig(params, onParams);
         }
-        // pwm is not set so validate the level
-        if (level >= levels.size()) {
-          BURP_DEBUG_INFO("Error::maxLevels");
-          return onParams(Error::outOfRange, nullptr);
-        }
+        // pwm is not set so validate the level.
+        // We can just check for a zero level as the levels array
+        // is always 256 entries so level cannot be off the end of
+        // the array
         auto pwm = levels[level];
         if (pwm == 0) {
           BURP_DEBUG_INFO("Error::outOfRange");
@@ -118,7 +117,10 @@ namespace BurpDimmer {
       unsigned char level;
       if (previous->on) {
         level = previous->level + 1;
-        if (level >= Config::Light::maxLevels || levels[level] == 0) {
+        // this works because the array is always one bigger
+        // than the maxLevels, so even if we use all the available
+        // levels there will always be a zero at the end of the array
+        if (levels[level] == 0) {
           BURP_DEBUG_INFO("Error::maxBrightness");
           return onParams(Error::maxBrightness, nullptr);
         }
@@ -137,15 +139,7 @@ namespace BurpDimmer {
     void decreaseBrightness(const State * previous, f_onParams onParams) {
       auto lightConfig = Config::store.getState()->light;
       auto levels = lightConfig->levels;
-      std::function<unsigned char()> maxLevel = [&]() {
-        unsigned char i = 0;
-        for (; i < levels.size(); i++) {
-          if (levels[i] == 0) {
-            break;
-          }
-        }
-        return i - 1;
-      };
+      auto offLevel = lightConfig->offLevel;
       bool on;
       unsigned char level;
       if (!previous->on) {
@@ -154,7 +148,7 @@ namespace BurpDimmer {
       }
       if (previous->level == 0) {
         on = false;
-        level = maxLevel();
+        level = offLevel;
       } else {
         on = true;
         level = previous->level - 1;
