@@ -1,18 +1,17 @@
 #pragma once
 
-#include <CppRedux/Store.hpp>
 #include <ArduinoJson.h>
-#include "Light/ActionType.hpp"
-#include "Light/State.hpp"
+#include "Light/Store.hpp"
+#include "Light/Reducer.hpp"
+#include "Light/ConfigSubscriber.hpp"
 
 namespace BurpDimmer {
   namespace Light {
 
-      using Store = CppRedux::Store<State, Action>;
-
-      extern Store store;
-
+      void init(Store & store, const Reducer & reducer, const JsonObject & object);
       void init(const JsonObject & object);
+      extern Store store;
+      extern ConfigSubscriber configSubscriber;
 
   }
 }

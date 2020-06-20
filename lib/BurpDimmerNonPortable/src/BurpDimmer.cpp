@@ -16,11 +16,7 @@ namespace BurpDimmer {
   Components::Light light(BURP_DIMMER_LIGHT_PIN);
 
   CppRedux::Subscribers<2> configSubscribers = {
-    // The config file instance should subscribe to config
-    // state changes so that they will be saved
     &configFile,
-    // The light store should be linked to the light config
-    // so that changes in levels will be applied
     &Light::subscriber
   };
   CppRedux::SubscriberList<2> configSubscriberList(configSubscribers);

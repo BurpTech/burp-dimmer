@@ -28,7 +28,8 @@ namespace BurpDimmer {
 
     };
 
-    extern Memory::Pair<State, Params> memory;
+    using Memory = Memory::Pair<State, Params>;
+    extern Memory memory;
 
   }
 }

@@ -5,7 +5,7 @@
 namespace BurpDimmer {
   namespace Light {
 
-    Memory::Pair<State, Params> memory;
+    Memory memory;
 
     constexpr bool defaultOn = false;
     unsigned char defaultLevel() {
@@ -35,8 +35,6 @@ namespace BurpDimmer {
       BURP_DEBUG_INFO("Set on field: %d", ret);
       object[levelField] = level;
       object[pwmField] = pwm;
-      // serializeJson(object, Serial);
-      // Serial.println("");
     }
 
   }

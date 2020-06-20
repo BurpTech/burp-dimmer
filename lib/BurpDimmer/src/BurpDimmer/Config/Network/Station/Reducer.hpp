@@ -13,7 +13,12 @@ namespace BurpDimmer {
 
           public:
 
+            Reducer(Memory & memory);
             const State * reduce(const State * previous, const Action & action) const override;
+
+          private:
+
+            Memory & _memory;
 
         };
 

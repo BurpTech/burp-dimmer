@@ -5,7 +5,7 @@ namespace BurpDimmer {
     namespace Network {
       namespace Manager {
 
-        Memory::Pair<State, Params> memory;
+        Memory memory;
 
         constexpr PermMode defaultPermMode = PermMode::NORMAL;
         constexpr unsigned long defaultAccessPointTimeout = 0;

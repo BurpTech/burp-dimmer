@@ -1,18 +1,25 @@
 #pragma once
 
-#include <CppRedux/Store.hpp>
 #include <ArduinoJson.h>
-#include "Config/ActionType.hpp"
-#include "Config/State.hpp"
+#include "Config/Store.hpp"
+#include "Config/Light/Selector.hpp"
+#include "Config/Network/Selector.hpp"
+#include "Config/Network/AccessPoint/Selector.hpp"
+#include "Config/Network/Manager/Selector.hpp"
+#include "Config/Network/Station/Selector.hpp"
+#include "Config/Reducer.hpp"
 
 namespace BurpDimmer {
   namespace Config {
 
-      using Store = CppRedux::Store<State, Action>;
-
-      extern Store store;
-
+      void init(Store & store, const Reducer & reducer, const JsonObject & object);
       void init(const JsonObject & object);
+      extern Store store;
+      extern Light::Selector lightSelector;
+      extern Network::Selector networkSelector;
+      extern Network::AccessPoint::Selector networkAccessPointSelector;
+      extern Network::Manager::Selector networkManagerSelector;
+      extern Network::Station::Selector networkStationSelector;
 
   }
 }

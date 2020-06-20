@@ -5,7 +5,7 @@ namespace BurpDimmer {
     namespace Network {
       namespace AccessPoint {
 
-        Memory::Pair<State, Params> memory;
+        Memory memory;
 
         constexpr int defaultTest = 0;
 

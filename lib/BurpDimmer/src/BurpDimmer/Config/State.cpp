@@ -3,7 +3,7 @@
 namespace BurpDimmer {
   namespace Config {
 
-    Memory::Pair<State, Params> memory;
+    Memory memory;
 
     State::State(const Params * params) :
       light(params->light),

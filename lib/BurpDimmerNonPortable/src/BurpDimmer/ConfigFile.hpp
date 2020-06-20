@@ -13,14 +13,17 @@ namespace BurpDimmer {
 
     public:
 
-      ConfigFile(const char * path) :
+      using f_withObj = std::function<void(const JsonObject & object)>;
+
+      ConfigFile(Config::Store & store, const char * path) :
+        _store(store),
         _file(path)
       {}
 
-      void init() {
+      void init(f_withObj withObj) {
         Json::withDoc<JsonDocumentClass>([&](JsonDocument & doc) {
           _file.read(doc);
-          Config::init(doc.as<JsonObject>());
+          withObj(doc.as<JsonObject>());
         });
       }
 
@@ -34,6 +37,7 @@ namespace BurpDimmer {
 
     private:
 
+      Config::Store & _store;
       const Json::File _file;
 
   };

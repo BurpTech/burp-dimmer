@@ -4,7 +4,7 @@ namespace BurpDimmer {
   namespace Config {
     namespace Network {
 
-      Memory::Pair<State, Params> memory;
+      Memory memory;
 
       State::State(const Params * params) :
         accessPoint(params->accessPoint),

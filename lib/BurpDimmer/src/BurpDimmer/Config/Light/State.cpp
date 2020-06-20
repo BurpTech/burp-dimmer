@@ -4,7 +4,7 @@ namespace BurpDimmer {
   namespace Config {
     namespace Light {
 
-      Memory::Pair<State, Params> memory;
+      Memory memory;
 
       constexpr Levels defaultLevels = {
         10,
