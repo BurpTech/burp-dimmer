@@ -1,16 +1,27 @@
 #pragma once
 
-#include <CppRedux/Selector.hpp>
-#include "../Selector.hpp"
+#include <BurpRedux/Selector/Instance.hpp>
 #include "../State.hpp"
 #include "State.hpp"
+
+#ifndef BURP_DIMMER_CONFIG_NETWORK_STATION_SUBSCRIBERS
+#define BURP_DIMMER_CONFIG_NETWORK_STATION_SUBSCRIBERS 0
+#endif
 
 namespace BurpDimmer {
   namespace Config {
     namespace Network {
-      namespace Manager {
+      namespace Station {
 
-        using Selector = CppRedux::Selector<Network::Selector, Network::State, State>;
+        using Selector = BurpRedux::Selector::Instance<
+          Network::State::Instance,
+          State::Instance,
+          BURP_DIMMER_CONFIG_NETWORK_STATION_SUBSCRIBERS
+        >;
+
+        extern Selector * selector;
+        void init(const Network::State::Instance * state);
+        void deinit();
 
       }
     }

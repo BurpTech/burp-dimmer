@@ -5,16 +5,16 @@ namespace BurpDimmer {
   namespace Config {
     namespace Light {
 
-      const Reducer reducer(memory);
+      Reducer reducer(State::memory);
 
-      Reducer::Reducer(Memory & memory) :
+      Reducer::Reducer(State::Memory & memory) :
         _memory(memory)
       {}
 
-      const State * Reducer::reduce(const State * previous, const Action & action) const {
+      const State::Instance * Reducer::reduce(const State::Instance * previous, const Action & action) {
         switch (action.type) {
           case ActionType::LIGHT_SET_STATE: {
-            return _memory.create(action.payload<Params>());
+            return _memory.create(action.payload<State::Params>());
           }
           default:
             return previous;

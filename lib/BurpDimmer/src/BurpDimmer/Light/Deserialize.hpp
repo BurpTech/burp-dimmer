@@ -2,13 +2,14 @@
 
 #include <ArduinoJson.h>
 #include <functional>
+#include "Config.hpp"
 #include "State.hpp"
 
 namespace BurpDimmer {
   namespace Light {
 
-    using f_onState = std::function<void(const State * state)>;
-    void deserialize(const JsonObject & object, f_onState onState);
+    using f_onState = std::function<void(const State::Instance * state)>;
+    void deserialize(const JsonObject & object, const Config * config, f_onState onState);
 
   }
 }

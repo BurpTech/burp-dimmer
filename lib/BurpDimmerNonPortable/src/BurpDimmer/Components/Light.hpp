@@ -1,27 +1,28 @@
 #pragma once
 
-#include <CppRedux/Subscriber.hpp>
-#include <BurpDimmer/Light.hpp>
+#include <BurpRedux/Subscriber.hpp>
+#include <BurpDimmer/Light/State.hpp>
 
 namespace BurpDimmer {
   namespace Components {
+    namespace Light {
 
-    class Light : public CppRedux::Subscriber {
+      using State = BurpDimmer::Light::State::Instance;
 
-      public:
+      class Instance : public BurpRedux::Subscriber<State> {
 
-        using Store = BurpDimmer::Light::Store;
+        public:
 
-        Light(int pin, const Store & store);
-        void setup();
-        void notify() override;
+          Instance(int pin);
+          void setup(const State * state);
+          void onPublish(const State * state) override;
 
-      private:
+        private:
 
-        int _pin;
-        const Store & _store;
+          int _pin;
 
-    };
+      };
 
+    }
   }
 }

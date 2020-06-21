@@ -1,6 +1,10 @@
 #include <unity.h>
 #include <BurpDimmer/Config.hpp>
-#include <CppRedux/Selector.hpp>
+#include <BurpDimmer/Config/Store.hpp>
+#include <BurpDimmer/Config/State.hpp>
+#include <BurpDimmer/Config/Network/State.hpp>
+#include <BurpDimmer/Config/Network/Manager/Selector.hpp>
+#include <BurpDimmer/Config/Network/Manager/State.hpp>
 #include <TestHelpers/TestSubscriber.hpp>
 #include <TestHelpers/withObj.hpp>
 #include "Manager.hpp"
@@ -12,30 +16,17 @@ namespace BurpDimmerTest {
 
         using namespace TestHelpers;
         using namespace BurpDimmer::Config;
-        using namespace BurpDimmer::Config::Network;
+        using namespace BurpDimmer::Config::State;
+        using namespace BurpDimmer::Config::Network::State;
         using namespace BurpDimmer::Config::Network::Manager;
+        using namespace BurpDimmer::Config::Network::Manager::State;
 
-        using Params = BurpDimmer::Config::Network::Manager::Params;
-        using State = BurpDimmer::Config::Network::Manager::State;
+        using Instance = BurpDimmer::Config::Network::Manager::State::Instance;
+        using Params = BurpDimmer::Config::Network::Manager::State::Params;
 
-        TestSubscriber subscriber;
+        TestSubscriber<Instance> subscriber;
 
         Module tests("Manager", [](Describe & describe) {
-
-          describe.setup([]() {
-            store.setSubscriber(&networkSelector);
-            networkSelector.setSubscriber(&networkManagerSelector);
-            networkManagerSelector.setSubscriber(&subscriber);
-          });
-
-          describe.loop([]() {
-            store.loop();
-            subscriber.loop();
-          });
-
-          describe.beforeEach([]() {
-            networkManagerSelector.reset();
-          });
 
           describe.it("should have the correct field names for serialization", []() {
             TEST_ASSERT_EQUAL_STRING("mode", modeField);
@@ -43,13 +34,22 @@ namespace BurpDimmerTest {
           });
 
           describe.describe("when initialised with an empty object", [](Describe & describe) {
-            describe.beforeEach([]() {
-              withObj([](JsonObject & obj) {
-                init(store, BurpDimmer::Config::reducer, obj);
-              });
+            describe.setup([]() {
+                withObj([](JsonObject & obj) {
+                    read(obj);
+                });
             });
+
+            describe.loop([]() {
+                store->loop();
+            });
+
+            describe.after([]() {
+                BurpDimmer::Config::deinit();
+            });
+
             describe.it("should have the default state", []() {
-              const State * state = networkManagerSelector.getState();
+              const Instance * state = selector->getState();
               TEST_ASSERT_EQUAL_INT(PermMode::NORMAL, state->permMode);
               TEST_ASSERT_EQUAL_INT(TempMode::ACCESS_POINT, state->tempMode);
               TEST_ASSERT_EQUAL_INT(false, state->tempModeActive);
@@ -58,15 +58,24 @@ namespace BurpDimmerTest {
           });
 
           describe.describe("when initialised with a serialized state", [](Describe & describe) {
-            describe.beforeEach([]() {
-              withObj([](JsonObject & obj) {
-                obj[networkField][managerField][modeField] = "accessPoint";
-                obj[networkField][managerField][accessPointTimeoutField] = 60000;
-                init(store, BurpDimmer::Config::reducer, obj);
-              });
+            describe.setup([]() {
+                withObj([](JsonObject & obj) {
+                    obj[networkField][managerField][modeField] = "accessPoint";
+                    obj[networkField][managerField][accessPointTimeoutField] = 60000;
+                    read(obj);
+                });
             });
+
+            describe.loop([]() {
+                store->loop();
+            });
+
+            describe.after([]() {
+                BurpDimmer::Config::deinit();
+            });
+
             describe.it("should have the deserialized state", []() {
-              const State * state = networkManagerSelector.getState();
+              const Instance * state = selector->getState();
               TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state->permMode);
               TEST_ASSERT_EQUAL_INT(TempMode::ACCESS_POINT, state->tempMode);
               TEST_ASSERT_EQUAL_INT(false, state->tempModeActive);
@@ -81,11 +90,11 @@ namespace BurpDimmerTest {
                   true,
                   30000
                 };
-                store.dispatch(Action(ActionType::NETWORK_MANAGER_SET_STATE, &params));
+                store->dispatch(Action(ActionType::NETWORK_MANAGER_SET_STATE, &params));
                 subscriber.callbackOnce(done);
               });
               describe.it("should have the new state", [&]() {
-                const State * state = networkManagerSelector.getState();
+                const Instance * state = selector->getState();
                 TEST_ASSERT_EQUAL_INT(PermMode::OFF, state->permMode);
                 TEST_ASSERT_EQUAL_INT(TempMode::WPS_CONFIG, state->tempMode);
                 TEST_ASSERT_EQUAL_INT(true, state->tempModeActive);

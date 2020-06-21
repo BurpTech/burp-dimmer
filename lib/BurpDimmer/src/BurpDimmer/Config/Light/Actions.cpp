@@ -8,13 +8,13 @@ namespace BurpDimmer {
 
       void deserialize(const JsonObject & object, f_onParams onParams) {
         if (!object.isNull()) {
-          if (object.containsKey(levelsField)) {
-            if (object.containsKey(saveStateDelayField)) {
-              if (object.containsKey(offLevelField)) {
-                JsonArray array = object[levelsField].as<JsonArray>();
+          if (object.containsKey(State::levelsField)) {
+            if (object.containsKey(State::saveStateDelayField)) {
+              if (object.containsKey(State::offLevelField)) {
+                JsonArray array = object[State::levelsField].as<JsonArray>();
                 if (array) {
                   auto size = array.size();
-                  if (size > maxLevels) {
+                  if (size > State::maxLevels) {
                     BURP_DEBUG_INFO("Error::maxLevels");
                     return onParams(Error::maxLevels, nullptr);
                   }
@@ -23,7 +23,7 @@ namespace BurpDimmer {
                     return onParams(Error::minLevels, nullptr);
                   }
                   auto index = 0;
-                  Levels levels;
+                  State::Levels levels;
                   for(JsonVariant v : array) {
                     if (!v.is<unsigned char>()) {
                       BURP_DEBUG_INFO("Error::invalidLevels");
@@ -36,21 +36,21 @@ namespace BurpDimmer {
                     }
                     levels[index++] = level;
                   }
-                  if (!object[saveStateDelayField].is<unsigned long>()) {
+                  if (!object[State::saveStateDelayField].is<unsigned long>()) {
                     BURP_DEBUG_INFO("Error::invalidSaveStateDelay");
                     return onParams(Error::invalidSaveStateDelay, nullptr);
                   }
-                  unsigned long saveStateDelay = object[saveStateDelayField];
-                  if (!object[offLevelField].is<unsigned char>()) {
+                  unsigned long saveStateDelay = object[State::saveStateDelayField];
+                  if (!object[State::offLevelField].is<unsigned char>()) {
                     BURP_DEBUG_INFO("Error::invalidOffLevel");
                     return onParams(Error::invalidOffLevel, nullptr);
                   }
-                  unsigned char offLevel = object[offLevelField];
+                  unsigned char offLevel = object[State::offLevelField];
                   if (offLevel >= size) {
                     BURP_DEBUG_INFO("Error::offLevelOutOfRange");
                     return onParams(Error::offLevelOutOfRange, nullptr);
                   }
-                  const Params params = {
+                  const State::Params params = {
                     levels,
                     saveStateDelay,
                     offLevel

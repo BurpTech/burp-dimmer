@@ -3,24 +3,26 @@
 namespace BurpDimmer {
   namespace Config {
     namespace Network {
+      namespace State {
 
-      Memory memory;
+        Memory memory;
 
-      State::State(const Params * params) :
-        accessPoint(params->accessPoint),
-        manager(params->manager),
-        station(params->station)
-      {}
+        Instance::Instance(const Params * params) :
+          accessPoint(params->accessPoint),
+          manager(params->manager),
+          station(params->station)
+        {}
 
-      void State::serialize(JsonObject & object) const {
-        JsonObject accessPointObject = object[accessPointField].as<JsonObject>();
-        accessPoint->serialize(accessPointObject);
-        JsonObject managerObject = object[managerField].as<JsonObject>();
-        manager->serialize(managerObject);
-        JsonObject stationObject = object[stationField].as<JsonObject>();
-        station->serialize(stationObject);
+        void Instance::serialize(JsonObject & object) const {
+          JsonObject accessPointObject = object[accessPointField].as<JsonObject>();
+          accessPoint->serialize(accessPointObject);
+          JsonObject managerObject = object[managerField].as<JsonObject>();
+          manager->serialize(managerObject);
+          JsonObject stationObject = object[stationField].as<JsonObject>();
+          station->serialize(stationObject);
+        }
+
       }
-
     }
   }
 }

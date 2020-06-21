@@ -4,9 +4,9 @@
 namespace BurpDimmer {
   namespace Light {
 
-    void deserialize(const JsonObject & object, f_onState onState) {
-      deserialize(object, [&](const Error error, const Params * params) {
-          onState(memory.create(params));
+    void deserialize(const JsonObject & object, const Config * config, f_onState onState) {
+      deserialize(object, config, [&](const Error error, const State::Params * params) {
+          onState(State::memory.create(params));
       });
     }
 

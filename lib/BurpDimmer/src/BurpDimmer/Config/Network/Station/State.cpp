@@ -4,19 +4,21 @@ namespace BurpDimmer {
   namespace Config {
     namespace Network {
       namespace Station {
+        namespace State {
 
-        Memory memory;
+          Memory memory;
 
-        constexpr int defaultTest = 0;
+          constexpr int defaultTest = 0;
 
-        State::State(const Params * params) :
-          test(params ? params->test : defaultTest)
-        {}
+          Instance::Instance(const Params * params) :
+            test(params ? params->test : defaultTest)
+          {}
 
-        void State::serialize(JsonObject & object) const {
-          object[testField] = test;
+          void Instance::serialize(JsonObject & object) const {
+            object[testField] = test;
+          }
+
         }
-
       }
     }
   }

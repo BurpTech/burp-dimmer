@@ -8,13 +8,13 @@ namespace BurpDimmer {
 
         void deserialize(const JsonObject & object, f_onParams onParams) {
           if (!object.isNull()) {
-            if (object.containsKey(testField)) {
-              const JsonVariant v = object[testField];
+            if (object.containsKey(State::testField)) {
+              const JsonVariant v = object[State::testField];
               if (!v.is<int>()) {
                 BURP_DEBUG_INFO("Error::invalidTest");
                 return onParams(Error::invalidTest, nullptr);
               }
-              const Params params = {
+              const State::Params params = {
                 v.as<int>()
               };
               return onParams(Error::noError, &params);

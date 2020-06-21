@@ -1,22 +1,29 @@
-#include <functional>
 #include <BurpDimmer/Util/Debug.hpp>
 #include "Manager.hpp"
 
 namespace BurpDimmer {
   namespace Network {
+    namespace Manager {
 
-    Manager manager(Config::networkManagerSelector);
+      Instance::Instance(const State * state) :
+        _state(state)
+      {}
 
-    using namespace Config::Network::Manager;
+      void Instance::onPublish(const State * state) {
+        _state = state;
+        BURP_DEBUG_INFO("state: %p", state);
+      }
 
-    Manager::Manager(const Manager::Selector & selector) :
-      _selector(selector)
-    {}
+      Instance * instance;
 
-    void Manager::notify() {
-      const State * state = _selector.getState();
-      BURP_DEBUG_INFO("state: %p", state);
+      void init(const State * state) {
+        instance = new Instance(state);
+      }
+
+      void deinit() {
+        delete instance;
+      }
+
     }
-
   }
 }

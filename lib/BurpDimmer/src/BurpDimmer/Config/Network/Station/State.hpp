@@ -1,33 +1,35 @@
 #pragma once
 
-#include "../../../Json/Serializer.hpp"
+#include <ArduinoJson.h>
 #include "../../../Memory/Pair.hpp"
 
 namespace BurpDimmer {
   namespace Config {
     namespace Network {
       namespace Station {
+        namespace State {
 
-        constexpr char testField[] = "test";
+          constexpr char testField[] = "test";
 
-        struct Params {
-          const int test;
-        };
-
-        class State : public Json::Serializer {
-
-          public:
-            
+          struct Params {
             const int test;
+          };
 
-            State(const Params * params);
-            void serialize(JsonObject & object) const override;
+          class Instance {
 
-        };
+            public:
+              
+              const int test;
 
-        using Memory = Memory::Pair<State, Params>;
-        extern Memory memory;
+              Instance(const Params * params);
+              void serialize(JsonObject & object) const;
 
+          };
+
+          using Memory = Memory::Pair<Instance, Params>;
+          extern Memory memory;
+
+        }
       }
     }
   }

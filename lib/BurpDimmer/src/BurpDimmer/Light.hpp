@@ -1,16 +1,12 @@
 #pragma once
 
 #include <ArduinoJson.h>
-#include "Light/Store.hpp"
-#include "Light/Reducer.hpp"
-#include "Light/ConfigSubscriber.hpp"
+#include "Light/Config.hpp"
 
 namespace BurpDimmer {
   namespace Light {
 
-      void init(Store & store, const Reducer & reducer, const JsonObject & object);
-      extern Store store;
-      extern ConfigSubscriber configSubscriber;
+      void read(const Config * config, const JsonObject & object);
 
   }
 }

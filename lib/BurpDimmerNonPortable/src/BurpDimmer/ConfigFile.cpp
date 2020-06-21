@@ -3,6 +3,6 @@
 namespace BurpDimmer {
 
   constexpr char configFilePath[] = "/config.json";
-  ConfigFile<ConfigFileDocumentClass> configFile(Config::store, configFilePath);
+  ConfigFile<ConfigFileDocumentClass> configFile(configFilePath);
 
 }

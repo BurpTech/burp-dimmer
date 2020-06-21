@@ -16,7 +16,7 @@ namespace BurpDimmer {
           invalidTest
         };
 
-        using f_onParams = std::function<void(const Error error, const Params * params)>;
+        using f_onParams = std::function<void(const Error error, const State::Params * params)>;
         void deserialize(const JsonObject & object, f_onParams onParams);
 
       }

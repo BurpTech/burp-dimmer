@@ -1,36 +1,45 @@
 #pragma once
 
-#include "../Json/Serializer.hpp"
+#include <ArduinoJson.h>
 #include "../Memory/Pair.hpp"
+#include "Config.hpp"
 
 namespace BurpDimmer {
   namespace Light {
+    namespace State {
 
-    constexpr char onField[] = "on";
-    constexpr char levelField[] = "level";
-    constexpr char pwmField[] = "pwm";
+      constexpr char onField[] = "on";
+      constexpr char levelField[] = "level";
+      constexpr char pwmField[] = "pwm";
 
-    struct Params {
-      const bool on;
-      const unsigned char level;
-      const unsigned char pwm;
-    };
-
-    class State {
-
-      public:
-
+      struct Fields {
         const bool on;
         const unsigned char level;
         const unsigned char pwm;
+      };
 
-        State(const Params * params);
-        void serialize(JsonObject & object) const;
+      struct Params {
+        const Config * config;
+        const Fields * fields;
+      };
 
-    };
+      class Instance {
 
-    using Memory = Memory::Pair<State, Params>;
-    extern Memory memory;
+        public:
 
+          const bool on;
+          const unsigned char level;
+          const unsigned char pwm;
+          const Config * config;
+
+          Instance(const Params * params);
+          void serialize(JsonObject & object) const;
+
+      };
+
+      using Memory = Memory::Pair<Instance, Params>;
+      extern Memory memory;
+
+    }
   }
 }

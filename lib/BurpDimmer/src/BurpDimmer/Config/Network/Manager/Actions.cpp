@@ -8,26 +8,26 @@ namespace BurpDimmer {
 
         void deserialize(const JsonObject & object, f_onParams onParams) {
           if (!object.isNull()) {
-            if (object.containsKey(modeField)) {
-              if (object.containsKey(accessPointTimeoutField)) {
-                const JsonVariant vapt = object[accessPointTimeoutField];
+            if (object.containsKey(State::modeField)) {
+              if (object.containsKey(State::accessPointTimeoutField)) {
+                const JsonVariant vapt = object[State::accessPointTimeoutField];
                 if (!vapt.is<unsigned long>()) {
                   BURP_DEBUG_INFO("Error::invalidAccessPointTimeout");
                   return onParams(Error::invalidAccessPointTimeout, nullptr);
                 }
                 const unsigned long accessPointTimeout = vapt.as<unsigned long>();
-                const JsonVariant vm = object[modeField];
+                const JsonVariant vm = object[State::modeField];
                 if (!vm.is<const char *>()) {
                   BURP_DEBUG_INFO("Error::invalidMode");
                   return onParams(Error::invalidMode, nullptr);
                 }
                 const char * modeString = vm.as<const char *>();
-                for (size_t i = 0 ; i < PermMode::count; i++) {
-                  if (strcmp(modeString, permModeNames[i]) == 0) {
-                    const Params params = {
-                      static_cast<PermMode>(i),
-                      defaultTempMode,
-                      defaultTempModeActive,
+                for (size_t i = 0 ; i < State::PermMode::count; i++) {
+                  if (strcmp(modeString, State::permModeNames[i]) == 0) {
+                    const State::Params params = {
+                      static_cast<State::PermMode>(i),
+                      State::defaultTempMode,
+                      State::defaultTempModeActive,
                       accessPointTimeout
                     };
                     return onParams(Error::noError, &params);
@@ -46,9 +46,9 @@ namespace BurpDimmer {
           return onParams(Error::noObject, nullptr);
         }
 
-        void nextPermMode(const State * previous, f_onParams onParams) {
-          const Params params = {
-            static_cast<PermMode>((previous->permMode + 1) % PermMode::count),
+        void nextPermMode(const State::Instance * previous, f_onParams onParams) {
+          const State::Params params = {
+            static_cast<State::PermMode>((previous->permMode + 1) % State::PermMode::count),
             previous->tempMode,
             false,
             previous->accessPointTimeout
@@ -56,28 +56,28 @@ namespace BurpDimmer {
           return onParams(Error::noError, &params);
         }
 
-        void startTempAccessPoint(const State * previous, f_onParams onParams) {
-          const Params params = {
+        void startTempAccessPoint(const State::Instance * previous, f_onParams onParams) {
+          const State::Params params = {
             previous->permMode,
-            TempMode::ACCESS_POINT,
+            State::TempMode::ACCESS_POINT,
             true,
             previous->accessPointTimeout
           };
           return onParams(Error::noError, &params);
         }
 
-        void startWpsConfig(const State * previous, f_onParams onParams) {
-          const Params params = {
+        void startWpsConfig(const State::Instance * previous, f_onParams onParams) {
+          const State::Params params = {
             previous->permMode,
-            TempMode::WPS_CONFIG,
+            State::TempMode::WPS_CONFIG,
             true,
             previous->accessPointTimeout
           };
           return onParams(Error::noError, &params);
         }
 
-        void stopTempMode(const State * previous, f_onParams onParams) {
-          const Params params = {
+        void stopTempMode(const State::Instance * previous, f_onParams onParams) {
+          const State::Params params = {
             previous->permMode,
             previous->tempMode,
             false,
@@ -86,9 +86,9 @@ namespace BurpDimmer {
           return onParams(Error::noError, &params);
         }
 
-        void setNormalMode(const State * previous, f_onParams onParams) {
-          const Params params = {
-            PermMode::NORMAL,
+        void setNormalMode(const State::Instance * previous, f_onParams onParams) {
+          const State::Params params = {
+            State::PermMode::NORMAL,
             previous->tempMode,
             false,
             previous->accessPointTimeout

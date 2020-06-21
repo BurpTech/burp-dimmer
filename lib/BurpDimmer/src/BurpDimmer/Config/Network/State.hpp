@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../Json/Serializer.hpp"
+#include <ArduinoJson.h>
 #include "../../Memory/Pair.hpp"
 #include "AccessPoint/State.hpp"
 #include "Manager/State.hpp"
@@ -9,33 +9,35 @@
 namespace BurpDimmer {
   namespace Config {
     namespace Network {
+      namespace State {
 
-      constexpr char accessPointField[] = "accessPoint";
-      constexpr char managerField[] = "manager";
-      constexpr char stationField[] = "station";
+        constexpr char accessPointField[] = "accessPoint";
+        constexpr char managerField[] = "manager";
+        constexpr char stationField[] = "station";
 
-      struct Params {
-        const AccessPoint::State * accessPoint;
-        const Manager::State * manager;
-        const Station::State * station;
-      };
+        struct Params {
+          const AccessPoint::State::Instance * accessPoint;
+          const Manager::State::Instance * manager;
+          const Station::State::Instance * station;
+        };
 
-      class State : public Json::Serializer {
+        class Instance {
 
-        public:
-          
-          const AccessPoint::State * accessPoint;
-          const Manager::State * manager;
-          const Station::State * station;
+          public:
+            
+            const AccessPoint::State::Instance * accessPoint;
+            const Manager::State::Instance * manager;
+            const Station::State::Instance * station;
 
-          State(const Params * params);
-          void serialize(JsonObject & object) const override;
+            Instance(const Params * params);
+            void serialize(JsonObject & object) const;
 
-      };
+        };
 
-      using Memory = Memory::Pair<State, Params>;
-      extern Memory memory;
+        using Memory = Memory::Pair<Instance, Params>;
+        extern Memory memory;
 
+      }
     }
   }
 }

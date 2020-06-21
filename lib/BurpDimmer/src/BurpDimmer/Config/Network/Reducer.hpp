@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CppRedux/Reducer.hpp>
+#include <BurpRedux/Reducer.hpp>
 #include "../ActionType.hpp"
 #include "AccessPoint/Reducer.hpp"
 #include "Manager/Reducer.hpp"
@@ -11,28 +11,28 @@ namespace BurpDimmer {
   namespace Config {
     namespace Network {
 
-      class Reducer : public CppRedux::Reducer<State, Action> {
+      class Reducer : public BurpRedux::Reducer<State::Instance, Action> {
 
         public:
 
           Reducer(
-              Memory & memory,
-              const AccessPoint::Reducer & accessPointReducer,
-              const Manager::Reducer & managerReducer,
-              const Station::Reducer & stationReducer
+              State::Memory & memory,
+              AccessPoint::Reducer & accessPointReducer,
+              Manager::Reducer & managerReducer,
+              Station::Reducer & stationReducer
           );
-          const State * reduce(const State * previous, const Action & action) const override;
+          const State::Instance * reduce(const State::Instance * previous, const Action & action) override;
 
         private:
 
-          Memory & _memory;
-          const AccessPoint::Reducer & _accessPointReducer;
-          const Manager::Reducer & _managerReducer;
-          const Station::Reducer & _stationReducer;
+          State::Memory & _memory;
+          AccessPoint::Reducer & _accessPointReducer;
+          Manager::Reducer & _managerReducer;
+          Station::Reducer & _stationReducer;
 
       };
 
-      extern const Reducer reducer;
+      extern Reducer reducer;
 
     }
   }

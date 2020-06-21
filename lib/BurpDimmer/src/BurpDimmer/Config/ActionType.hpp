@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CppRedux/Action.hpp>
+#include <BurpRedux/Action.hpp>
 
 namespace BurpDimmer {
   namespace Config {
@@ -12,7 +12,7 @@ namespace BurpDimmer {
       LIGHT_SET_STATE
     };
 
-    using Action = CppRedux::Action<ActionType>;
+    using Action = BurpRedux::Action<ActionType>;
 
   }
 }

@@ -1,24 +1,29 @@
 #pragma once
 
-#include <CppRedux/Subscriber.hpp>
-#include <CppRedux/Selector.hpp>
+#include <BurpRedux/Subscriber.hpp>
+#include "../Config/Light/State.hpp"
 #include "Store.hpp"
+#include "Config.hpp"
 
 namespace BurpDimmer {
   namespace Light {
 
-    class ConfigSubscriber : public CppRedux::Subscriber {
+    class ConfigSubscriber : public BurpRedux::Subscriber<Config> {
 
       public:
 
         ConfigSubscriber(Store & store);
-        void notify() override;
+        void onPublish(const Config * config) override;
 
       private:
 
         Store & _store;
 
     };
+
+    extern ConfigSubscriber * configSubscriber;
+    void initConfigSubscriber(Store & store);
+    void deinitConfigSubscriber();
 
   }
 }

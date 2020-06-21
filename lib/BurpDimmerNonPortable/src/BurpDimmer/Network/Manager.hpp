@@ -1,28 +1,32 @@
 #pragma once
 
-#include <CppRedux/Subscriber.hpp>
-#include <CppRedux/Selector.hpp>
-#include <BurpDimmer/Config.hpp>
+#include <BurpRedux/Subscriber.hpp>
+#include <BurpDimmer/Config/Network/Manager/State.hpp>
 
 namespace BurpDimmer {
   namespace Network {
+    namespace Manager {
 
-    class Manager : public CppRedux::Subscriber {
+      using State = Config::Network::Manager::State::Instance;
 
-      public:
+      class Instance : public BurpRedux::Subscriber<State> {
 
-        using Selector = Config::Network::Manager::Selector;
+        public:
 
-        Manager(const Selector & selector);
-        void notify() override;
 
-      private:
+          Instance(const State * state);
+          void onPublish(const State * state) override;
 
-        const Selector & _selector;
+        private:
 
-    };
+          const State * _state;
 
-    extern Manager manager;
+      };
 
+      extern Instance * instance;
+      void init(const State * state);
+      void deinit();
+
+    }
   }
 }

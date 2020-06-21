@@ -9,10 +9,10 @@ namespace BurpDimmerTest {
     namespace State {
 
       using namespace TestHelpers;
-      using namespace BurpDimmer::Light;
+      using namespace BurpDimmer::Light::State;
 
       TestAsync testAsync;
-      const class State * persistentState = nullptr;
+      const class Instance * persistentState = nullptr;
 
       Module tests("State", [](Describe & describe) {
 
@@ -28,26 +28,34 @@ namespace BurpDimmerTest {
 
           describe.describe("serialize", [](Describe & describe) {
               describe.it("should populate the JSON object", []() {
-                  const Params params = {
+                  const Fields fields = {
                     true,
                     5,
                     20,
                   };
-                  const class State state(&params);
+                  const Params params = {
+                    nullptr,
+                    &fields
+                  };
+                  const class Instance state(&params);
                   withObj([&](JsonObject & obj) {
                       state.serialize(obj);
-                      TEST_ASSERT_EQUAL(params.on, obj[onField].as<bool>());
-                      TEST_ASSERT_EQUAL(params.level, obj[levelField].as<unsigned char>());
-                      TEST_ASSERT_EQUAL(params.pwm, obj[pwmField].as<unsigned char>());
+                      TEST_ASSERT_EQUAL(fields.on, obj[onField].as<bool>());
+                      TEST_ASSERT_EQUAL(fields.level, obj[levelField].as<unsigned char>());
+                      TEST_ASSERT_EQUAL(fields.pwm, obj[pwmField].as<unsigned char>());
                   });
               });
           });
 
           describe.async("memory", [](Async & async, f_done & done) {
-              const Params params = {
+              const Fields fields = {
                 false,
                 15,
                 78
+              };
+              const Params params = {
+                nullptr,
+                &fields
               };
               persistentState = memory.create(&params);
               testAsync.callbackOnce([&]() {

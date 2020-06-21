@@ -1,24 +1,23 @@
 #pragma once
 
 #include <functional>
-#include <CppRedux/Subscriber.hpp>
+#include <BurpRedux/Subscriber.hpp>
 #include <BurpDimmer/Util/Debug.hpp>
 #include <BurpDimmer/Json/withDoc.hpp>
-#include <BurpDimmer/Config.hpp>
-#include <BurpDimmer/Light.hpp>
+#include <BurpDimmer/Light/State.hpp>
 #include "Json/File.hpp"
 
 namespace BurpDimmer {
 
   template <class JsonDocumentClass>
-  class LightFile : public CppRedux::Subscriber {
+  class LightFile : public BurpRedux::Subscriber<Light::State::Instance> {
 
     public:
 
       using f_withObj = std::function<void(const JsonObject & object)>;
 
-      LightFile(Light::Store & store, const char * path) :
-        _store(store),
+      LightFile(const char * path) :
+        _state(nullptr),
         _file(path),
         _lastChange(0)
       {}
@@ -30,21 +29,22 @@ namespace BurpDimmer {
         });
       }
 
-      void notify() override {
+      void onPublish(const Light::State::Instance * state) override {
         // Wait for inactivity before saving the state
         _lastChange = millis();
+        _state = state;
       }
 
       void loop() {
         if (_lastChange > 0) {
           // There has been a change so check for inactivity
-          if (millis() - _lastChange > Config::store.getState()->light->saveStateDelay) {
+          if (millis() - _lastChange > _state->config->saveStateDelay) {
             _lastChange = 0;
             Json::withDoc<JsonDocumentClass>([&](JsonDocument & doc) {
               JsonObject object = doc.as<JsonObject>();
               BURP_DEBUG_INFO("Document capacity: %u", doc.capacity());
               BURP_DEBUG_INFO("Document memory used: %u", doc.memoryUsage());
-              _store.getState()->serialize(object);
+              _state->serialize(object);
               _file.write(doc);
             });
           }
@@ -53,7 +53,7 @@ namespace BurpDimmer {
 
     private:
 
-      Light::Store & _store;
+      const Light::State::Instance * _state;
       const Json::File _file;
       unsigned long _lastChange;
 

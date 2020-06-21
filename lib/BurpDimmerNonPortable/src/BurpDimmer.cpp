@@ -1,7 +1,10 @@
 #include <functional>
-#include <CppRedux/SubscriberList.hpp>
 #include <BurpDimmer/Config.hpp>
+#include <BurpDimmer/Config/Store.hpp>
+#include <BurpDimmer/Config/Light/Selector.hpp>
+#include <BurpDimmer/Config/Network/Manager/Selector.hpp>
 #include <BurpDimmer/Light.hpp>
+#include <BurpDimmer/Light/Store.hpp>
 #include <BurpDimmer/Light/ConfigSubscriber.hpp>
 #include "BurpDimmer/FactorySettings.hpp"
 #include "BurpDimmer/Storage.hpp"
@@ -17,27 +20,7 @@ namespace BurpDimmer {
 
   using namespace std::placeholders;
 
-  Components::Light light(BURP_DIMMER_LIGHT_PIN, Light::store);
-
-  CppRedux::Subscribers<3> configSubscribers = {
-    &configFile,
-    &Config::lightSelector,
-    &Config::networkSelector
-  };
-  CppRedux::SubscriberList<3> configSubscriberList(configSubscribers);
-
-  CppRedux::Subscribers<3> configNetworkSubscribers = {
-    &Config::networkAccessPointSelector,
-    &Config::networkManagerSelector,
-    &Config::networkStationSelector
-  };
-  CppRedux::SubscriberList<3> configNetworkSubscriberList(configNetworkSubscribers);
-
-  CppRedux::Subscribers<2> lightSubscribers = {
-    &light,
-    &lightFile
-  };
-  CppRedux::SubscriberList<2> lightSubscriberList(lightSubscribers);
+  Components::Light::Instance light(BURP_DIMMER_LIGHT_PIN);
 
   void setup() {
     // Initialise the factory settings
@@ -47,26 +30,26 @@ namespace BurpDimmer {
     Storage::begin();
 
     // Load the config state from the config file
-    configFile.init([](const JsonObject & obj) {
-        Config::init(Config::store, Config::reducer, obj);
-    });
+    configFile.init(Config::read);
 
     // load the light state from the light file
     lightFile.init([](const JsonObject & obj) {
-        Light::init(Light::store, Light::reducer, obj);
+        Light::read(Config::Light::selector->getState(), obj);
     });
     
     // setup the light as soon as we can
-    light.setup();
+    light.setup(Light::store->getState());
+
+    // initialize the network manager
+    Network::Manager::init(Config::Network::Manager::selector->getState());
     
     // set the config subscribers
-    Config::store.setSubscriber(&configSubscriberList);
-    Config::lightSelector.setSubscriber(&Light::configSubscriber);
-    Config::networkSelector.setSubscriber(&configNetworkSubscriberList);
-    Config::networkManagerSelector.setSubscriber(&Network::manager);
+    Config::store->subscribe(&configFile);
+    Config::Light::selector->subscribe(Light::configSubscriber);
+    Config::Network::Manager::selector->subscribe(Network::Manager::instance);
 
     // set the light subscribers
-    Light::store.setSubscriber(&lightSubscriberList);
+    Light::store->subscribe(&light);
 
     // setup the light controls
     LightControls::setup();
@@ -74,8 +57,8 @@ namespace BurpDimmer {
 
   void loop() {
     // loop the redux stores to notify subscribers
-    Light::store.loop();
-    Config::store.loop();
+    Light::store->loop();
+    Config::store->loop();
 
     // loop the light controls
     LightControls::loop();

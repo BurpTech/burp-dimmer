@@ -10,7 +10,7 @@ namespace BurpDimmerTest {
     namespace Network {
       Module tests("Network", [](Describe & describe) {
 
-        using namespace BurpDimmer::Config::Network;
+        using namespace BurpDimmer::Config::Network::State;
 
         describe.it("should have the correct field names for serialization", []() {
           TEST_ASSERT_EQUAL_STRING("manager", managerField);

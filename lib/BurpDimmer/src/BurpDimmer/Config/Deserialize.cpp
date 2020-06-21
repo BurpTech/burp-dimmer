@@ -6,15 +6,15 @@ namespace BurpDimmer {
   namespace Config {
 
     void deserialize(const JsonObject & object, f_onState onState) {
-      JsonObject lightObject = object[lightField].as<JsonObject>();
-      JsonObject networkObject = object[networkField].as<JsonObject>();
-      Light::deserialize(lightObject, [&](const Light::State * lightState) {
-          Network::deserialize(networkObject, [&](const Network::State * networkState) {
-              const Params params = {
+      JsonObject lightObject = object[State::lightField].as<JsonObject>();
+      JsonObject networkObject = object[State::networkField].as<JsonObject>();
+      Light::deserialize(lightObject, [&](const Light::State::Instance * lightState) {
+          Network::deserialize(networkObject, [&](const Network::State::Instance * networkState) {
+              const State::Params params = {
                 lightState,
                 networkState
               };
-              onState(memory.create(&params));
+              onState(State::memory.create(&params));
           });
       });
     }

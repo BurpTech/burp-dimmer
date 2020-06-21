@@ -1,22 +1,21 @@
 #pragma once
 
 #include <functional>
-#include <CppRedux/Subscriber.hpp>
+#include <BurpRedux/Subscriber.hpp>
 #include <BurpDimmer/Json/withDoc.hpp>
-#include <BurpDimmer/Config.hpp>
+#include <BurpDimmer/Config/State.hpp>
 #include "Json/File.hpp"
 
 namespace BurpDimmer {
 
   template <class JsonDocumentClass>
-  class ConfigFile : public CppRedux::Subscriber {
+  class ConfigFile : public BurpRedux::Subscriber<Config::State::Instance> {
 
     public:
 
       using f_withObj = std::function<void(const JsonObject & object)>;
 
-      ConfigFile(Config::Store & store, const char * path) :
-        _store(store),
+      ConfigFile(const char * path) :
         _file(path)
       {}
 
@@ -27,17 +26,16 @@ namespace BurpDimmer {
         });
       }
 
-      void notify() override {
+      void onPublish(const Config::State::Instance * state) override {
         Json::withDoc<JsonDocumentClass>([&](JsonDocument & doc) {
           JsonObject object = doc.as<JsonObject>();
-          _store.getState()->serialize(object);
+          state->serialize(object);
           _file.write(doc);
         });
       }
 
     private:
 
-      Config::Store & _store;
       const Json::File _file;
 
   };

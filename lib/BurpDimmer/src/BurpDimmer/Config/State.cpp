@@ -2,20 +2,22 @@
 
 namespace BurpDimmer {
   namespace Config {
+    namespace State {
 
-    Memory memory;
+      Memory memory;
 
-    State::State(const Params * params) :
-      light(params->light),
-      network(params->network)
-    {}
+      Instance::Instance(const Params * params) :
+        light(params->light),
+        network(params->network)
+      {}
 
-    void State::serialize(JsonObject & object) const {
-      JsonObject lightObject = object[lightField].as<JsonObject>();
-      light->serialize(lightObject);
-      JsonObject networkObject = object[networkField].as<JsonObject>();
-      network->serialize(networkObject);
+      void Instance::serialize(JsonObject & object) const {
+        JsonObject lightObject = object[lightField].as<JsonObject>();
+        light->serialize(lightObject);
+        JsonObject networkObject = object[networkField].as<JsonObject>();
+        network->serialize(networkObject);
+      }
+
     }
-
   }
 }
