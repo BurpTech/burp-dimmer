@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interface.hpp"
+#include <BurpDimmer/Json/File/Interface.hpp>
 
 namespace BurpDimmer {
   namespace Json {

@@ -6,10 +6,11 @@
 #include <BurpDimmer/Light.hpp>
 #include <BurpDimmer/Light/Store.hpp>
 #include <BurpDimmer/Light/ConfigSubscriber.hpp>
+#include <BurpDimmer/Json/File/Instance.hpp>
+#include <BurpDimmer/ConfigFile.hpp>
+#include <BurpDimmer/LightFile.hpp>
 #include "BurpDimmer/FactorySettings.hpp"
 #include "BurpDimmer/Storage.hpp"
-#include "BurpDimmer/ConfigFile.hpp"
-#include "BurpDimmer/LightFile.hpp"
 #include "BurpDimmer/Components/Light.hpp"
 #include "BurpDimmer/LightControls.hpp"
 #include "BurpDimmer/Network.hpp"
@@ -21,6 +22,14 @@ namespace BurpDimmer {
   using namespace std::placeholders;
 
   Components::Light::Instance light(BURP_DIMMER_LIGHT_PIN);
+
+  constexpr char configFilePath[] = "/config.json";
+  const Json::File::Instance configFileInstance(configFilePath);
+  ConfigFile<StaticJsonDocument<1024>> configFile(configFileInstance);
+
+  constexpr char lightFilePath[] = "/light.json";
+  const Json::File::Instance lightFileInstance(lightFilePath);
+  LightFile<StaticJsonDocument<256>> lightFile(lightFileInstance);
 
   void setup() {
     // Initialise the factory settings

@@ -40,7 +40,4 @@ namespace BurpDimmer {
 
   };
 
-  using ConfigFileDocumentClass = StaticJsonDocument<1024>;
-  extern ConfigFile<ConfigFileDocumentClass> configFile;
-
 }

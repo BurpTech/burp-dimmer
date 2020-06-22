@@ -60,7 +60,4 @@ namespace BurpDimmer {
 
   };
 
-  using LightFileDocumentClass = StaticJsonDocument<256>;
-  extern LightFile<LightFileDocumentClass> lightFile;
-
 }
