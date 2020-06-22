@@ -50,6 +50,7 @@ namespace BurpDimmer {
 
     // set the light subscribers
     Light::store->subscribe(&light);
+    Light::store->subscribe(&lightFile);
 
     // setup the light controls
     LightControls::setup();

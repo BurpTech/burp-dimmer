@@ -2,7 +2,11 @@
 
 #include "Util/Debug.hpp"
 
-#define REPORT_SUBSCRIBER_COUNT(LABEL, PUBLISHER) BURP_DEBUG_INFO(LABEL ": subscribers: %u%s", PUBLISHER->getSubscriberCount(), PUBLISHER->isOverSubscribed() ? " - OVERSUBSCRIBED" : "")
+#ifndef BURP_SIZE_T_FORMAT
+#define BURP_SIZE_T_FORMAT "%lu"
+#endif
+
+#define REPORT_SUBSCRIBER_COUNT(LABEL, PUBLISHER) BURP_DEBUG_INFO(LABEL ": subscribers: " BURP_SIZE_T_FORMAT "/" BURP_SIZE_T_FORMAT "%s", PUBLISHER->getSubscriberCount(), PUBLISHER->getSubscriberMax(), PUBLISHER->isOverSubscribed() ? " - OVERSUBSCRIBED" : "")
 
 #ifndef BURP_DIMMER_LIGHT_SUBSCRIBERS
 #define BURP_DIMMER_LIGHT_SUBSCRIBERS 5
