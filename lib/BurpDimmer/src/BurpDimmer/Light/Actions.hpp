@@ -25,9 +25,9 @@ namespace BurpDimmer {
 
     void deserialize(const JsonObject & object, const Config * config, f_onParams onParams);
     void applyConfig(const State::Instance * previous, const Config * config, f_onParams onParams);
-    void toggle(const State::Instance * previous, const Config * config, f_onParams onParams);
-    void increaseBrightness(const State::Instance * previous, const Config * config, f_onParams onParams);
-    void decreaseBrightness(const State::Instance * previous, const Config * config, f_onParams onParams);
+    void toggle(const State::Instance * previous, f_onParams onParams);
+    void increaseBrightness(const State::Instance * previous, f_onParams onParams);
+    void decreaseBrightness(const State::Instance * previous, f_onParams onParams);
 
   }
 }

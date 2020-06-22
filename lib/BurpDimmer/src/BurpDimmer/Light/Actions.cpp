@@ -107,17 +107,17 @@ namespace BurpDimmer {
       applyConfig(fields, config, onParams);
     }
 
-    void toggle(const State::Instance * previous, const Config * config, f_onParams onParams) {
+    void toggle(const State::Instance * previous, f_onParams onParams) {
       const State::Fields fields = {
         !previous->on,
         previous->level,
         previous->pwm
       };
-      return onFields(onParams, Error::noError, config, &fields);
+      return onFields(onParams, Error::noError, previous->config, &fields);
     }
 
-    void increaseBrightness(const State::Instance * previous, const Config * config, f_onParams onParams) {
-      auto levels = config->levels;
+    void increaseBrightness(const State::Instance * previous, f_onParams onParams) {
+      auto levels = previous->config->levels;
       unsigned char level;
       if (previous->on) {
         level = previous->level + 1;
@@ -126,7 +126,7 @@ namespace BurpDimmer {
         // levels there will always be a zero at the end of the array
         if (levels[level] == 0) {
           BURP_DEBUG_INFO("Error::maxBrightness");
-          return onFields(onParams, Error::maxBrightness, config, nullptr);
+          return onFields(onParams, Error::maxBrightness, previous->config, nullptr);
         }
       } else {
         level = 0;
@@ -137,17 +137,17 @@ namespace BurpDimmer {
         level,
         pwm
       };
-      return onFields(onParams, Error::noError, config, &fields);
+      return onFields(onParams, Error::noError, previous->config, &fields);
     }
 
-    void decreaseBrightness(const State::Instance * previous, const Config * config, f_onParams onParams) {
-      auto levels = config->levels;
-      auto offLevel = config->offLevel;
+    void decreaseBrightness(const State::Instance * previous, f_onParams onParams) {
+      auto levels = previous->config->levels;
+      auto offLevel = previous->config->offLevel;
       bool on;
       unsigned char level;
       if (!previous->on) {
         BURP_DEBUG_INFO("Error::minBrightness");
-        return onFields(onParams, Error::minBrightness, config, nullptr);
+        return onFields(onParams, Error::minBrightness, previous->config, nullptr);
       }
       if (previous->level == 0) {
         on = false;
@@ -162,7 +162,7 @@ namespace BurpDimmer {
         level,
         pwm
       };
-      return onFields(onParams, Error::noError, config, &fields);
+      return onFields(onParams, Error::noError, previous->config, &fields);
     }
 
   }

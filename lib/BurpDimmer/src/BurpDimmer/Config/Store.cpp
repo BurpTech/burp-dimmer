@@ -22,5 +22,11 @@ namespace BurpDimmer {
       delete store;
     }
 
+    void reportSubscriberCounts() {
+      REPORT_SUBSCRIBER_COUNT("Config::store", store);
+      Light::reportSubscriberCounts();
+      Network::reportSubscriberCounts();
+    }
+
   }
 }

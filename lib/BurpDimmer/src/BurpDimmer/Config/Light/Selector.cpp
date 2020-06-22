@@ -18,6 +18,10 @@ namespace BurpDimmer {
         delete selector;
       }
 
+      void reportSubscriberCounts() {
+        REPORT_SUBSCRIBER_COUNT("Config::Light::selector", selector);
+      }
+
     }
   }
 }

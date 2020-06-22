@@ -53,6 +53,10 @@ namespace BurpDimmer {
 
     // setup the light controls
     LightControls::setup();
+
+    // Report the number of subscribers actually used
+    Config::reportSubscriberCounts();
+    Light::reportSubscriberCounts();
   }
 
   void loop() {

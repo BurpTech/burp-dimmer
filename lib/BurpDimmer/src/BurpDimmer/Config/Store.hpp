@@ -3,10 +3,7 @@
 #include <BurpRedux/Store/Instance.hpp>
 #include "State.hpp"
 #include "ActionType.hpp"
-
-#ifndef BURP_DIMMER_CONFIG_SUBSCRIBERS
-#define BURP_DIMMER_CONFIG_SUBSCRIBERS 0
-#endif
+#include "../defines.hpp"
 
 namespace BurpDimmer {
   namespace Config {
@@ -20,6 +17,7 @@ namespace BurpDimmer {
     extern Store * store;
     void init(const State::Instance * state);
     void deinit();
+    void reportSubscriberCounts();
 
   }
 }

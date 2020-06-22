@@ -3,10 +3,7 @@
 #include <BurpRedux/Selector/Instance.hpp>
 #include "../State.hpp"
 #include "State.hpp"
-
-#ifndef BURP_DIMMER_CONFIG_NETWORK_MANAGER_SUBSCRIBERS
-#define BURP_DIMMER_CONFIG_NETWORK_MANAGER_SUBSCRIBERS 0
-#endif
+#include "../../../defines.hpp"
 
 namespace BurpDimmer {
   namespace Config {
@@ -22,6 +19,7 @@ namespace BurpDimmer {
         extern Selector * selector;
         void init(const Network::State::Instance * state);
         void deinit();
+        void reportSubscriberCounts();
 
       }
     }
