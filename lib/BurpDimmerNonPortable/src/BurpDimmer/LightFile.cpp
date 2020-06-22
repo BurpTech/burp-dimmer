@@ -1,8 +1,10 @@
+#include "Json/File/Instance.hpp"
 #include "LightFile.hpp"
 
 namespace BurpDimmer {
 
   constexpr char lightFilePath[] = "/light.json";
-  LightFile<LightFileDocumentClass> lightFile(lightFilePath);
+  const Json::File::Instance lightFileInstance(lightFilePath);
+  LightFile<LightFileDocumentClass> lightFile(lightFileInstance);
 
 }

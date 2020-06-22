@@ -4,7 +4,7 @@
 #include <BurpRedux/Subscriber.hpp>
 #include <BurpDimmer/Json/withDoc.hpp>
 #include <BurpDimmer/Config/State.hpp>
-#include "Json/File.hpp"
+#include "Json/File/Interface.hpp"
 
 namespace BurpDimmer {
 
@@ -15,8 +15,8 @@ namespace BurpDimmer {
 
       using f_withObj = std::function<void(const JsonObject & object)>;
 
-      ConfigFile(const char * path) :
-        _file(path)
+      ConfigFile(const Json::File::Interface & file) :
+        _file(file)
       {}
 
       void read(f_withObj withObj) {
@@ -36,7 +36,7 @@ namespace BurpDimmer {
 
     private:
 
-      const Json::File _file;
+      const Json::File::Interface & _file;
 
   };
 

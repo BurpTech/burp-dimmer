@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Json/File/Interface.hpp"
 #include <functional>
 #include <BurpDebug.hpp>
 #include <BurpRedux/Subscriber.hpp>
 #include <BurpDimmer/Json/withDoc.hpp>
 #include <BurpDimmer/Light/State.hpp>
-#include "Json/File.hpp"
+#include "Json/File/Interface.hpp"
 
 namespace BurpDimmer {
 
@@ -16,9 +17,9 @@ namespace BurpDimmer {
 
       using f_withObj = std::function<void(const JsonObject & object)>;
 
-      LightFile(const char * path) :
+      LightFile(const Json::File::Interface & file) :
         _state(nullptr),
-        _file(path),
+        _file(file),
         _lastChange(0)
       {}
 
@@ -54,7 +55,7 @@ namespace BurpDimmer {
     private:
 
       const Light::State::Instance * _state;
-      const Json::File _file;
+      const Json::File::Interface & _file;
       unsigned long _lastChange;
 
   };
