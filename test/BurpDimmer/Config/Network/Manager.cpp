@@ -38,6 +38,7 @@ namespace BurpDimmerTest {
                 withObj([](JsonObject & obj) {
                     read(obj);
                 });
+                selector.subscribe(&subscriber);
             });
 
             describe.loop([]() {
