@@ -19,7 +19,7 @@ namespace BurpDimmer {
         _file(path)
       {}
 
-      void init(f_withObj withObj) {
+      void read(f_withObj withObj) {
         Json::withDoc<JsonDocumentClass>([&](JsonDocument & doc) {
           _file.read(doc);
           withObj(doc.as<JsonObject>());

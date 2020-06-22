@@ -30,28 +30,24 @@ namespace BurpDimmer {
     Storage::begin();
 
     // Load the config state from the config file
-    configFile.init(Config::read);
+    configFile.read(Config::read);
+    Config::store.subscribe(&configFile);
+    Config::Light::selector.subscribe(&Light::configSubscriber);
 
     // load the light state from the light file
-    lightFile.init([](const JsonObject & obj) {
+    lightFile.read([](const JsonObject & obj) {
         Light::read(Config::Light::selector.getState(), obj);
     });
+    Light::store.subscribe(&lightFile);
     
     // setup the light as soon as we can
     light.setup(Light::store.getState());
+    Light::store.subscribe(&light);
 
     // initialize the network manager
     Network::Manager::setup(Config::Network::Manager::selector.getState());
-    
-    // set the config subscribers
-    Config::store.subscribe(&configFile);
-    Config::Light::selector.subscribe(&Light::configSubscriber);
     Config::Network::Manager::selector.subscribe(&Network::Manager::instance);
-
-    // set the light subscribers
-    Light::store.subscribe(&light);
-    Light::store.subscribe(&lightFile);
-
+    
     // setup the light controls
     LightControls::setup();
 
