@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ArduinoJson.h>
-#include "../Util/Debug.hpp"
+#include <BurpDebug.hpp>
 
 namespace BurpDimmer {
   namespace Json {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Util/Debug.hpp"
+#include <BurpDebug.hpp>
 
 #ifndef BURP_SIZE_T_FORMAT
 #define BURP_SIZE_T_FORMAT "%lu"

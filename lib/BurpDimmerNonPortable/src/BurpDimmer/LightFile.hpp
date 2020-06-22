@@ -1,8 +1,8 @@
 #pragma once
 
 #include <functional>
+#include <BurpDebug.hpp>
 #include <BurpRedux/Subscriber.hpp>
-#include <BurpDimmer/Util/Debug.hpp>
 #include <BurpDimmer/Json/withDoc.hpp>
 #include <BurpDimmer/Light/State.hpp>
 #include "Json/File.hpp"

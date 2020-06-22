@@ -10,3 +10,6 @@
 [submodule "lib/BurpUnity"]
 	path = lib/BurpUnity
 	url = https://github.com/pghalliday/BurpUnity.git
+[submodule "lib/BurpDebug"]
+	path = lib/BurpDebug
+	url = https://github.com/pghalliday/BurpDebug.git

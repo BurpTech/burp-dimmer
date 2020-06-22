@@ -1,4 +1,4 @@
-#include "../../Util/Debug.hpp"
+#include <BurpDebug.hpp>
 #include "Actions.hpp"
 #include "State.hpp"
 

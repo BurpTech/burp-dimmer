@@ -1,4 +1,4 @@
-#include <BurpDimmer/Util/Debug.hpp>
+#include <BurpDebug.hpp>
 #include "Manager.hpp"
 
 namespace BurpDimmer {

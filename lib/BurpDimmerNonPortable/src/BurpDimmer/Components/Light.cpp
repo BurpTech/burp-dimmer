@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <BurpDimmer/Util/Debug.hpp>
+#include <BurpDebug.hpp>
 #include "Light.hpp"
 
 
