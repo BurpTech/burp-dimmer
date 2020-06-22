@@ -42,24 +42,24 @@ namespace BurpDimmer {
 
     void rotaryEncoderChange(int direction) {
       if (direction > 0) {
-        increaseBrightness(store->getState(), [](const Error error, const Params * params){
+        increaseBrightness(store.getState(), [](const Error error, const Params * params){
             if (Error::noError == error) {
-              store->dispatch(Action(ActionType::SET_STATE, params));
+              store.dispatch(Action(ActionType::SET_STATE, params));
             }
         });
       } else {
-        decreaseBrightness(store->getState(), [](const Error error, const Params * params){
+        decreaseBrightness(store.getState(), [](const Error error, const Params * params){
             if (Error::noError == error) {
-              store->dispatch(Action(ActionType::SET_STATE, params));
+              store.dispatch(Action(ActionType::SET_STATE, params));
             }
         });
       }
     }
 
     void buttonRelease() {
-      toggle(store->getState(), [](const Error error, const Params * params){
+      toggle(store.getState(), [](const Error error, const Params * params){
           if (Error::noError == error) {
-            store->dispatch(Action(ActionType::SET_STATE, params));
+            store.dispatch(Action(ActionType::SET_STATE, params));
           }
       });
     }

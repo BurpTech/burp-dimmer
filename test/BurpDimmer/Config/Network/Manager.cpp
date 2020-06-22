@@ -41,15 +41,11 @@ namespace BurpDimmerTest {
             });
 
             describe.loop([]() {
-                store->loop();
-            });
-
-            describe.after([]() {
-                BurpDimmer::Config::deinit();
+                store.loop();
             });
 
             describe.it("should have the default state", []() {
-              const Instance * state = selector->getState();
+              const Instance * state = selector.getState();
               TEST_ASSERT_EQUAL_INT(PermMode::NORMAL, state->permMode);
               TEST_ASSERT_EQUAL_INT(TempMode::ACCESS_POINT, state->tempMode);
               TEST_ASSERT_EQUAL_INT(false, state->tempModeActive);
@@ -67,15 +63,11 @@ namespace BurpDimmerTest {
             });
 
             describe.loop([]() {
-                store->loop();
-            });
-
-            describe.after([]() {
-                BurpDimmer::Config::deinit();
+                store.loop();
             });
 
             describe.it("should have the deserialized state", []() {
-              const Instance * state = selector->getState();
+              const Instance * state = selector.getState();
               TEST_ASSERT_EQUAL_INT(PermMode::ACCESS_POINT, state->permMode);
               TEST_ASSERT_EQUAL_INT(TempMode::ACCESS_POINT, state->tempMode);
               TEST_ASSERT_EQUAL_INT(false, state->tempModeActive);
@@ -90,11 +82,11 @@ namespace BurpDimmerTest {
                   true,
                   30000
                 };
-                store->dispatch(Action(ActionType::NETWORK_MANAGER_SET_STATE, &params));
+                store.dispatch(Action(ActionType::NETWORK_MANAGER_SET_STATE, &params));
                 subscriber.callbackOnce(done);
               });
               describe.it("should have the new state", [&]() {
-                const Instance * state = selector->getState();
+                const Instance * state = selector.getState();
                 TEST_ASSERT_EQUAL_INT(PermMode::OFF, state->permMode);
                 TEST_ASSERT_EQUAL_INT(TempMode::WPS_CONFIG, state->tempMode);
                 TEST_ASSERT_EQUAL_INT(true, state->tempModeActive);

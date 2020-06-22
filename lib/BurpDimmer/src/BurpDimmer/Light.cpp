@@ -6,7 +6,7 @@ namespace BurpDimmer {
   namespace Light {
 
     void read(const Config * config, const JsonObject & object) {
-      deserialize(object, config, init);
+      deserialize(object, config, setup);
     }
 
   }

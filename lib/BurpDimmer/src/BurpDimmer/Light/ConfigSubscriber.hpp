@@ -21,9 +21,7 @@ namespace BurpDimmer {
 
     };
 
-    extern ConfigSubscriber * configSubscriber;
-    void initConfigSubscriber(Store & store);
-    void deinitConfigSubscriber();
+    extern ConfigSubscriber configSubscriber;
 
   }
 }

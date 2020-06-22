@@ -16,9 +16,8 @@ namespace BurpDimmer {
           BURP_DIMMER_CONFIG_NETWORK_ACCESS_POINT_SUBSCRIBERS
         >;
 
-        extern Selector * selector;
-        void init(const Network::State::Instance * state);
-        void deinit();
+        extern Selector selector;
+        void setup(const Network::State::Instance * state);
         void reportSubscriberCounts();
 
       }

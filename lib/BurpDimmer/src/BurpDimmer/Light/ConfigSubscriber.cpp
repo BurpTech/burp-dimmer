@@ -17,15 +17,7 @@ namespace BurpDimmer {
       });
     }
 
-    ConfigSubscriber * configSubscriber;
-
-    void initConfigSubscriber(Store & store) {
-      configSubscriber = new ConfigSubscriber(store);
-    }
-
-    void deinitConfigSubscriber() {
-      delete configSubscriber;
-    }
+    ConfigSubscriber configSubscriber(store);
 
   }
 }

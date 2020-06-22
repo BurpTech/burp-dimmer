@@ -5,16 +5,10 @@
 namespace BurpDimmer {
   namespace Light {
 
-    Store * store;
+    Store store(reducer);
 
-    void init(const State::Instance * state) {
-      store = new Store(reducer, state);
-      initConfigSubscriber(*store);
-    }
-
-    void deinit() {
-      deinitConfigSubscriber();
-      delete store;
+    void setup(const State::Instance * state) {
+      store.setup(state);
     }
 
     void reportSubscriberCounts() {

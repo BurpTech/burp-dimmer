@@ -5,18 +5,14 @@ namespace BurpDimmer {
     namespace Network {
       namespace Station {
 
-        Selector * selector;
-
         const State::Instance * select(const Network::State::Instance * state) {
           return state->station;
         }
 
-        void init(const Network::State::Instance * state) {
-          selector = new Selector(select, state);
-        }
+        Selector selector(select);
 
-        void deinit() {
-          delete selector;
+        void setup(const Network::State::Instance * state) {
+          selector.setup(state);
         }
 
         void reportSubscriberCounts() {

@@ -4,18 +4,14 @@ namespace BurpDimmer {
   namespace Config {
     namespace Light {
 
-      Selector * selector;
-
       const State::Instance * select(const Config::State::Instance * state) {
         return state->light;
       }
 
-      void init(const Config::State::Instance * state) {
-        selector = new Selector(select, state);
-      }
+      Selector selector(select);
 
-      void deinit() {
-        delete selector;
+      void setup(const Config::State::Instance * state) {
+        selector.setup(state);
       }
 
       void reportSubscriberCounts() {

@@ -7,27 +7,20 @@ namespace BurpDimmer {
   namespace Config {
     namespace Network {
 
-      Selector * selector;
-
       const State::Instance * select(const Config::State::Instance * state) {
         return state->network;
       }
 
-      void init(const Config::State::Instance * state) {
-        selector = new Selector(select, state);
-        AccessPoint::init(selector->getState());
-        selector->subscribe(AccessPoint::selector);
-        Manager::init(selector->getState());
-        selector->subscribe(Manager::selector);
-        Station::init(selector->getState());
-        selector->subscribe(Station::selector);
-      }
+      Selector selector(select);
 
-      void deinit() {
-        Station::deinit();
-        Manager::deinit();
-        AccessPoint::deinit();
-        delete selector;
+      void setup(const Config::State::Instance * state) {
+        selector.setup(state);
+        AccessPoint::setup(selector.getState());
+        selector.subscribe(&AccessPoint::selector);
+        Manager::setup(selector.getState());
+        selector.subscribe(&Manager::selector);
+        Station::setup(selector.getState());
+        selector.subscribe(&Station::selector);
       }
 
       void reportSubscriberCounts() {

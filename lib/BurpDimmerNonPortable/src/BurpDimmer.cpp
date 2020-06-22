@@ -34,23 +34,23 @@ namespace BurpDimmer {
 
     // load the light state from the light file
     lightFile.init([](const JsonObject & obj) {
-        Light::read(Config::Light::selector->getState(), obj);
+        Light::read(Config::Light::selector.getState(), obj);
     });
     
     // setup the light as soon as we can
-    light.setup(Light::store->getState());
+    light.setup(Light::store.getState());
 
     // initialize the network manager
-    Network::Manager::init(Config::Network::Manager::selector->getState());
+    Network::Manager::setup(Config::Network::Manager::selector.getState());
     
     // set the config subscribers
-    Config::store->subscribe(&configFile);
-    Config::Light::selector->subscribe(Light::configSubscriber);
-    Config::Network::Manager::selector->subscribe(Network::Manager::instance);
+    Config::store.subscribe(&configFile);
+    Config::Light::selector.subscribe(&Light::configSubscriber);
+    Config::Network::Manager::selector.subscribe(&Network::Manager::instance);
 
     // set the light subscribers
-    Light::store->subscribe(&light);
-    Light::store->subscribe(&lightFile);
+    Light::store.subscribe(&light);
+    Light::store.subscribe(&lightFile);
 
     // setup the light controls
     LightControls::setup();
@@ -62,8 +62,8 @@ namespace BurpDimmer {
 
   void loop() {
     // loop the redux stores to notify subscribers
-    Light::store->loop();
-    Config::store->loop();
+    Light::store.loop();
+    Config::store.loop();
 
     // loop the light controls
     LightControls::loop();

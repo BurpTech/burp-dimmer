@@ -14,9 +14,8 @@ namespace BurpDimmer {
       BURP_DIMMER_LIGHT_SUBSCRIBERS
     >;
 
-    extern Store * store;
-    void init(const State::Instance * state);
-    void deinit();
+    extern Store store;
+    void setup(const State::Instance * state);
     void reportSubscriberCounts();
 
   }
