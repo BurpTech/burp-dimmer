@@ -21,9 +21,11 @@ namespace BurpDimmerTest {
 
           char strData[strSize];
           int intData;
+          unsigned long sequenceId;
 
-          State(const Params * params) :
-            intData(params->intData)
+          State(const Params * params, unsigned long sequenceId) :
+            intData(params->intData),
+            sequenceId(sequenceId)
           {
             strlcpy(strData, params->strData, strSize);
           }
@@ -50,6 +52,10 @@ namespace BurpDimmerTest {
                   TEST_ASSERT_EQUAL(1234, first->intData);
               });
 
+              describe.it("should set the sequence ID", []() {
+                  TEST_ASSERT_EQUAL(1, first->sequenceId);
+              });
+
               describe.describe("then create again", [](Describe & describe) {
                   describe.before([]() {
                       Params params = {
@@ -63,6 +69,10 @@ namespace BurpDimmerTest {
                       TEST_ASSERT_FALSE(second == first);
                       TEST_ASSERT_EQUAL_STRING("apple", second->strData);
                       TEST_ASSERT_EQUAL(4321, second->intData);
+                  });
+
+                  describe.it("should set the next sequence ID", []() {
+                      TEST_ASSERT_EQUAL(2, second->sequenceId);
                   });
 
                   describe.describe("then create a 3rd time", [](Describe & describe) {
@@ -79,6 +89,10 @@ namespace BurpDimmerTest {
                           TEST_ASSERT_TRUE(third == first);
                           TEST_ASSERT_EQUAL_STRING("banana", third->strData);
                           TEST_ASSERT_EQUAL(5555, third->intData);
+                      });
+
+                      describe.it("should set the next sequence ID", []() {
+                          TEST_ASSERT_EQUAL(3, third->sequenceId);
                       });
                   });
               });

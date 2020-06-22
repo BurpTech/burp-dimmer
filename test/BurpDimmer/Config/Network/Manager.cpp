@@ -84,6 +84,7 @@ namespace BurpDimmerTest {
                   30000
                 };
                 store.dispatch(Action(ActionType::NETWORK_MANAGER_SET_STATE, &params));
+                store.dispatch(Action(ActionType::NETWORK_MANAGER_SET_STATE, &params));
                 subscriber.callbackOnce(done);
               });
               describe.it("should have the new state", [&]() {

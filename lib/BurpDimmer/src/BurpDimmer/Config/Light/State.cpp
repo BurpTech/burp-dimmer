@@ -37,10 +37,11 @@ namespace BurpDimmer {
         constexpr unsigned long defaultSaveStateDelay = 5000;
         constexpr unsigned char defaultOffLevel = 24;
 
-        Instance::Instance(const Params * params) :
+        Instance::Instance(const Params * params, unsigned long sequenceId) :
           levels(params ? params->levels : defaultLevels),
           saveStateDelay(params ? params->saveStateDelay : defaultSaveStateDelay),
-          offLevel(params ? params->offLevel : defaultOffLevel)
+          offLevel(params ? params->offLevel : defaultOffLevel),
+          sequenceId(sequenceId)
         {}
 
         void Instance::serialize(JsonObject & object) const {
@@ -55,6 +56,10 @@ namespace BurpDimmer {
           }
           object[saveStateDelayField] = saveStateDelay;
           object[offLevelField] = offLevel;
+        }
+
+        unsigned long Instance::getUid() const {
+          return sequenceId;
         }
 
       }

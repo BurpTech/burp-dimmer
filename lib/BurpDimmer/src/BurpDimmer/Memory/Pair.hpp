@@ -13,7 +13,8 @@ namespace BurpDimmer {
         const State * create(const Params * params) {
           _current++;
           _current %= 2;
-          return new(&(_pair[_current])) State(params);
+          _sequenceId++;
+          return new(&(_pair[_current])) State(params, _sequenceId);
         }
 
       private:
@@ -21,6 +22,7 @@ namespace BurpDimmer {
         std::allocator<State> allocator;
         State * _pair = allocator.allocate(2);
         size_t _current = 1;
+        unsigned long _sequenceId = 0;
 
     };
 

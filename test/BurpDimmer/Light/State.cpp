@@ -37,7 +37,7 @@ namespace BurpDimmerTest {
                     nullptr,
                     &fields
                   };
-                  const class Instance state(&params);
+                  const class Instance state(&params, 0);
                   withObj([&](JsonObject & obj) {
                       state.serialize(obj);
                       TEST_ASSERT_EQUAL(fields.on, obj[onField].as<bool>());

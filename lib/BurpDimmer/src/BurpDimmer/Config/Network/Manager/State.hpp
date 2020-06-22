@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <ArduinoJson.h>
+#include <BurpRedux/State.hpp>
 #include "../../../Memory/Pair.hpp"
 
 namespace BurpDimmer {
@@ -42,7 +43,7 @@ namespace BurpDimmer {
             const unsigned long accessPointTimeout;
           };
 
-          class Instance {
+          class Instance : public BurpRedux::State {
 
             public:
               
@@ -51,8 +52,13 @@ namespace BurpDimmer {
               const bool tempModeActive;
               const unsigned long accessPointTimeout;
 
-              Instance(const Params * params);
+              Instance(const Params * params, unsigned long sequenceId);
               void serialize(JsonObject & object) const;
+              unsigned long getUid() const override;
+
+            private:
+
+              unsigned long sequenceId;
 
           };
 

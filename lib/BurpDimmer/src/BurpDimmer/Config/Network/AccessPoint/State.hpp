@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ArduinoJson.h>
+#include <BurpRedux/State.hpp>
 #include "../../../Memory/Pair.hpp"
 
 namespace BurpDimmer {
@@ -15,14 +16,19 @@ namespace BurpDimmer {
             const int test;
           };
 
-          class Instance {
+          class Instance : public BurpRedux::State {
 
             public:
               
               const int test;
 
-              Instance(const Params * params);
+              Instance(const Params * params, unsigned long sequenceId);
               void serialize(JsonObject & object) const;
+              unsigned long getUid() const override;
+
+            private:
+
+              unsigned long sequenceId;
 
           };
 

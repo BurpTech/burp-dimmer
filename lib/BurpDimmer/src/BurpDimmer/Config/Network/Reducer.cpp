@@ -22,19 +22,12 @@ namespace BurpDimmer {
         const AccessPoint::State::Instance * accessPoint = _accessPointReducer.reduce(previous->accessPoint, action);
         const Manager::State::Instance * manager = _managerReducer.reduce(previous->manager, action);
         const Station::State::Instance * station = _stationReducer.reduce(previous->station, action);
-        if (
-          accessPoint != previous->accessPoint ||
-          manager != previous->manager ||
-          station != previous->station
-        ) {
-          const State::Params params = {
-            accessPoint,
-            manager,
-            station
-          };
-          return _memory.create(&params);
-        }
-        return previous;
+        const State::Params params = {
+          accessPoint,
+          manager,
+          station
+        };
+        return _memory.create(&params);
       }
 
     }
