@@ -12,7 +12,5 @@ namespace BurpDimmer {
       LIGHT_SET_STATE
     };
 
-    using Action = BurpRedux::Action<ActionType>;
-
   }
 }

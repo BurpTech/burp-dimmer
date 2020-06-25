@@ -6,8 +6,6 @@ namespace BurpDimmer {
       namespace AccessPoint {
         namespace State {
 
-          Memory memory;
-
           constexpr int defaultTest = 0;
 
           Instance::Instance(const Params * params, unsigned long sequenceId) :

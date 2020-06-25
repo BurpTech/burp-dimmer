@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ArduinoJson.h>
-#include <BurpRedux/State.hpp>
+#include <BurpRedux/State/Interface.hpp>
 #include "../Memory/Pair.hpp"
 #include "Config.hpp"
 
@@ -24,7 +24,7 @@ namespace BurpDimmer {
         const Fields * fields;
       };
 
-      class Instance : public BurpRedux::State {
+      class Instance : public BurpRedux::State::Interface {
 
         public:
 
@@ -44,7 +44,6 @@ namespace BurpDimmer {
       };
 
       using Memory = Memory::Pair<Instance, Params>;
-      extern Memory memory;
 
     }
   }

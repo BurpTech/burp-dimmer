@@ -9,20 +9,7 @@ namespace BurpDimmer {
     namespace Network {
       namespace Manager {
 
-        class Reducer : public BurpRedux::Reducer<State::Instance, Action> {
-
-          public:
-
-            Reducer(State::Memory & memory);
-            const State::Instance * reduce(const State::Instance * previous, const Action & action) override;
-
-          private:
-
-            State::Memory & _memory;
-
-        };
-
-        extern Reducer reducer;
+        using Reducer = BurpRedux::Reducer::Instance<State::Instance, State::Params, ActionType::NETWORK_ACCESS_POINT_SET_STATE>;
 
       }
     }

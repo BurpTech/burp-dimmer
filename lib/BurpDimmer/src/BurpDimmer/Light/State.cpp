@@ -5,8 +5,6 @@ namespace BurpDimmer {
   namespace Light {
     namespace State {
 
-      Memory memory;
-
       constexpr bool defaultOn = false;
       unsigned char defaultLevel(const Config * config) {
         return config->offLevel;

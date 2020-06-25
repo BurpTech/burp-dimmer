@@ -6,8 +6,6 @@ namespace BurpDimmer {
       namespace Manager {
         namespace State {
 
-          Memory memory;
-
           constexpr PermMode defaultPermMode = PermMode::NORMAL;
           constexpr unsigned long defaultAccessPointTimeout = 0;
 

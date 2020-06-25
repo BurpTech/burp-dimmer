@@ -2,7 +2,7 @@
 
 #include <array>
 #include <ArduinoJson.h>
-#include <BurpRedux/State.hpp>
+#include <BurpRedux/State/Interface.hpp>
 #include "../../Memory/Pair.hpp"
 
 namespace BurpDimmer {
@@ -32,7 +32,7 @@ namespace BurpDimmer {
           const unsigned char offLevel;
         };
 
-        class Instance : public BurpRedux::State {
+        class Instance : public BurpRedux::State::Interface {
 
           public:
             
@@ -51,7 +51,6 @@ namespace BurpDimmer {
         };
 
         using Memory = Memory::Pair<Instance, Params>;
-        extern Memory memory;
 
       }
     }

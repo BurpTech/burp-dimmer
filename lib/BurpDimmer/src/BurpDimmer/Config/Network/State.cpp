@@ -5,8 +5,6 @@ namespace BurpDimmer {
     namespace Network {
       namespace State {
 
-        Memory memory;
-
         Instance::Instance(const Params * params, unsigned long sequenceId) :
           accessPoint(params->accessPoint),
           manager(params->manager),

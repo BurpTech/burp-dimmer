@@ -5,8 +5,6 @@ namespace BurpDimmer {
     namespace Light {
       namespace State {
 
-        Memory memory;
-
         constexpr Levels defaultLevels = {
           10,
           20,

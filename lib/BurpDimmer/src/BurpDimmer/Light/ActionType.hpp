@@ -5,11 +5,9 @@
 namespace BurpDimmer {
   namespace Light {
 
-    enum class ActionType {
+    enum ActionType : unsigned int {
       SET_STATE
     };
-
-    using Action = BurpRedux::Action<ActionType>;
 
   }
 }

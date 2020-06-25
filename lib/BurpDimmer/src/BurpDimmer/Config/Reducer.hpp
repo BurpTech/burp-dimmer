@@ -1,34 +1,28 @@
 #pragma once
 
-#include <BurpRedux/Reducer.hpp>
-#include "ActionType.hpp"
-#include "Light/Reducer.hpp"
-#include "Network/Reducer.hpp"
+#include <BurpRedux/CombinedReducer.hpp>
+#include <BurpRedux/SubState.hpp>
+#include "Light/State.hpp"
+#include "Network/State.hpp"
 #include "State.hpp"
+
+#define BURP_DIMMER_CONFIG_SUB_STATE(NAME) BURP_REDUX_SUB_STATE(NAME, Config::State::Instance, Config::State::Params, State::Instance)
 
 namespace BurpDimmer {
   namespace Config {
 
-    class Reducer : public BurpRedux::Reducer<State::Instance, Action> {
+    template <size_t mappingCount>
+    using Reducer = BurpRedux::CombinedReducer<State::Instance, State::Params, mappingCount>;
 
-      public:
+    namespace Light {
+      // define the ReducerMapping and Selector classes
+      BURP_DIMMER_CONFIG_SUB_STATE(light);
+    }
 
-        Reducer(
-            State::Memory & memory,
-            Network::Reducer & networkReducer,
-            Light::Reducer & lightReducer
-        );
-        const State::Instance * reduce(const State::Instance * previous, const Action & action) override;
-
-      private:
-
-        State::Memory & _memory;
-        Network::Reducer & _networkReducer;
-        Light::Reducer & _lightReducer;
-
-    };
-
-    extern Reducer reducer;
+    namespace Network {
+      // define the ReducerMapping and Selector classes
+      BURP_DIMMER_CONFIG_SUB_STATE(network);
+    }
 
   }
 }

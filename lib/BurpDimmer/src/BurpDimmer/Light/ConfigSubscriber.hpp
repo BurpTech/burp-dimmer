@@ -13,6 +13,7 @@ namespace BurpDimmer {
       public:
 
         ConfigSubscriber(Store & store);
+        void setup(const Config * config) override;
         void onPublish(const Config * config) override;
 
       private:
@@ -20,8 +21,6 @@ namespace BurpDimmer {
         Store & _store;
 
     };
-
-    extern ConfigSubscriber configSubscriber;
 
   }
 }

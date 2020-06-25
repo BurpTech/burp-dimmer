@@ -9,15 +9,17 @@ namespace BurpDimmer {
       _store(store)
     {}
 
+    void ConfigSubscriber::setup(const Config * config) {
+      // do nothing
+    }
+
     void ConfigSubscriber::onPublish(const Config * config) {
       applyConfig(_store.getState(), config, [&](const Error error, const State::Params * params) {
           if (Error::noError == error) {
-            _store.dispatch(Action(ActionType::SET_STATE, params));
+            _store.dispatch(Action(*params));
           }
       });
     }
-
-    ConfigSubscriber configSubscriber(store);
 
   }
 }

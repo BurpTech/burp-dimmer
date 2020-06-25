@@ -4,8 +4,6 @@ namespace BurpDimmer {
   namespace Config {
     namespace State {
 
-      Memory memory;
-
       Instance::Instance(const Params * params, unsigned long sequenceId) :
         light(params->light),
         network(params->network),

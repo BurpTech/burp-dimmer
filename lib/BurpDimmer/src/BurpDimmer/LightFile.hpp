@@ -3,7 +3,7 @@
 #include "Json/File/Interface.hpp"
 #include <functional>
 #include <BurpDebug.hpp>
-#include <BurpRedux/Subscriber.hpp>
+#include <BurpRedux/Subscriber/Interface.hpp>
 #include <BurpDimmer/Json/withDoc.hpp>
 #include <BurpDimmer/Light/State.hpp>
 #include "Json/File/Interface.hpp"
@@ -11,7 +11,7 @@
 namespace BurpDimmer {
 
   template <class JsonDocumentClass>
-  class LightFile : public BurpRedux::Subscriber<Light::State::Instance> {
+  class LightFile : public BurpRedux::Subscriber::Interface<Light::State::Instance> {
 
     public:
 
@@ -28,6 +28,10 @@ namespace BurpDimmer {
           _file.read(doc);
           withObj(doc.as<JsonObject>());
         });
+      }
+
+      void setup(const Light::State::Instance * state) override {
+        // do nothing (the config read triggers setup)
       }
 
       void onPublish(const Light::State::Instance * state) override {

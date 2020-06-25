@@ -1,16 +1,17 @@
 #pragma once
 
 #include <memory>
+#include <BurpRedux/Creator/Interface.hpp>
 
 namespace BurpDimmer {
   namespace Memory {
 
     template <class State, class Params>
-    class Pair {
+    class Pair : public BurpRedux::Creator::Interface<State, Params> {
 
       public:
 
-        const State * create(const Params * params) {
+        const State * create(const State * previous, const Params * params) {
           _current++;
           _current %= 2;
           _sequenceId++;

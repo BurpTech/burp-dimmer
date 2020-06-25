@@ -1,38 +1,35 @@
 #pragma once
 
-#include <BurpRedux/Reducer.hpp>
-#include "../ActionType.hpp"
-#include "AccessPoint/Reducer.hpp"
-#include "Manager/Reducer.hpp"
-#include "Station/Reducer.hpp"
+#include <BurpRedux/CombinedReducer.hpp>
+#include <BurpRedux/SubState.hpp>
+#include "AccessPoint/State.hpp"
+#include "Manager/State.hpp"
+#include "Station/State.hpp"
 #include "State.hpp"
+
+#define BURP_DIMMER_CONFIG_NETWORK_SUB_STATE(NAME) BURP_REDUX_SUB_STATE(NAME, Network::State::Instance, Network::State::Params, State::Instance)
 
 namespace BurpDimmer {
   namespace Config {
     namespace Network {
 
-      class Reducer : public BurpRedux::Reducer<State::Instance, Action> {
+      template <size_t mappingCount>
+      using Reducer = BurpRedux::CombinedReducer<State::Instance, State::Params, mappingCount>;
 
-        public:
+      namespace AccessPoint {
+        // define the ReducerMapping and Selector classes
+        BURP_DIMMER_CONFIG_NETWORK_SUB_STATE(accessPoint);
+      }
 
-          Reducer(
-              State::Memory & memory,
-              AccessPoint::Reducer & accessPointReducer,
-              Manager::Reducer & managerReducer,
-              Station::Reducer & stationReducer
-          );
-          const State::Instance * reduce(const State::Instance * previous, const Action & action) override;
+      namespace Manager {
+        // define the ReducerMapping and Selector classes
+        BURP_DIMMER_CONFIG_NETWORK_SUB_STATE(manager);
+      }
 
-        private:
-
-          State::Memory & _memory;
-          AccessPoint::Reducer & _accessPointReducer;
-          Manager::Reducer & _managerReducer;
-          Station::Reducer & _stationReducer;
-
-      };
-
-      extern Reducer reducer;
+      namespace Station {
+        // define the ReducerMapping and Selector classes
+        BURP_DIMMER_CONFIG_NETWORK_SUB_STATE(accessPoint);
+      }
 
     }
   }
