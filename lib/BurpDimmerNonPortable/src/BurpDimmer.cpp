@@ -1,80 +1,54 @@
-#include <functional>
-#include <BurpDimmer/Config.hpp>
-#include <BurpDimmer/Config/Store.hpp>
-#include <BurpDimmer/Config/Light/Selector.hpp>
-#include <BurpDimmer/Config/Network/Manager/Selector.hpp>
-#include <BurpDimmer/Light.hpp>
-#include <BurpDimmer/Light/Store.hpp>
-#include <BurpDimmer/Light/ConfigSubscriber.hpp>
-#include <BurpDimmer/Json/File/Instance.hpp>
-#include <BurpDimmer/ConfigFile.hpp>
-#include <BurpDimmer/LightFile.hpp>
-#include "BurpDimmer/FactorySettings.hpp"
-#include "BurpDimmer/Storage.hpp"
-#include "BurpDimmer/Components/Light.hpp"
-#include "BurpDimmer/LightControls.hpp"
-#include "BurpDimmer/Network.hpp"
-#include "BurpDimmer/defines.hpp"
-#include "BurpDimmer.hpp"
+#include <Arduino.h>
+#include <EEPROM.h>
+#include <LittleFS.h>
+#include "BurpDimmer/Application.hpp"
+
+#define _STR(VAL) #VAL
+#define STR(VAL) _STR(VAL)
+
+#define EEPROM_SIZE 512
+
+#ifndef APPL_NAME
+#define APPL_NAME application
+#endif
+
+#ifndef VERSION
+#define VERSION development
+#endif
+
+#ifndef BAUDRATE
+#define BAUDRATE 9600
+#endif
 
 namespace BurpDimmer {
 
-  using namespace std::placeholders;
-
-  Components::Light::Instance light(BURP_DIMMER_LIGHT_PIN);
-
-  constexpr char configFilePath[] = "/config.json";
-  const Json::File::Instance configFileInstance(configFilePath);
-  ConfigFile<StaticJsonDocument<1024>> configFile(configFileInstance);
-
-  constexpr char lightFilePath[] = "/light.json";
-  const Json::File::Instance lightFileInstance(lightFilePath);
-  LightFile<StaticJsonDocument<256>> lightFile(lightFileInstance);
-
   void setup() {
-    // Initialise the factory settings
-    FactorySettings::instance.init();
+    // Initialise the serial output
+    Serial.begin(BAUDRATE);
+    
+    // Report name and version
+    Serial.println(STR(APPL_NAME) " : " STR(VERSION));
+
+    // TODO: We may not be concerned about
+    // real random values but should probably
+    // change this seed. However at present
+    // this does still generate different values
+    // every time
+    randomSeed(0);
+
+    // Initialise the EEPROM library
+    EEPROM.begin(EEPROM_SIZE);
 
     // Initialise the file system
-    Storage::begin();
+    LittleFS.begin();
 
-    // Load the config state from the config file
-    configFile.read(Config::read);
-    Config::store.subscribe(&configFile);
-    Config::Light::selector.subscribe(&Light::configSubscriber);
-
-    // load the light state from the light file
-    lightFile.read([](const JsonObject & obj) {
-        Light::read(Config::Light::selector.getState(), obj);
-    });
-    Light::store.subscribe(&lightFile);
-    
-    // setup the light as soon as we can
-    light.setup(Light::store.getState());
-    Light::store.subscribe(&light);
-
-    // initialize the network manager
-    Network::Manager::setup(Config::Network::Manager::selector.getState());
-    Config::Network::Manager::selector.subscribe(&Network::Manager::instance);
-    
-    // setup the light controls
-    LightControls::setup();
-
-    // Report the number of subscribers actually used
-    Config::reportSubscriberCounts();
-    Light::reportSubscriberCounts();
+    // setup the application
+    Application::setup();
   }
 
   void loop() {
-    // loop the redux stores to notify subscribers
-    Light::store.loop();
-    Config::store.loop();
-
-    // loop the light controls
-    LightControls::loop();
-
-    // loop the lightFile for delayed saves
-    lightFile.loop();
+    // loop the application
+    Application::loop();
   }
 
 }

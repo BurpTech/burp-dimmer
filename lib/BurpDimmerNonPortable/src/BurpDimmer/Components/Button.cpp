@@ -1,57 +1,53 @@
-#include "Button.hpp"
-
 #include <Arduino.h>
+#include "Button.hpp"
 
 namespace BurpDimmer {
   namespace Components {
 
-    Button::Button(
-      int pin,
-      unsigned long debounceDelay,
-      unsigned long delay,
-      f_callback onPress,
-      f_callback onRelease
-    ) :
+    Button::Button(int pin, unsigned long debounceDelay) :
       _pin(pin),
-      _debounceDelay(debounceDelay),
-      _longPresses(_ppSingle),
-      _single({delay, onPress, onRelease}) {
-    }
+      _debounceDelay(debounceDelay)
+    {}
 
-    Button::Button(
-      int pin,
-      unsigned long debounceDelay,
+    void Button::setup(
+      unsigned long delay,
       f_callback onPress,
       f_callback onRelease
-    ) :
-      Button(pin, debounceDelay, 0, onPress, onRelease) {
+    ) {
+      setup();
+      _longPresses = _ppSingle;
+      _single = {
+        delay,
+        onPress,
+        onRelease
+      };
     }
 
-    Button::Button(
-      int pin,
-      unsigned long debounceDelay,
+    void Button::setup(
+      f_callback onPress,
+      f_callback onRelease
+    ) {
+      setup(0, onPress, onRelease);
+    }
+
+    void Button::setup(
       unsigned long delay,
       f_callback onRelease
-    ) :
-      Button(pin, debounceDelay, delay, nullptr, onRelease) {
+    ) {
+      setup(delay, nullptr, onRelease);
     }
 
-    Button::Button(
-      int pin,
-      unsigned long debounceDelay,
+    void Button::setup(
       f_callback onRelease
-    ) :
-      Button(pin, debounceDelay, nullptr, onRelease) {
+    ) {
+      setup(nullptr, onRelease);
     }
 
-    Button::Button(
-      int pin,
-      unsigned long debounceDelay,
+    void Button::setup(
       const LongPress ** longPresses
-    ) :
-      _pin(pin),
-      _debounceDelay(debounceDelay),
-      _longPresses(longPresses) {
+    ) {
+      setup();
+      _longPresses = longPresses;
     }
 
     void Button::setup() {

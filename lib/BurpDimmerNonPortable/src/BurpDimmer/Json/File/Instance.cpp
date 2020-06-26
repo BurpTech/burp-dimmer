@@ -1,5 +1,5 @@
+#include <LittleFS.h>
 #include <BurpDebug.hpp>
-#include "../../Storage.hpp"
 #include "Instance.hpp"
 
 namespace BurpDimmer {
@@ -12,8 +12,8 @@ namespace BurpDimmer {
 
       void Instance::read(JsonDocument & doc) const {
         BURP_DEBUG_INFO("check file: path: [%s]", _path);
-        if (Storage::exists(_path)) {
-          fs::File file = Storage::open(_path, "r");
+        if (LittleFS.exists(_path)) {
+          fs::File file = LittleFS.open(_path, "r");
           if (file) {
             DeserializationError error = deserializeJson(doc, file);
             if (error) {
@@ -29,7 +29,7 @@ namespace BurpDimmer {
       }
 
       void Instance::write(JsonDocument & doc) const {
-        fs::File file = Storage::open(_path, "w");
+        fs::File file = LittleFS.open(_path, "w");
         if (file) {
           BURP_DEBUG_INFO("Opened file: path: [%s]", _path);
           if (serializeJson(doc, file) == 0) {
@@ -43,7 +43,7 @@ namespace BurpDimmer {
       }
 
       void Instance::remove() {
-        if (!Storage::remove(_path)) {
+        if (!LittleFS.remove(_path)) {
           BURP_DEBUG_INFO("Failed to remove file: path: [%s]", _path);
         }
         BURP_DEBUG_INFO("Removed file: path: [%s]", _path);

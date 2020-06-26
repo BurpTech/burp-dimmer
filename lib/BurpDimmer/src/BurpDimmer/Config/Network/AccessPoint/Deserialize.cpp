@@ -6,9 +6,9 @@ namespace BurpDimmer {
     namespace Network {
       namespace AccessPoint {
 
-        void deserialize(const JsonObject & object, f_onState onState) {
+        void deserialize(State::Creator & creator, const JsonObject & object, f_onState onState) {
           deserialize(object, [&](const Error error, const State::Params * params) {
-              onState(State::memory.create(params));
+              onState(creator.init(params));
           });
         }
 

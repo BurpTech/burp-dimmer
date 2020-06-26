@@ -7,7 +7,7 @@ namespace BurpDimmer {
   namespace Config {
 
     using f_onState = std::function<void(const State::Instance * state)>;
-    void deserialize(const JsonObject & object, f_onState onState);
+    void deserialize(State::Creator & creator, const JsonObject & object, f_onState onState);
 
   }
 }

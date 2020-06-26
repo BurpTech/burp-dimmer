@@ -13,9 +13,8 @@ namespace BurpDimmer {
 
         public:
 
-
           Instance();
-          void setup(const State * state);
+          void setup(const State * state) override;
           void onPublish(const State * state) override;
 
         private:

@@ -13,12 +13,12 @@ namespace BurpDimmer {
         return config->levels[defaultLevel(config)];
       }
 
-      Instance::Instance(const Params * params, unsigned long sequenceId) :
+      Instance::Instance(const Params * params, const unsigned long uid) :
+        BurpRedux::State::Instance(uid),
         on(params->fields ? params->fields->on : defaultOn),
         level(params->fields ? params->fields->level : defaultLevel(params->config)),
         pwm(params->fields ? params->fields->pwm : defaultPwm(params->config)),
-        config(params->config),
-        sequenceId(sequenceId)
+        config(params->config)
       {}
 
       void Instance::serialize(JsonObject & object) const {
@@ -35,10 +35,6 @@ namespace BurpDimmer {
         BURP_DEBUG_INFO("Set on field: %d", ret);
         object[levelField] = level;
         object[pwmField] = pwm;
-      }
-
-      unsigned long Instance::getUid() const {
-        return sequenceId;
       }
 
     }

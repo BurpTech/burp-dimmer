@@ -21,8 +21,8 @@ namespace BurpDimmer {
         // member function
         using f_interruptDispatch = void(*)();
 
-        RotaryEncoder(int pinA, int pinB, f_interruptDispatch interruptDispatch, f_onChange onChange);
-        void setup();
+        RotaryEncoder(int pinA, int pinB, f_interruptDispatch interruptDispatch);
+        void setup(f_onChange onChange);
         void loop();
         ICACHE_RAM_ATTR void interrupt();
 

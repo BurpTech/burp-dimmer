@@ -1,4 +1,4 @@
-#include "FactorySettings.hpp"
+#include "Instance.hpp"
 
 #include <stdint.h>
 #include <EEPROM.h>
@@ -30,7 +30,7 @@ namespace BurpDimmer {
     // This uses the random function so
     // randomSeed should really be called before
     // calling this function
-    void Instance::init() {
+    void Instance::setup() {
       int address = 0;
 
       // Read the check
@@ -51,36 +51,36 @@ namespace BurpDimmer {
         // We may have initialized already so read in
         // the initialized values
         BURP_DEBUG_INFO("Read initialized values from EEPROM: address: [%d]", address);
-        EEPROM.get(address, values);
+        EEPROM.get(address, _values);
         address += sizeof(Values);
 
         // We don't trust these values so let's calculate
         // the checksum and compare to the previously
         // read checksum
         uint32_t checksum = CRC32::calculate(
-          (uint8_t *) &values,
+          (uint8_t *) &_values,
           sizeof(Values)
         );
         if (checksum != check.checksum) {
           BURP_DEBUG_INFO("Checksum invalid, initializing with new values: expected: [%08X]: actual: [%08X]", check.checksum, checksum);
           _initialize();
         } else {
-          BURP_DEBUG_INFO("Checksum valid, initial values are: ssid: [%s]: password: [%s]", values.ssid, values.password);
+          BURP_DEBUG_INFO("Checksum valid, initial values are: ssid: [%s]: password: [%s]", _values.ssid, _values.password);
         }
       }
     }
 
     void Instance::_initialize() {
       // initialize new random values
-      strlcpy(values.ssid, namePrefix, WL_SSID_MAX_LENGTH + 1);
-      _fillRandom(values.ssid, sizeof(namePrefix) - 1, nameSuffixLength, WL_SSID_MAX_LENGTH + 1);
-      _fillRandom(values.password, 0, passwordLength, WL_WPA_KEY_MAX_LENGTH + 1);
+      strlcpy(_values.ssid, namePrefix, WL_SSID_MAX_LENGTH + 1);
+      _fillRandom(_values.ssid, sizeof(namePrefix) - 1, nameSuffixLength, WL_SSID_MAX_LENGTH + 1);
+      _fillRandom(_values.password, 0, passwordLength, WL_WPA_KEY_MAX_LENGTH + 1);
 
       // Create a new Check structure
       Check check;
       check.version = version;
       check.checksum = CRC32::calculate(
-        (uint8_t *) &values,
+        (uint8_t *) &_values,
         sizeof(Values)
       );
       
@@ -92,8 +92,8 @@ namespace BurpDimmer {
       address += sizeof(Check);
 
       // write initial values to EEPROM
-      BURP_DEBUG_INFO("initial values are: ssid: [%s]: password: [%s]", values.ssid, values.password);
-      EEPROM.put(address, values);
+      BURP_DEBUG_INFO("initial values are: ssid: [%s]: password: [%s]", _values.ssid, _values.password);
+      EEPROM.put(address, _values);
       address += sizeof(Values);
 
       //Commit the changes

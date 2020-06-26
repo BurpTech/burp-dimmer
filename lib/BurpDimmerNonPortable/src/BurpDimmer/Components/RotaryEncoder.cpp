@@ -5,14 +5,15 @@
 namespace BurpDimmer {
   namespace Components {
 
-    RotaryEncoder::RotaryEncoder(int pinA, int pinB, f_interruptDispatch interruptDispatch, f_onChange onChange) :
+    RotaryEncoder::RotaryEncoder(int pinA, int pinB, f_interruptDispatch interruptDispatch) :
       _pinA(pinA),
       _pinB(pinB),
       _interruptDispatch(interruptDispatch),
-      _onChange(onChange) {
+      _onChange(nullptr) {
     }
 
-    void RotaryEncoder::setup() {
+    void RotaryEncoder::setup(f_onChange onChange) {
+      _onChange = onChange;
       pinMode(_pinA, INPUT);
       pinMode(_pinB, INPUT);
       _pinAState = digitalRead(_pinA);

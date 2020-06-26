@@ -16,41 +16,27 @@ namespace BurpDimmer {
           f_callback onRelease;
         };
 
-        Button(
-          int pin,
-          unsigned long debounceDelay,
-          unsigned long delay,
-          f_callback onPress,
-          f_callback onRelease
-        );
-
-        Button(
-          int pin,
-          unsigned long debounceDelay,
-          f_callback onPress,
-          f_callback onRelease
-        );
-
-        Button(
-          int pin,
-          unsigned long debounceDelay,
-          unsigned long delay,
-          f_callback onRelease
-        );
-
-        Button(
-          int pin,
-          unsigned long debounceDelay,
-          f_callback onRelease
-        );
-
-        Button(
-          int pin,
-          unsigned long debounceDelay,
+        Button(int pin, unsigned long debounceDelay);
+        void setup();
+        void setup(
           const LongPress ** longPresses
         );
-
-        void setup();
+        void setup(
+          f_callback onRelease
+        );
+        void setup(
+          unsigned long delay,
+          f_callback onRelease
+        );
+        void setup(
+          f_callback onPress,
+          f_callback onRelease
+        );
+        void setup(
+          unsigned long delay,
+          f_callback onPress,
+          f_callback onRelease
+        );
         void loop();
 
       private:

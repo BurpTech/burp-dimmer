@@ -6,9 +6,13 @@
 
 namespace BurpDimmer {
   namespace Config {
+    namespace Store {
 
-    template <size_t subscriberCount>
-    using Store = BurpRedux::Store::Instance<State::Instance, subscriberCount>;
+      using Interface = BurpRedux::Store::Interface<State::Instance>;
 
+      template <size_t subscriberCount>
+      using Instance = BurpRedux::Store::Instance<State::Instance, subscriberCount>;
+
+    }
   }
 }

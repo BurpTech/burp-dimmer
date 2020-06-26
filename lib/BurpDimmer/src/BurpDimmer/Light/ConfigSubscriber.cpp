@@ -5,7 +5,7 @@
 namespace BurpDimmer {
   namespace Light {
 
-    ConfigSubscriber::ConfigSubscriber(Store & store) :
+    ConfigSubscriber::ConfigSubscriber(Store::Interface & store) :
       _store(store)
     {}
 

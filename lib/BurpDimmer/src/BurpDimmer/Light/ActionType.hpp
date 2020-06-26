@@ -1,7 +1,5 @@
 #pragma once
 
-#include <BurpRedux/Action.hpp>
-
 namespace BurpDimmer {
   namespace Light {
 

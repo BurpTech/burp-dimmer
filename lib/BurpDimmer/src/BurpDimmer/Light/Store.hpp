@@ -2,12 +2,16 @@
 
 #include <BurpRedux/Store/Instance.hpp>
 #include "State.hpp"
-#include "../defines.hpp"
 
 namespace BurpDimmer {
   namespace Light {
+    namespace Store {
 
-    using Store = BurpRedux::Store::Instance<State::Instance, BURP_DIMMER_LIGHT_SUBSCRIBERS>;
+      using Interface = BurpRedux::Store::Interface<State::Instance>;
 
+      template <size_t subscriberCount>
+      using Instance = BurpRedux::Store::Instance<State::Instance, subscriberCount>;
+
+    }
   }
 }

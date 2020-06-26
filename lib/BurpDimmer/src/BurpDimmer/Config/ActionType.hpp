@@ -1,11 +1,9 @@
 #pragma once
 
-#include <BurpRedux/Action.hpp>
-
 namespace BurpDimmer {
   namespace Config {
 
-    enum class ActionType {
+    enum ActionType : unsigned int {
       NETWORK_MANAGER_SET_STATE,
       NETWORK_STATION_SET_STATE,
       NETWORK_ACCESS_POINT_SET_STATE,
