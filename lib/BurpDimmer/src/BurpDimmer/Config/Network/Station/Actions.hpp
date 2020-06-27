@@ -11,16 +11,8 @@ namespace BurpDimmer {
     namespace Network {
       namespace Station {
 
-        enum class Error {
-          noError,
-          noObject,
-          noTest,
-          invalidTest
-        };
-
         using Action = BurpRedux::Action::Instance<State::Params, ActionType::NETWORK_STATION_SET_STATE>;
-        using f_onParams = std::function<void(const Error error, const State::Params * params)>;
-        void deserialize(const JsonObject & object, f_onParams onParams);
+        void deserialize(const JsonObject & object, State::Params & params);
 
       }
     }

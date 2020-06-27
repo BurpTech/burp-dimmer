@@ -7,10 +7,10 @@ namespace BurpDimmer {
   namespace Light {
     namespace Store {
 
-      using Interface = BurpRedux::Store::Interface<State::Instance>;
+      using Interface = BurpRedux::Store::Interface<State::Instance, State::Params>;
 
       template <size_t subscriberCount>
-      using Instance = BurpRedux::Store::Instance<State::Instance, subscriberCount>;
+      using Instance = BurpRedux::Store::Instance<State::Instance, State::Params, subscriberCount>;
 
     }
   }

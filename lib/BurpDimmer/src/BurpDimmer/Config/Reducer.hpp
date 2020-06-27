@@ -6,7 +6,7 @@
 #include "Network/State.hpp"
 #include "State.hpp"
 
-#define BURP_DIMMER_CONFIG_SUB_STATE(NAME) BURP_REDUX_SUB_STATE(NAME, Config::State::Instance, Config::State::Params, State::Instance)
+#define BURP_DIMMER_CONFIG_SUB_STATE(NAME, FIELD) BURP_REDUX_SUB_STATE(NAME, FIELD, Config::State::Instance, Config::State::Params, State::Instance, State::Params)
 
 namespace BurpDimmer {
   namespace Config {
@@ -16,12 +16,12 @@ namespace BurpDimmer {
 
     namespace Light {
       // define the ReducerMapping and Selector classes
-      BURP_DIMMER_CONFIG_SUB_STATE(light);
+      BURP_DIMMER_CONFIG_SUB_STATE(light, Config::State::lightField);
     }
 
     namespace Network {
       // define the ReducerMapping and Selector classes
-      BURP_DIMMER_CONFIG_SUB_STATE(network);
+      BURP_DIMMER_CONFIG_SUB_STATE(network, Config::State::networkField);
     }
 
   }

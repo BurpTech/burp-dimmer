@@ -113,7 +113,5 @@ namespace BurpDimmer {
       BURP_DEBUG_INFO("filled: buffer: [%s]", buffer);
     }
 
-    Instance instance;
-
   }
 }

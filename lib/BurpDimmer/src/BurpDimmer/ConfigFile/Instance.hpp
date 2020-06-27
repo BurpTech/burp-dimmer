@@ -17,7 +17,7 @@ namespace BurpDimmer {
         {}
 
         void read(f_withObj withObj) override {
-          Json::withDoc<size>([&](JsonDocument & doc) {
+          Json::withStaticDoc<size>([&](JsonDocument & doc) {
             _file.read(doc);
             withObj(doc.as<JsonObject>());
           });
@@ -28,8 +28,8 @@ namespace BurpDimmer {
         }
 
         void onPublish(const Config::State::Instance * state) override {
-          Json::withDoc<size>([&](JsonDocument & doc) {
-            JsonObject object = doc.as<JsonObject>();
+          Json::withStaticDoc<size>([&](JsonDocument & doc) {
+            JsonObject object = doc.to<JsonObject>();
             state->serialize(object);
             _file.write(doc);
           });

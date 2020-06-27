@@ -1,7 +1,6 @@
 #pragma once
 
-#include <BurpRedux/Store/Interface.hpp>
-#include <BurpDimmer/Light/State.hpp>
+#include <BurpDimmer/Light/Store.hpp>
 #include "../Components/RotaryEncoder.hpp"
 #include "../Components/Button.hpp"
 

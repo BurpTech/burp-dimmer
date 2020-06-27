@@ -14,6 +14,22 @@ namespace BurpDimmer {
         constexpr char saveStateDelayField[] = "saveStateDelay";
         constexpr char offLevelField[] = "offLevelField";
 
+        enum class Error {
+          noError,
+          noObject,
+          noLevels,
+          noSaveStateDelay,
+          noOffLevel,
+          notAnArray,
+          minLevels,
+          maxLevels,
+          invalidLevels,
+          invalidSaveStateDelay,
+          invalidOffLevel,
+          offLevelOutOfRange,
+          levelZero
+        };
+
         // max levels is 255 and not 256 because 0 is
         // not a valid level (it is off).
         // Also this allows us to still reference the
@@ -27,9 +43,10 @@ namespace BurpDimmer {
         using Levels = std::array<unsigned char, maxLevels + 1>;
 
         struct Params {
-          const Levels & levels;
-          const unsigned long saveStateDelay;
-          const unsigned char offLevel;
+          Error error;
+          Levels levels;
+          unsigned long saveStateDelay;
+          unsigned char offLevel;
         };
 
         class Instance : public BurpRedux::State::Instance {
@@ -40,8 +57,8 @@ namespace BurpDimmer {
             const unsigned long saveStateDelay;
             const unsigned char offLevel;
 
-            Instance(const Params * params, const unsigned long uid);
-            void serialize(JsonObject & object) const;
+            Instance(const Params & params, const unsigned long uid);
+            void serialize(const JsonObject & object) const override;
 
         };
 

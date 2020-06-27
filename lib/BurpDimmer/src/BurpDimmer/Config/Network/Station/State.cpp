@@ -8,12 +8,12 @@ namespace BurpDimmer {
 
           constexpr int defaultTest = 0;
 
-          Instance::Instance(const Params * params, const unsigned long uid) :
+          Instance::Instance(const Params & params, const unsigned long uid) :
             BurpRedux::State::Instance(uid),
-            test(params ? params->test : defaultTest)
+            test(params.error == Error::noError ? params.test : defaultTest)
           {}
 
-          void Instance::serialize(JsonObject & object) const {
+          void Instance::serialize(const JsonObject & object) const {
             object[testField] = test;
           }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <BurpRedux/Subscriber.hpp>
+#include <BurpRedux/Subscriber/Interface.hpp>
 #include <BurpDimmer/Config/Network/Manager/State.hpp>
 
 namespace BurpDimmer {
@@ -9,7 +9,7 @@ namespace BurpDimmer {
 
       using State = Config::Network::Manager::State::Instance;
 
-      class Instance : public BurpRedux::Subscriber<State> {
+      class Instance : public BurpRedux::Subscriber::Interface<State> {
 
         public:
 
@@ -22,9 +22,6 @@ namespace BurpDimmer {
           const State * _state;
 
       };
-
-      extern Instance instance;
-      void setup(const State * state);
 
     }
   }

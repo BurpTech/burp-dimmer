@@ -17,9 +17,9 @@ namespace BurpDimmer {
         constexpr char stationField[] = "station";
 
         struct Params {
-          const AccessPoint::State::Instance * accessPoint;
-          const Manager::State::Instance * manager;
-          const Station::State::Instance * station;
+          AccessPoint::State::Params accessPoint;
+          Manager::State::Params manager;
+          Station::State::Params station;
         };
 
         class Instance : public BurpRedux::State::Instance {
@@ -30,12 +30,13 @@ namespace BurpDimmer {
             const Manager::State::Instance * manager;
             const Station::State::Instance * station;
 
-            Instance(const Params * params, const unsigned long uid);
-            void serialize(JsonObject & object) const;
+            Instance();
+            Instance(const Instance & instance, const unsigned long uid);
+            void serialize(const JsonObject & object) const override;
 
         };
 
-        using Creator = BurpRedux::Creator::Instance<Instance, Params>;
+        using Creator = BurpRedux::Creator::Instance<Instance, Instance>;
 
       }
     }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <BurpRedux/Subscriber.hpp>
+#include <BurpRedux/Subscriber/Interface.hpp>
 #include <BurpDimmer/Light/State.hpp>
 
 namespace BurpDimmer {
@@ -9,7 +9,7 @@ namespace BurpDimmer {
 
       using State = BurpDimmer::Light::State::Instance;
 
-      class Instance : public BurpRedux::Subscriber<State> {
+      class Instance : public BurpRedux::Subscriber::Interface<State> {
 
         public:
 

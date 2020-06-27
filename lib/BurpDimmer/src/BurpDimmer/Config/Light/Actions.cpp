@@ -6,7 +6,8 @@ namespace BurpDimmer {
   namespace Config {
     namespace Light {
 
-      void deserialize(const JsonObject & object, f_onParams onParams) {
+      void deserialize(const JsonObject & object, State::Params & params) {
+        params.error = State::Error::noError;
         if (!object.isNull()) {
           if (object.containsKey(State::levelsField)) {
             if (object.containsKey(State::saveStateDelayField)) {
@@ -16,61 +17,70 @@ namespace BurpDimmer {
                   auto size = array.size();
                   if (size > State::maxLevels) {
                     BURP_DEBUG_INFO("Error::maxLevels");
-                    return onParams(Error::maxLevels, nullptr);
+                    params.error = State::Error::maxLevels;
+                    return;
                   }
                   if (size == 0) {
                     BURP_DEBUG_INFO("Error::minLevels");
-                    return onParams(Error::minLevels, nullptr);
+                    params.error = State::Error::minLevels;
+                    return;
                   }
                   auto index = 0;
                   State::Levels levels;
                   for(JsonVariant v : array) {
                     if (!v.is<unsigned char>()) {
                       BURP_DEBUG_INFO("Error::invalidLevels");
-                      return onParams(Error::invalidLevels, nullptr);
+                      params.error = State::Error::invalidLevels;
+                      return;
                     }
                     const unsigned char level = v.as<unsigned char>();
                     if (level == 0) {
                       BURP_DEBUG_INFO("Error::levelZero");
-                      return onParams(Error::levelZero, nullptr);
+                      params.error = State::Error::levelZero;
+                      return;
                     }
                     levels[index++] = level;
                   }
                   if (!object[State::saveStateDelayField].is<unsigned long>()) {
                     BURP_DEBUG_INFO("Error::invalidSaveStateDelay");
-                    return onParams(Error::invalidSaveStateDelay, nullptr);
+                    params.error = State::Error::invalidSaveStateDelay;
+                    return;
                   }
                   unsigned long saveStateDelay = object[State::saveStateDelayField];
                   if (!object[State::offLevelField].is<unsigned char>()) {
                     BURP_DEBUG_INFO("Error::invalidOffLevel");
-                    return onParams(Error::invalidOffLevel, nullptr);
+                    params.error = State::Error::invalidOffLevel;
+                    return;
                   }
                   unsigned char offLevel = object[State::offLevelField];
                   if (offLevel >= size) {
                     BURP_DEBUG_INFO("Error::offLevelOutOfRange");
-                    return onParams(Error::offLevelOutOfRange, nullptr);
+                    params.error = State::Error::offLevelOutOfRange;
+                    return;
                   }
-                  const State::Params params = {
-                    levels,
-                    saveStateDelay,
-                    offLevel
-                  };
-                  return onParams(Error::noError, &params);
+                  params.levels = levels;
+                  params.saveStateDelay = saveStateDelay;
+                  params.offLevel = offLevel;
+                  return;
                 }
                 BURP_DEBUG_INFO("Error::notAnArray");
-                return onParams(Error::notAnArray, nullptr);
+                params.error = State::Error::notAnArray;
+                return;
               }
               BURP_DEBUG_INFO("Error::noOffLevel");
-              return onParams(Error::noOffLevel, nullptr);
+              params.error = State::Error::noOffLevel;
+              return;
             }
             BURP_DEBUG_INFO("Error::noSaveStateDelay");
-            return onParams(Error::noSaveStateDelay, nullptr);
+            params.error = State::Error::noSaveStateDelay;
+            return;
           }
           BURP_DEBUG_INFO("Error::noLevels");
-          return onParams(Error::noLevels, nullptr);
+          params.error = State::Error::noLevels;
+          return;
         }
         BURP_DEBUG_INFO("Error::noObject");
-        return onParams(Error::noObject, nullptr);
+        params.error = State::Error::noObject;
       }
 
     }

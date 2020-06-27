@@ -1,6 +1,7 @@
 #include "ActionType.hpp"
 #include "Actions.hpp"
 #include "ConfigSubscriber.hpp"
+#include "State.hpp"
 
 namespace BurpDimmer {
   namespace Light {
@@ -14,11 +15,11 @@ namespace BurpDimmer {
     }
 
     void ConfigSubscriber::onPublish(const Config * config) {
-      applyConfig(_store.getState(), config, [&](const Error error, const State::Params * params) {
-          if (Error::noError == error) {
-            _store.dispatch(Action(*params));
-          }
-      });
+      State::Params params;
+      applyConfig(_store.getState(), config, params);
+      if (State::Error::noError == params.error) {
+        _store.dispatch(Action(params));
+      }
     }
 
   }

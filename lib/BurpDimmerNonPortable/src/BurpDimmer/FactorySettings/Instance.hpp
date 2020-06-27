@@ -2,7 +2,7 @@
 
 #include <ESP8266WiFi.h>
 #include <stddef.h>
-#include "Interface.hpp"
+#include <BurpDimmer/FactorySettings/Interface.hpp>
 
 namespace BurpDimmer {
   namespace FactorySettings {
@@ -28,8 +28,6 @@ namespace BurpDimmer {
 
 
     };
-
-    extern Instance instance;
 
   }
 }

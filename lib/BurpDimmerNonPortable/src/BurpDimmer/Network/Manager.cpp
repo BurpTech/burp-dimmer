@@ -18,12 +18,6 @@ namespace BurpDimmer {
         BURP_DEBUG_INFO("state: %p", state);
       }
 
-      Instance instance;
-
-      void setup(const State * state) {
-        instance.setup(state);
-      }
-
     }
   }
 }

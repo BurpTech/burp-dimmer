@@ -23,26 +23,26 @@ namespace BurpDimmer {
 
     void Instance::_rotaryEncoderChange(int direction) {
       if (direction > 0) {
-        Light::increaseBrightness(_store.getState(), [](const Error error, const Params * params){
-            if (Error::noError == error) {
-              _store.dispatch(Light::Action(*params));
-            }
-        });
+        Light::State::Params params;
+        Light::increaseBrightness(_store.getState(), params);
+        if (Light::State::Error::noError == params.error) {
+          _store.dispatch(Light::Action(params));
+        }
       } else {
-        Light::decreaseBrightness(_store.getState(), [](const Error error, const Params * params){
-            if (Error::noError == error) {
-              _store.dispatch(Light::Action(*params));
-            }
-        });
+        Light::State::Params params;
+        Light::decreaseBrightness(_store.getState(), params);
+        if (Light::State::Error::noError == params.error) {
+          _store.dispatch(Light::Action(params));
+        }
       }
     }
 
     void Instance::_buttonRelease() {
-      toggle(_store.getState(), [](const Error error, const Params * params){
-          if (Error::noError == error) {
-            _store.dispatch(Light::Action(*params));
-          }
-      });
+      Light::State::Params params;
+      Light::toggle(_store.getState(), params);
+      if (Light::State::Error::noError == params.error) {
+        _store.dispatch(Light::Action(params));
+      }
     }
 
   }

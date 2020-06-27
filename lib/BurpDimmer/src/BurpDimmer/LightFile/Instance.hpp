@@ -13,14 +13,14 @@ namespace BurpDimmer {
 
       public:
 
-        LightFile(const Json::File::Interface & file) :
+        Instance(const Json::File::Interface & file) :
           _state(nullptr),
           _file(file),
           _lastChange(0)
         {}
 
         void read(f_withObj withObj) override {
-          Json::withDoc<size>([&](JsonDocument & doc) {
+          Json::withStaticDoc<size>([&](JsonDocument & doc) {
             _file.read(doc);
             withObj(doc.as<JsonObject>());
           });
@@ -41,10 +41,8 @@ namespace BurpDimmer {
             // There has been a change so check for inactivity
             if (millis() - _lastChange > _state->config->saveStateDelay) {
               _lastChange = 0;
-              Json::withDoc<size>([&](JsonDocument & doc) {
-                JsonObject object = doc.as<JsonObject>();
-                BURP_DEBUG_INFO("Document capacity: %u", doc.capacity());
-                BURP_DEBUG_INFO("Document memory used: %u", doc.memoryUsage());
+              Json::withStaticDoc<size>([&](JsonDocument & doc) {
+                JsonObject object = doc.to<JsonObject>();
                 _state->serialize(object);
                 _file.write(doc);
               });

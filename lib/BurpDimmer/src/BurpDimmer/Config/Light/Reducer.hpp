@@ -1,6 +1,6 @@
 #pragma once
 
-#include <BurpRedux/Reducer.hpp>
+#include <BurpRedux/Reducer/Instance.hpp>
 #include "../ActionType.hpp"
 #include "State.hpp"
 

@@ -8,7 +8,7 @@
 namespace BurpDimmer {
   namespace Light {
 
-    using Reducer = BurpRedux::Store::Reducer<State::Instance, State::Params, ActionType::SET_STATE>;
+    using Reducer = BurpRedux::Reducer::Instance<State::Instance, State::Params, ActionType::SET_STATE>;
 
   }
 }

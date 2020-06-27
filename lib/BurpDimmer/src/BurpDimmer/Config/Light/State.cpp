@@ -35,14 +35,14 @@ namespace BurpDimmer {
         constexpr unsigned long defaultSaveStateDelay = 5000;
         constexpr unsigned char defaultOffLevel = 24;
 
-        Instance::Instance(const Params * params, const unsigned long uid) :
+        Instance::Instance(const Params & params, const unsigned long uid) :
           BurpRedux::State::Instance(uid),
-          levels(params ? params->levels : defaultLevels),
-          saveStateDelay(params ? params->saveStateDelay : defaultSaveStateDelay),
-          offLevel(params ? params->offLevel : defaultOffLevel)
+          levels(params.error == Error::noError ? params.levels : defaultLevels),
+          saveStateDelay(params.error == Error::noError ? params.saveStateDelay : defaultSaveStateDelay),
+          offLevel(params.error == Error::noError ? params.offLevel : defaultOffLevel)
         {}
 
-        void Instance::serialize(JsonObject & object) const {
+        void Instance::serialize(const JsonObject & object) const {
           JsonArray array = object[levelsField].as<JsonArray>();
           for (unsigned char i = 0; i < maxLevels; i++) {
             // break out at the first zero as this

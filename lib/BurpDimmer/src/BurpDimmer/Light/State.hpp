@@ -13,15 +13,24 @@ namespace BurpDimmer {
       constexpr char levelField[] = "level";
       constexpr char pwmField[] = "pwm";
 
-      struct Fields {
-        const bool on;
-        const unsigned char level;
-        const unsigned char pwm;
+      enum class Error {
+        noError,
+        noObject,
+        maxLevels,
+        outOfRange,
+        invalidOn,
+        invalidLevel,
+        invalidPwm,
+        maxBrightness,
+        minBrightness
       };
 
       struct Params {
+        Error error;
         const Config * config;
-        const Fields * fields;
+        bool on;
+        unsigned char level;
+        unsigned char pwm;
       };
 
       class Instance : public BurpRedux::State::Instance {
@@ -33,8 +42,8 @@ namespace BurpDimmer {
           const unsigned char pwm;
           const Config * config;
 
-          Instance(const Params * params, const unsigned long uid);
-          void serialize(JsonObject & object) const;
+          Instance(const Params & params, const unsigned long uid);
+          void serialize(const JsonObject & object) const override;
 
       };
 

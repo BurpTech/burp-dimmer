@@ -14,8 +14,8 @@ namespace BurpDimmer {
       constexpr char networkField[] = "network";
 
       struct Params {
-        const Light::State::Instance * light;
-        const Network::State::Instance * network;
+        Light::State::Params light;
+        Network::State::Params network;
       };
 
       class Instance : public BurpRedux::State::Instance {
@@ -25,12 +25,13 @@ namespace BurpDimmer {
           const Light::State::Instance * light;
           const Network::State::Instance * network;
 
-          Instance(const Params * params, const unsigned long uid);
-          void serialize(JsonObject & object) const;
+          Instance();
+          Instance(const Instance & instance, const unsigned long uid);
+          void serialize(const JsonObject & object) const override;
 
       };
 
-      using Creator = BurpRedux::Creator::Instance<Instance, Params>;
+      using Creator = BurpRedux::Creator::Instance<Instance, Instance>;
 
     }
   }

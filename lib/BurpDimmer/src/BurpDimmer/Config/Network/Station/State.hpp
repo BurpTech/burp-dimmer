@@ -12,8 +12,16 @@ namespace BurpDimmer {
 
           constexpr char testField[] = "test";
 
+          enum class Error {
+            noError,
+            noObject,
+            noTest,
+            invalidTest
+          };
+
           struct Params {
-            const int test;
+            Error error;
+            int test;
           };
 
           class Instance : public BurpRedux::State::Instance {
@@ -22,8 +30,8 @@ namespace BurpDimmer {
               
               const int test;
 
-              Instance(const Params * params, const unsigned long uid);
-              void serialize(JsonObject & object) const;
+              Instance(const Params & params, const unsigned long uid);
+              void serialize(const JsonObject & object) const override;
 
           };
 

@@ -15,6 +15,16 @@ namespace BurpDimmer {
           constexpr char modeField[] = "mode";
           constexpr char accessPointTimeoutField[] = "accessPointTimeout";
 
+          enum class Error {
+            noError,
+            noObject,
+            noMode,
+            noAccessPointTimeout,
+            invalidMode,
+            invalidAccessPointTimeout,
+            unknownMode
+          };
+
           enum PermMode : size_t {
             NORMAL = 0,
             ACCESS_POINT,
@@ -37,10 +47,11 @@ namespace BurpDimmer {
           constexpr bool defaultTempModeActive = false;
 
           struct Params {
-            const PermMode permMode;
-            const TempMode tempMode;
-            const bool tempModeActive;
-            const unsigned long accessPointTimeout;
+            Error error;
+            PermMode permMode;
+            TempMode tempMode;
+            bool tempModeActive;
+            unsigned long accessPointTimeout;
           };
 
           class Instance : public BurpRedux::State::Instance {
@@ -52,8 +63,8 @@ namespace BurpDimmer {
               const bool tempModeActive;
               const unsigned long accessPointTimeout;
 
-              Instance(const Params * params, const unsigned long uid);
-              void serialize(JsonObject & object) const;
+              Instance(const Params & params, const unsigned long uid);
+              void serialize(const JsonObject & object) const override;
 
           };
 

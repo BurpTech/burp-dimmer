@@ -1,23 +1,16 @@
 #include <BurpDebug.hpp>
 #include "Actions.hpp"
+#include "State.hpp"
 
 namespace BurpDimmer {
   namespace Light {
 
-    void onFields(f_onParams onParams, const Error error, const Config * config, const State::Fields * fields) {
-      const State::Params params = {
-        config,
-        fields
-      };
-      return onParams(error, &params);
-    }
-
-    void applyConfig(const State::Fields & previous, const Config * config, f_onParams onParams) {
-      auto levels = config->levels;
-      auto offLevel = config->offLevel;
+    void applyConfig(State::Params & params) {
+      auto levels = params.config->levels;
+      auto offLevel = params.config->offLevel;
       // check if the pwm and level matches the current config levels
-      if (previous.pwm == levels[previous.level]) {
-        return onFields(onParams, Error::noError, config, &previous);
+      if (params.pwm == levels[params.level]) {
+        return;
       }
       // pick the largest pwm less than or equal to the current pwm
       // if no level found then pick the maximum level
@@ -30,8 +23,8 @@ namespace BurpDimmer {
           // no more levels
           break;
         }
-        if (pwm <= previous.pwm) {
-          on = previous.on;
+        if (pwm <= params.pwm) {
+          on = params.on;
           level = count;
           count++;
         } else {
@@ -39,26 +32,26 @@ namespace BurpDimmer {
         }
       }
       auto pwm = levels[level];
-      const State::Fields fields = {
-        on,
-        level,
-        pwm
-      };
-      return onFields(onParams, Error::noError, config, &fields);
+      params.on = on;
+      params.level = level;
+      params.pwm = pwm;
     }
 
-    void deserialize(const JsonObject & object, const Config * config, f_onParams onParams) {
-      auto levels = config->levels;
+    void deserialize(const JsonObject & object, State::Params & params) {
+      params.error = State::Error::noError;
+      auto levels = params.config->levels;
       if (!object.isNull()) {
         // deserialize
         if (!object[State::onField].is<bool>()) {
           BURP_DEBUG_INFO("Error::invalidOn");
-          return onFields(onParams, Error::invalidOn, config, nullptr);
+          params.error = State::Error::invalidOn;
+          return;
         }
         bool on = object[State::onField];
         if (!object[State::levelField].is<unsigned char>()) {
           BURP_DEBUG_INFO("Error::invalidLevel");
-          return onFields(onParams, Error::invalidLevel, config, nullptr);
+          params.error = State::Error::invalidLevel;
+          return;
         }
         unsigned char level = object[State::levelField];
         // we allow a null pwm field but if it is set
@@ -66,17 +59,16 @@ namespace BurpDimmer {
         if (!object[State::pwmField].isNull()) {
           if (!object[State::pwmField].is<unsigned char>()) {
             BURP_DEBUG_INFO("Error::invalidPwm");
-            return onFields(onParams, Error::invalidPwm, config, nullptr);
+            params.error = State::Error::invalidPwm;
+            return;
           }
           unsigned char pwm = object[State::pwmField];
           // both level and pwm are set so check them against
           // the configured levels and choose the most appropriate
-          const State::Fields fields = {
-            on,
-            level,
-            pwm
-          };
-          return applyConfig(fields, config, onParams);
+          params.on = on;
+          params.level = level;
+          params.pwm = pwm;
+          return applyConfig(params);
         }
         // pwm is not set so validate the level.
         // We can just check for a zero level as the levels array
@@ -85,38 +77,38 @@ namespace BurpDimmer {
         auto pwm = levels[level];
         if (pwm == 0) {
           BURP_DEBUG_INFO("Error::outOfRange");
-          return onFields(onParams, Error::outOfRange, config, nullptr);
+          params.error = State::Error::outOfRange;
+          return;
         }
-        const State::Fields fields = {
-          on,
-          level,
-          pwm
-        };
-        return onFields(onParams, Error::noError, config, &fields);
+        params.on = on;
+        params.level = level;
+        params.pwm = pwm;
+        return;
       }
       BURP_DEBUG_INFO("Error::noObject");
-      return onFields(onParams, Error::noObject, config, nullptr);
+      params.error = State::Error::noObject;
     }
 
-    void applyConfig(const State::Instance * previous, const Config * config, f_onParams onParams) {
-      const State::Fields fields = {
-        previous->on,
-        previous->level,
-        previous->pwm
-      };
-      applyConfig(fields, config, onParams);
+    void applyConfig(const State::Instance * previous, const Config * config, State::Params & params) {
+      params.error = State::Error::noError,
+      params.config = config;
+      params.on = previous->on;
+      params.level = previous->level;
+      params.pwm = previous->pwm;
+      applyConfig(params);
     }
 
-    void toggle(const State::Instance * previous, f_onParams onParams) {
-      const State::Fields fields = {
-        !previous->on,
-        previous->level,
-        previous->pwm
-      };
-      return onFields(onParams, Error::noError, previous->config, &fields);
+    void toggle(const State::Instance * previous, State::Params & params) {
+      params.error = State::Error::noError;
+      params.config = previous->config;
+      params.on = !previous->on;
+      params.level = previous->level;
+      params.pwm = previous->pwm;
     }
 
-    void increaseBrightness(const State::Instance * previous, f_onParams onParams) {
+    void increaseBrightness(const State::Instance * previous, State::Params & params) {
+      params.error = State::Error::noError;
+      params.config = previous->config;
       auto levels = previous->config->levels;
       unsigned char level;
       if (previous->on) {
@@ -126,28 +118,29 @@ namespace BurpDimmer {
         // levels there will always be a zero at the end of the array
         if (levels[level] == 0) {
           BURP_DEBUG_INFO("Error::maxBrightness");
-          return onFields(onParams, Error::maxBrightness, previous->config, nullptr);
+          params.error = State::Error::maxBrightness;
+          return;
         }
       } else {
         level = 0;
       }
       auto pwm = levels[level];
-      const State::Fields fields = {
-        true,
-        level,
-        pwm
-      };
-      return onFields(onParams, Error::noError, previous->config, &fields);
+      params.on = true;
+      params.level = level;
+      params.pwm = pwm;
     }
 
-    void decreaseBrightness(const State::Instance * previous, f_onParams onParams) {
+    void decreaseBrightness(const State::Instance * previous, State::Params & params) {
+      params.error = State::Error::noError;
+      params.config = previous->config;
       auto levels = previous->config->levels;
       auto offLevel = previous->config->offLevel;
       bool on;
       unsigned char level;
       if (!previous->on) {
         BURP_DEBUG_INFO("Error::minBrightness");
-        return onFields(onParams, Error::minBrightness, previous->config, nullptr);
+        params.error = State::Error::minBrightness;
+        return;
       }
       if (previous->level == 0) {
         on = false;
@@ -157,12 +150,9 @@ namespace BurpDimmer {
         level = previous->level - 1;
       }
       auto pwm = levels[level];
-      const State::Fields fields = {
-        on,
-        level,
-        pwm
-      };
-      return onFields(onParams, Error::noError, previous->config, &fields);
+      params.on = on;
+      params.level = level;
+      params.pwm = pwm;
     }
 
   }

@@ -5,14 +5,21 @@ namespace BurpDimmer {
     namespace Network {
       namespace State {
 
-        Instance::Instance(const Params * params, const unsigned long uid) :
-          BurpRedux::State::Instance(uid),
-          accessPoint(params->accessPoint),
-          manager(params->manager),
-          station(params->station)
+        Instance::Instance() :
+          BurpRedux::State::Instance(0),
+          accessPoint(nullptr),
+          manager(nullptr),
+          station(nullptr)
         {}
 
-        void Instance::serialize(JsonObject & object) const {
+        Instance::Instance(const Instance & instance, const unsigned long uid) :
+          BurpRedux::State::Instance(uid),
+          accessPoint(instance.accessPoint),
+          manager(instance.manager),
+          station(instance.station)
+        {}
+
+        void Instance::serialize(const JsonObject & object) const {
           JsonObject accessPointObject = object[accessPointField].as<JsonObject>();
           accessPoint->serialize(accessPointObject);
           JsonObject managerObject = object[managerField].as<JsonObject>();
