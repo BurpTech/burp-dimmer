@@ -1,25 +1,5 @@
-#include <Arduino.h>
 #include <EEPROM.h>
 #include <LittleFS.h>
-#include "BurpDimmer.hpp"
-
-#define _STR(VAL) #VAL
-#define STR(VAL) _STR(VAL)
-
-#define EEPROM_SIZE 512
-
-#ifndef APPL_NAME
-#define APPL_NAME application
-#endif
-
-#ifndef VERSION
-#define VERSION development
-#endif
-
-#ifndef BAUDRATE
-#define BAUDRATE 9600
-#endif
-
 #include <ArduinoJson.h>
 #include <BurpDimmer/FactorySettings/Instance.hpp>
 #include <BurpDimmer/Light/Store.hpp>
@@ -46,6 +26,24 @@
 #include <BurpDimmer/Components/RotaryEncoder.hpp>
 #include <BurpDimmer/Components/Button.hpp>
 #include <BurpDimmer/Constants.hpp>
+#include "BurpDimmer.hpp"
+
+#define _STR(VAL) #VAL
+#define STR(VAL) _STR(VAL)
+
+#define EEPROM_SIZE 512
+
+#ifndef APPL_NAME
+#define APPL_NAME application
+#endif
+
+#ifndef VERSION
+#define VERSION development
+#endif
+
+#ifndef BAUDRATE
+#define BAUDRATE 9600
+#endif
 
 namespace BurpDimmer {
 

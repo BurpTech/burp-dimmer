@@ -1,10 +1,8 @@
-#include "Instance.hpp"
-
 #include <stdint.h>
 #include <EEPROM.h>
 #include <CRC32.h>
-
 #include <BurpDebug.hpp>
+#include "Instance.hpp"
 
 namespace BurpDimmer {
   namespace FactorySettings {
@@ -68,6 +66,14 @@ namespace BurpDimmer {
           BURP_DEBUG_INFO("Checksum valid, initial values are: ssid: [%s]: password: [%s]", _values.ssid, _values.password);
         }
       }
+    }
+
+    const char * Instance::getSsid() const {
+      return _values.ssid;
+    }
+
+    const char * Instance::getPassword() const {
+      return _values.password;
     }
 
     void Instance::_initialize() {

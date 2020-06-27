@@ -1,2 +1,10 @@
+#include <Arduino.h>
 #include <BurpDimmer.hpp>
-using namespace BurpDimmer;
+
+void setup() {
+  BurpDimmer::setup();
+}
+
+void loop() {
+  BurpDimmer::loop();
+}
