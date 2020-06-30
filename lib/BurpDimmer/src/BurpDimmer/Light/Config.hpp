@@ -5,7 +5,7 @@
 namespace BurpDimmer {
   namespace Light {
 
-    using Config = Config::Light::State::Instance;
+    using Config = Config::Light::State;
 
   }
 }

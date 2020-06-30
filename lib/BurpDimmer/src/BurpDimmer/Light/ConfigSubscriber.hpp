@@ -1,24 +1,22 @@
 #pragma once
 
-#include <BurpRedux/Subscriber/Interface.hpp>
-#include "../Config/Light/State.hpp"
-#include "Store.hpp"
-#include "Config.hpp"
+#include <BurpTree/Root.hpp>
+#include <BurpTree/Subscriber.hpp>
 
 namespace BurpDimmer {
   namespace Light {
 
-    class ConfigSubscriber : public BurpRedux::Subscriber::Interface<Config> {
+    class ConfigSubscriber : public BurpTree::Subscriber {
 
       public:
 
-        ConfigSubscriber(Store::Interface & store);
-        void setup(const Config * config) override;
-        void onPublish(const Config * config) override;
+        ConfigSubscriber(BurpTree::Root & root);
+        void setup(const BurpTree::State * initial) override;
+        void onPublish(const BurpTree::State * next) override;
 
       private:
 
-        Store::Interface & _store;
+        BurpTree::Store & _store;
 
     };
 

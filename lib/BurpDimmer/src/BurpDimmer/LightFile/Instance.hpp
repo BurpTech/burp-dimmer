@@ -26,11 +26,11 @@ namespace BurpDimmer {
           });
         }
 
-        void setup(const Light::State::Instance * state) override {
+        void setup(const BurpTree::State * state) override {
           // do nothing (the config read triggers setup)
         }
 
-        void onPublish(const Light::State::Instance * state) override {
+        void onPublish(const BurpTree::State * state) override {
           // Wait for inactivity before saving the state
           _lastChange = millis();
           _state = state;
@@ -52,7 +52,7 @@ namespace BurpDimmer {
 
       private:
 
-        const Light::State::Instance * _state;
+        const BurpTree::State * _state;
         const Json::File::Interface & _file;
         unsigned long _lastChange;
 

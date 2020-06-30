@@ -1,13 +1,13 @@
 #pragma once
 
 #include <functional>
-#include <BurpRedux/Subscriber/Interface.hpp>
+#include <BurpTree/Subscriber.hpp>
 #include "../Light/State.hpp"
 
 namespace BurpDimmer {
   namespace LightFile {
 
-    class Interface : public BurpRedux::Subscriber::Interface<Light::State::Instance> {
+    class Interface : public BurpTree::Subscriber {
 
       public:
 
