@@ -4,12 +4,12 @@
 [submodule "lib/ArduinoJson"]
 	path = lib/ArduinoJson
 	url = https://github.com/bblanchon/ArduinoJson.git
-[submodule "lib/BurpRedux"]
-	path = lib/BurpRedux
-	url = https://github.com/pghalliday/BurpRedux.git
 [submodule "lib/BurpUnity"]
 	path = lib/BurpUnity
 	url = https://github.com/pghalliday/BurpUnity.git
 [submodule "lib/BurpDebug"]
 	path = lib/BurpDebug
 	url = https://github.com/pghalliday/BurpDebug.git
+[submodule "lib/BurpTree"]
+	path = lib/BurpTree
+	url = https://github.com/pghalliday/BurpTree.git
