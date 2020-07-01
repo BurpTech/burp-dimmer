@@ -4,7 +4,11 @@ namespace BurpDimmer {
   namespace Config {
     namespace Light {
 
-      constexpr Levels defaultLevels = {
+      constexpr char levelsField[] = "levels";
+      constexpr char saveStateDelayField[] = "saveStateDelay";
+      constexpr char offLevelField[] = "offLevelField";
+
+      constexpr State::Levels defaultLevels = {
         10,
         20,
         31,
@@ -64,13 +68,8 @@ namespace BurpDimmer {
         object[offLevelField] = offLevel;
       }
 
-      const BurpTree::Status & Factory::getStatus() const {
-        return _status;
-      }
-
       const BurpTree::State * Factory::deserialize(const JsonObject & object) {
-        return _create([&](const Uid uid, void * address) {
-          _status.set(Status::Level::INFO, Status::noError);
+        return create([&]() -> const State * {
           if (!object.isNull()) {
             if (object.containsKey(levelsField)) {
               if (object.containsKey(saveStateDelayField)) {
@@ -79,55 +78,72 @@ namespace BurpDimmer {
                   if (array) {
                     auto size = array.size();
                     if (size > maxLevels) {
-                      return _fail(uid, address, Status::maxLevels);
+                      return fail(Status::maxLevels);
                     }
                     if (size == 0) {
-                      return _fail(uid, address, Status::minLevels);
+                      return fail(Status::minLevels);
                     }
                     auto index = 0;
                     State::Levels levels;
                     for(JsonVariant v : array) {
                       if (!v.is<State::Level>()) {
-                        return _fail(uid, address, Status::invalidLevels);
+                        return fail(Status::invalidLevels);
                       }
                       const State::Level level = v.as<State::Level>();
                       if (level == 0) {
-                        return _fail(uid, address, Status::levelZero);
+                        return fail(Status::levelZero);
                       }
                       levels[index++] = level;
                     }
-                    if (!object[State::saveStateDelayField].is<State::Delay>()) {
-                      return _fail(uid, address, Status::invalidSaveStateDelay);
+                    if (!object[saveStateDelayField].is<State::Delay>()) {
+                      return fail(Status::invalidSaveStateDelay);
                     }
-                    State::Delay saveStateDelay = object[State::saveStateDelayField];
-                    if (!object[State::offLevelField].is<State::Level>()) {
-                      return _fail(uid, address, Status::invalidOffLevel);
+                    State::Delay saveStateDelay = object[saveStateDelayField];
+                    if (!object[offLevelField].is<State::Level>()) {
+                      return fail(Status::invalidOffLevel);
                     }
-                    State::Level offLevel = object[State::offLevelField];
+                    State::Level offLevel = object[offLevelField];
                     if (offLevel >= size) {
-                      return _fail(uid, address, Status::offLevelOutOfRange);
+                      return fail(Status::offLevelOutOfRange);
                     }
-                    return new(address) State(uid, levels, saveStateDelay, offLevel);
+                    return new(getAddress()) State(getUid(), levels, saveStateDelay, offLevel);
                   }
-                  return _fail(uid, address, Status::notAnArray);
+                  return fail(Status::notAnArray);
                 }
-                return _fail(uid, address, Status::noOffLevel);
+                return fail(Status::noOffLevel);
               }
-              return _fail(uid, address, Status::noSaveStateDelay);
+              return fail(Status::noSaveStateDelay);
             }
-            return _fail(uid, address, Status::noLevels);
+            return fail(Status::noLevels);
           }
-          return _fail(uid, address, Status::noObject);
+          return fail(Status::noObject);
         });
       }
 
-      const BurpTree::State * Factory::_fail(const Uid uid, void * address, const Status::Code code) {
-        if (_previous) {
-          _status.set(Status::Level::ERROR, code);
-          return nullptr;
+      const State * Factory::_default() {
+        return new(getAddress()) State(getUid());
+      }
+
+      #define C_STR_LABEL "BurpDimmer::Config::Light"
+      #define C_STR_CASE(CODE) BURP_TREE_C_STR_CASE(C_STR_LABEL, CODE)
+      #define C_STR_DEFAULT BURP_TREE_C_STR_DEFAULT(C_STR_LABEL)
+      const char * Status::c_str() const {
+        switch (getCode()) {
+          C_STR_CASE(noError);
+          C_STR_CASE(noObject);
+          C_STR_CASE(noLevels);
+          C_STR_CASE(noSaveStateDelay);
+          C_STR_CASE(noOffLevel);
+          C_STR_CASE(notAnArray);
+          C_STR_CASE(minLevels);
+          C_STR_CASE(maxLevels);
+          C_STR_CASE(invalidLevels);
+          C_STR_CASE(invalidSaveStateDelay);
+          C_STR_CASE(invalidOffLevel);
+          C_STR_CASE(offLevelOutOfRange);
+          C_STR_CASE(levelZero);
+          C_STR_DEFAULT;
         }
-        _status.set(Status::Level::WARNING, code);
-        return new(address) State(uid);
       }
 
     }

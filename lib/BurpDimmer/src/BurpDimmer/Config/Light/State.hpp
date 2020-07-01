@@ -9,10 +9,6 @@ namespace BurpDimmer {
   namespace Config {
     namespace Light {
 
-      constexpr char levelsField[] = "levels";
-      constexpr char saveStateDelayField[] = "saveStateDelay";
-      constexpr char offLevelField[] = "offLevelField";
-
       // max levels is 255 and not 256 because 0 is
       // not a valid level (it is off).
       // Also this allows us to still reference the
@@ -48,39 +44,35 @@ namespace BurpDimmer {
 
       };
 
-      class Factory : public BurpTree::Factory<State> {
+      class Status : public BurpTree::Status {
+        public:
+          enum : BurpTree::Status::Code {
+            noError,
+            noObject,
+            noLevels,
+            noSaveStateDelay,
+            noOffLevel,
+            notAnArray,
+            minLevels,
+            maxLevels,
+            invalidLevels,
+            invalidSaveStateDelay,
+            invalidOffLevel,
+            offLevelOutOfRange,
+            levelZero
+          };
+          const char * c_str() const override;
+      };
+
+      class Factory : public BurpTree::Factory<State, Status> {
 
         public:
 
-          const BurpTree::Status & getStatus() const override;
           const BurpTree::State * deserialize(const JsonObject & serialized) override ;
 
         private:
 
-          class Status : public BurpTree::Status {
-            public:
-              using Level = BurpTree::Status::Level;
-              enum Code : BurpTree::Status::Code {
-                noError,
-                noObject,
-                noLevels,
-                noSaveStateDelay,
-                noOffLevel,
-                notAnArray,
-                minLevels,
-                maxLevels,
-                invalidLevels,
-                invalidSaveStateDelay,
-                invalidOffLevel,
-                offLevelOutOfRange,
-                levelZero
-              };
-              const char * c_str() const override;
-          };
-
-          Status _status;
-
-          const BurpTree::State * _fail(const Uid uid, void * address, const Status::Code code);
+          const State * _default() override;
 
       };
 

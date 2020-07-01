@@ -1,76 +1,81 @@
 #pragma once
 
 #include <array>
-#include <cstddef>
-#include <ArduinoJson.h>
-#include <BurpRedux/State/Instance.hpp>
-#include <BurpRedux/Creator/Instance.hpp>
+#include <BurpTree/State.hpp>
+#include <BurpTree/Factory.hpp>
+#include <BurpTree/Status.hpp>
 
 namespace BurpDimmer {
   namespace Config {
     namespace Network {
       namespace Manager {
-        namespace State {
 
-          constexpr char modeField[] = "mode";
-          constexpr char accessPointTimeoutField[] = "accessPointTimeout";
+        class State : public BurpTree::State {
 
-          enum class Error {
-            noError,
-            noObject,
-            noMode,
-            noAccessPointTimeout,
-            invalidMode,
-            invalidAccessPointTimeout,
-            unknownMode
-          };
+          public:
 
-          enum PermMode : size_t {
-            NORMAL = 0,
-            ACCESS_POINT,
-            OFF,
-            count
-          };
+            enum PermMode : size_t {
+              NORMAL = 0,
+              ACCESS_POINT,
+              OFF,
+              count
+            };
 
-          constexpr std::array<const char *, PermMode::count> permModeNames = {
-            "normal",
-            "accessPoint",
-            "off"
-          };
+            enum class TempMode {
+              ACCESS_POINT,
+              WPS_CONFIG
+            };
 
-          enum class TempMode {
-            ACCESS_POINT,
-            WPS_CONFIG
-          };
+            using Timeout = unsigned long;
 
-          constexpr TempMode defaultTempMode = TempMode::ACCESS_POINT;
-          constexpr bool defaultTempModeActive = false;
+            const PermMode permMode;
+            const TempMode tempMode;
+            const bool tempModeActive;
+            const Timeout accessPointTimeout;
 
-          struct Params {
-            Error error;
-            PermMode permMode;
-            TempMode tempMode;
-            bool tempModeActive;
-            unsigned long accessPointTimeout;
-          };
+            State(
+                const Uid uid,
+                const PermMode permMode,
+                const TempMode tempMode,
+                const bool tempModeActive,
+                const Timeout accessPointTimeout
+            );
+            State(const Uid uid);
+            void serialize(const JsonObject & object) const override;
 
-          class Instance : public BurpRedux::State::Instance {
+        };
 
-            public:
-              
-              const PermMode permMode;
-              const TempMode tempMode;
-              const bool tempModeActive;
-              const unsigned long accessPointTimeout;
+        class Status : public BurpTree::Status {
+          public:
+            enum : BurpTree::Status::Code {
+              noError,
+              noObject,
+              noMode,
+              noAccessPointTimeout,
+              invalidMode,
+              invalidAccessPointTimeout,
+              unknownMode
+            };
+            const char * c_str() const override;
+        };
 
-              Instance(const Params & params, const unsigned long uid);
-              void serialize(const JsonObject & object) const override;
+        class Factory : public BurpTree::Factory<State, Status> {
 
-          };
+          public:
 
-          using Creator = BurpRedux::Creator::Instance<Instance, Params>;
+            const BurpTree::State * deserialize(const JsonObject & serialized) override ;
+            const BurpTree::State * nextPermMode();
+            const BurpTree::State * startTempAccessPoint();
+            const BurpTree::State * startWpsConfig();
+            const BurpTree::State * stopTempMode();
+            const BurpTree::State * setNormalMode();
 
-        }
+          private:
+
+            const State * _default() override;
+
+        };
+
       }
     }
   }

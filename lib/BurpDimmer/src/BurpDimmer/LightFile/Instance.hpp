@@ -3,6 +3,7 @@
 #include <BurpDebug.hpp>
 #include "../Json/withDoc.hpp"
 #include "../Json/File/Interface.hpp"
+#include "../Light/State.hpp"
 #include "Interface.hpp"
 
 namespace BurpDimmer {
@@ -12,6 +13,8 @@ namespace BurpDimmer {
     class Instance : public Interface {
 
       public:
+
+        using State = Light::State;
 
         Instance(const Json::File::Interface & file) :
           _state(nullptr),
@@ -26,14 +29,14 @@ namespace BurpDimmer {
           });
         }
 
-        void setup(const BurpTree::State * state) override {
+        void setup(const BurpTree::State * initial) override {
           // do nothing (the config read triggers setup)
         }
 
-        void onPublish(const BurpTree::State * state) override {
+        void onPublish(const BurpTree::State * next) override {
           // Wait for inactivity before saving the state
           _lastChange = millis();
-          _state = state;
+          _state = next->as<State>();
         }
 
         void loop() override {
@@ -52,7 +55,7 @@ namespace BurpDimmer {
 
       private:
 
-        const BurpTree::State * _state;
+        const State * _state;
         const Json::File::Interface & _file;
         unsigned long _lastChange;
 

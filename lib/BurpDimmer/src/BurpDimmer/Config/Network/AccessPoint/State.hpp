@@ -1,43 +1,52 @@
 #pragma once
 
-#include <ArduinoJson.h>
-#include <BurpRedux/State/Instance.hpp>
-#include <BurpRedux/Creator/Instance.hpp>
+#include <BurpTree/State.hpp>
+#include <BurpTree/Factory.hpp>
+#include <BurpTree/Status.hpp>
 
 namespace BurpDimmer {
   namespace Config {
     namespace Network {
       namespace AccessPoint {
-        namespace State {
 
-          constexpr char testField[] = "test";
+        class State : public BurpTree::State {
 
-          enum class Error {
-            noError,
-            noObject,
-            noTest,
-            invalidTest
-          };
+          public:
 
-          struct Params {
-            Error error;
-            int test;
-          };
+            const int test;
 
-          class Instance : public BurpRedux::State::Instance {
+            State(
+                const Uid uid,
+                const int test
+            );
+            State(const Uid uid);
+            void serialize(const JsonObject & object) const override;
 
-            public:
-              
-              const int test;
+        };
 
-              Instance(const Params & params, const unsigned long uid);
-              void serialize(const JsonObject & object) const override;
+        class Status : public BurpTree::Status {
+          public:
+            enum : BurpTree::Status::Code {
+              noError,
+              noObject,
+              noTest,
+              invalidTest
+            };
+            const char * c_str() const override;
+        };
 
-          };
+        class Factory : public BurpTree::Factory<State, Status> {
 
-          using Creator = BurpRedux::Creator::Instance<Instance, Params>;
+          public:
 
-        }
+            const BurpTree::State * deserialize(const JsonObject & serialized) override ;
+
+          private:
+
+            const State * _default() override;
+
+        };
+
       }
     }
   }

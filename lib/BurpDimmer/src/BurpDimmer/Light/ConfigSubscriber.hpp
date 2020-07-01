@@ -1,7 +1,9 @@
 #pragma once
 
-#include <BurpTree/Root.hpp>
+#include <BurpTree/Dispatcher.hpp>
 #include <BurpTree/Subscriber.hpp>
+#include "../Logger.hpp"
+#include "State.hpp"
 
 namespace BurpDimmer {
   namespace Light {
@@ -10,13 +12,15 @@ namespace BurpDimmer {
 
       public:
 
-        ConfigSubscriber(BurpTree::Root & root);
+        ConfigSubscriber(BurpTree::Dispatcher<Factory> & dispatcher, Factory & factory);
         void setup(const BurpTree::State * initial) override;
         void onPublish(const BurpTree::State * next) override;
 
       private:
 
-        BurpTree::Store & _store;
+        BurpTree::Dispatcher<Factory> & _dispatcher;
+        Factory & _factory;
+        Logger _logger;
 
     };
 

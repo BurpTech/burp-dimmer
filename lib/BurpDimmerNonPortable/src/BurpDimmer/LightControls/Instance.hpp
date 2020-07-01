@@ -1,27 +1,33 @@
 #pragma once
 
-#include <BurpDimmer/Light/Store.hpp>
+#include <BurpTree/Dispatcher.hpp>
+#include <BurpDimmer/Light/State.hpp>
+#include <BurpDimmer/Logger.hpp>
 #include "../Components/RotaryEncoder.hpp"
 #include "../Components/Button.hpp"
 
 namespace BurpDimmer {
   namespace LightControls {
 
-    using Store = Light::Store::Interface;
     using namespace Components;
 
     class Instance {
+
       public:
 
-        Instance(Store & store, RotaryEncoder & rotaryEncoder, Button & button);
+        using Factory = Light::Factory;
+        using Dispatcher = BurpTree::Dispatcher<Factory>;
+
+        Instance(Dispatcher & dispatcher, RotaryEncoder & rotaryEncoder, Button & button);
         void setup();
         void loop();
 
       private:
 
-        Store & _store;
+        Dispatcher & _dispatcher;
         RotaryEncoder & _rotaryEncoder;
         Button & _button;
+        Logger _logger;
 
         void _rotaryEncoderChange(int direction);
         void _buttonRelease();

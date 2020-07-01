@@ -6,16 +6,16 @@ namespace BurpDimmer {
     namespace Manager {
 
       Instance::Instance() :
-        _state(nullptr)
+        _config(nullptr)
       {}
 
-      void Instance::setup(const State * state) {
-        _state = state;
+      void Instance::setup(const BurpTree::State * state) {
+        _config = state->as<Config>();
       }
 
-      void Instance::onPublish(const State * state) {
-        _state = state;
-        BURP_DEBUG_INFO("state: %p", state);
+      void Instance::onPublish(const BurpTree::State * state) {
+        _config = state->as<Config>();
+        BURP_DEBUG_INFO("_config: %p", _config);
       }
 
     }

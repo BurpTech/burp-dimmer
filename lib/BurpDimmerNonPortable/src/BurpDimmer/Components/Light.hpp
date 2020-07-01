@@ -1,21 +1,21 @@
 #pragma once
 
-#include <BurpRedux/Subscriber/Interface.hpp>
+#include <BurpTree/Subscriber.hpp>
 #include <BurpDimmer/Light/State.hpp>
 
 namespace BurpDimmer {
   namespace Components {
     namespace Light {
 
-      using State = BurpDimmer::Light::State::Instance;
-
-      class Instance : public BurpRedux::Subscriber::Interface<State> {
+      class Instance : public BurpTree::Subscriber {
 
         public:
 
+          using State = BurpDimmer::Light::State;
+
           Instance(int pin);
-          void setup(const State * state) override;
-          void onPublish(const State * state) override;
+          void setup(const BurpTree::State * state) override;
+          void onPublish(const BurpTree::State * state) override;
 
         private:
 

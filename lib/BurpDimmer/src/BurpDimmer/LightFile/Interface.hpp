@@ -2,7 +2,6 @@
 
 #include <functional>
 #include <BurpTree/Subscriber.hpp>
-#include "../Light/State.hpp"
 
 namespace BurpDimmer {
   namespace LightFile {

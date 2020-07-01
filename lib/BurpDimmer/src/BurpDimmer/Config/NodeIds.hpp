@@ -3,10 +3,13 @@
 #include <BurpTree/Node.hpp>
 
 namespace BurpDimmer {
-  namespace Light {
+  namespace Config {
 
     enum Id : BurpTree::Node::Id {
-      root
+      networkAccessPoint,
+      networkManager,
+      networkStation,
+      light
     };
 
   }

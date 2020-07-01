@@ -23,14 +23,14 @@ namespace BurpDimmer {
           });
         }
 
-        void setup(const Config::State::Instance * state) override {
+        void setup(const BurpTree::State * initial) override {
           // do nothing (the config read triggers setup)
         }
 
-        void onPublish(const Config::State::Instance * state) override {
+        void onPublish(const BurpTree::State * next) override {
           Json::withStaticDoc<size>([&](JsonDocument & doc) {
             JsonObject object = doc.to<JsonObject>();
-            state->serialize(object);
+            next->serialize(object);
             _file.write(doc);
           });
         }

@@ -3,6 +3,10 @@
 namespace BurpDimmer {
   namespace Light {
 
+    constexpr char onField[] = "on";
+    constexpr char levelField[] = "level";
+    constexpr char pwmField[] = "pwm";
+
     constexpr bool defaultOn = false;
     unsigned char defaultLevel(const Config * config) {
       return config->offLevel;
@@ -35,39 +39,35 @@ namespace BurpDimmer {
       object[pwmField] = pwm;
     }
 
-    void Factory::setInitialConfig(const Config * config) {
-      _initialConfig = config;
-    }
-
-    const BurpTree::Status & Factory::getStatus() const {
-      return _status;
+    void Factory::setConfig(const Config * config) {
+      _config = config;
     }
 
     const BurpTree::State * Factory::deserialize(const JsonObject & object) {
-      return _create([&](const Uid uid, void * address) {
-          _status.set(Status::Level::INFO, Status::noError);
-          auto config = _previous ? _previous->config : _initialConfig;
+      return create([&]() -> const State * {
+          const State * previous = getState();
+          auto config = previous ? previous->config : _config;
           auto levels = config->levels;
           if (!object.isNull()) {
             // deserialize
             if (!object[onField].is<bool>()) {
-              return _fail(uid, address, Status::invalidOn);
+              return fail(Status::invalidOn);
             }
             bool on = object[onField];
             if (!object[levelField].is<State::Level>()) {
-              return _fail(uid, address, Status::invalidLevel);
+              return fail(Status::invalidLevel);
             }
-            State::Level level = object[State::levelField];
+            State::Level level = object[levelField];
             // we allow a null pwm field but if it is set
             // it must be valid
             if (!object[pwmField].isNull()) {
               if (!object[pwmField].is<State::Pwm>()) {
-                return _fail(uid, address, Status::invalidPwm);
+                return fail(Status::invalidPwm);
               }
-              State::Pwm pwm = object[State::pwmField];
+              State::Pwm pwm = object[pwmField];
               // both level and pwm are set so check them against
               // the configured levels and choose the most appropriate
-              return applyConfig(uid, address, config, on, level, pwm);
+              return _applyConfig(on, level, pwm);
             }
             // pwm is not set so validate the level.
             // We can just check for a zero level as the levels array
@@ -75,110 +75,82 @@ namespace BurpDimmer {
             // the array
             auto pwm = levels[level];
             if (pwm == 0) {
-              return _fail(uid, address, Status::outOfRange);
+              return fail(Status::outOfRange);
             }
-            return new(address) State(uid, config, on, level, pwm);
+            return new(getAddress()) State(getUid(), config, on, level, pwm);
           }
-          return _fail(uid, address, Status::noObject);
+          return fail(Status::noObject);
       });
     }
 
     const BurpTree::State * Factory::applyConfig(const Config * config) {
-      return _create([&](const Uid uid, void * address) {
-          _status.set(Status::Level::INFO, Status::noError);
-          return _applyConfig(uid, address, config, _previous->on, _previous->level, _previous->pwm);
+      return create([&]() -> const State * {
+          _config = config;
+          const State * previous = getState();
+          return _applyConfig(previous->on, previous->level, previous->pwm);
       });
     }
 
-    const BurpTree::State * toggle() {
-      return _create([&](const Uid uid, void * address) {
-          _status.set(Status::Level::INFO, Status::noError);
-          return new(address) State(uid, _previous->config, !_previous->on, _previous->level, _previous->pwm);
+    const BurpTree::State * Factory::toggle() {
+      return create([&]() -> const State * {
+          const State * previous = getState();
+          return new(getAddress()) State(getUid(), previous->config, !previous->on, previous->level, previous->pwm);
       });
     }
 
     const BurpTree::State * Factory::increaseBrightness() {
-      return _create([&](const Uid uid, void * address) {
-          _status.set(Status::Level::INFO, Status::noError);
-          auto config = _previous->config;
+      return create([&]() -> const State * {
+          const State * previous = getState();
+          auto config = previous->config;
           auto levels = config->levels;
           State::Level level;
-          if (_previous->on) {
-            level = _previous->level + 1;
+          if (previous->on) {
+            level = previous->level + 1;
             // this works because the array is always one bigger
             // than the maxLevels, so even if we use all the available
             // levels there will always be a zero at the end of the array
             if (levels[level] == 0) {
-              _status.set(Status::Level::ERROR, Status::maxBrightness);
-              return nullptr;
+              return fail(Status::maxBrightness);
             }
           } else {
             level = 0;
           }
-          return new(address) State(uid, config, true, level, levels[level]);
+          return new(getAddress()) State(getUid(), config, true, level, levels[level]);
       });
     }
 
     const BurpTree::State * Factory::decreaseBrightness() {
-      return _create([&](const Uid uid, void * address) {
-          _status.set(Status::Level::INFO, Status::noError);
-          auto config = _previous->config;
+      return create([&]() -> const State * {
+          const State * previous = getState();
+          auto config = previous->config;
           auto levels = config->levels;
           auto offLevel = config->offLevel;
           bool on;
           State::Level level;
-          if (!_previous->on) {
-            _status.set(Status::Level::ERROR, Status::minBrightness);
-            return nullptr;
+          if (!previous->on) {
+            return fail(Status::minBrightness);
           }
-          if (_previous->level == 0) {
+          if (previous->level == 0) {
             on = false;
             level = offLevel;
           } else {
             on = true;
-            level = _previous->level - 1;
+            level = previous->level - 1;
           }
-          return new(address) State(uid, config, on, level, levels[level]);
+          return new(getAddress()) State(getUid(), config, on, level, levels[level]);
       });
     }
 
-    const char * Factory::Status::c_str() const {
-      switch (getCode()) {
-        case noError:
-          return "BurpDimmer::Light::Factory : no error";
-        case noObject:
-          return "BurpDimmer::Light::Factory : no object";
-        case maxLevels:
-          return "BurpDimmer::Light::Factory : max levels";
-        case outOfRange:
-          return "BurpDimmer::Light::Factory : out of range";
-        case invalidOn:
-          return "BurpDimmer::Light::Factory : invalid on";
-        case invalidLevel:
-          return "BurpDimmer::Light::Factory : invalid level";
-        case invalidPwm:
-          return "BurpDimmer::Light::Factory : invalid pwm";
-        case maxBrightness:
-          return "BurpDimmer::Light::Factory : max brightness";
-        case minBrightness:
-          return "BurpDimmer::Light::Factory : min brightness";
-        default:
-          return "BurpDimmer::Light::Factory : unknown";
-    }
-
-    const BurpTree::State * Factory::_applyConfig(
-        const Uid uid,
-        void * address,
-        const Config * config,
+    const State * Factory::_applyConfig(
         const bool on,
         const State::Level level,
         const State::Pwm pwm
-    )
-      auto levels = config->levels;
-      auto offLevel = config->offLevel;
+    ) {
+      auto levels = _config->levels;
+      auto offLevel = _config->offLevel;
       // check if the pwm and level matches the current config levels
       if (pwm == levels[level]) {
-        return new(address) State(uid, config, on, level, pwm);
+        return new(getAddress()) State(getUid(), _config, on, level, pwm);
       }
       // pick the largest pwm less than or equal to the current pwm
       // if no level found then pick the maximum level
@@ -199,16 +171,29 @@ namespace BurpDimmer {
           break;
         }
       }
-      return new(address) State(uid, config, _on, _level, levels[_level]);
+      return new(getAddress()) State(getUid(), _config, _on, _level, levels[_level]);
     }
 
-    const BurpTree::State * Factory::_fail(const Uid uid, void * address, const Status::Code code) {
-      if (_previous) {
-        _status.set(Status::Level::ERROR, code);
-        return nullptr;
+    const State * Factory::_default() {
+      return new(getAddress()) State(getUid(), _config);
+    }
+
+    #define C_STR_LABEL "BurpDimmer::Light"
+    #define C_STR_CASE(CODE) BURP_TREE_C_STR_CASE(C_STR_LABEL, CODE)
+    #define C_STR_DEFAULT BURP_TREE_C_STR_DEFAULT(C_STR_LABEL)
+    const char * Status::c_str() const {
+      switch (getCode()) {
+        C_STR_CASE(noError);
+        C_STR_CASE(noObject);
+        C_STR_CASE(maxLevels);
+        C_STR_CASE(outOfRange);
+        C_STR_CASE(invalidOn);
+        C_STR_CASE(invalidLevel);
+        C_STR_CASE(invalidPwm);
+        C_STR_CASE(maxBrightness);
+        C_STR_CASE(minBrightness);
+        C_STR_DEFAULT;
       }
-      _status.set(Status::Level::WARNING, code);
-      return new(address) State(uid);
     }
 
   }

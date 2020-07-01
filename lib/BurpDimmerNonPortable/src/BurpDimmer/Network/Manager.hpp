@@ -1,25 +1,25 @@
 #pragma once
 
-#include <BurpRedux/Subscriber/Interface.hpp>
+#include <BurpTree/Subscriber.hpp>
 #include <BurpDimmer/Config/Network/Manager/State.hpp>
 
 namespace BurpDimmer {
   namespace Network {
     namespace Manager {
 
-      using State = Config::Network::Manager::State::Instance;
+      using Config = Config::Network::Manager::State;
 
-      class Instance : public BurpRedux::Subscriber::Interface<State> {
+      class Instance : public BurpTree::Subscriber {
 
         public:
 
           Instance();
-          void setup(const State * state) override;
-          void onPublish(const State * state) override;
+          void setup(const BurpTree::State * state) override;
+          void onPublish(const BurpTree::State * state) override;
 
         private:
 
-          const State * _state;
+          const Config * _config;
 
       };
 

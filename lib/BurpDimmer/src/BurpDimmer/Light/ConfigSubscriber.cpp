@@ -1,23 +1,22 @@
 #include "ConfigSubscriber.hpp"
-#include "State.hpp"
+#include "Config.hpp"
 
 namespace BurpDimmer {
   namespace Light {
 
-    ConfigSubscriber::ConfigSubscriber(BurpTree::Store & store) :
-      _store(store)
+    ConfigSubscriber::ConfigSubscriber(BurpTree::Dispatcher<Factory> & dispatcher, Factory & factory) :
+      _dispatcher(dispatcher),
+      _factory(factory),
+      _logger("Light::ConfigSubscriber")
     {}
 
     void ConfigSubscriber::setup(const BurpTree::State * initial) {
-      // do nothing
+      _factory.setConfig(initial->as<Config>());
     }
 
     void ConfigSubscriber::onPublish(const BurpTree::State * next) {
-      State::Params params;
-      applyConfig(_store.getState(), next, params);
-      if (State::Error::noError == params.error) {
-        _store.dispatch(Action(params));
-      }
+      using namespace std::placeholders;
+      _logger.status(_dispatcher.dispatch(std::bind(&Factory::applyConfig, _1, next->as<Config>())));
     }
 
   }

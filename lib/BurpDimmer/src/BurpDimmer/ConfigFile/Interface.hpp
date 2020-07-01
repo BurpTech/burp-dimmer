@@ -1,13 +1,12 @@
 #pragma once
 
 #include <functional>
-#include <BurpRedux/Subscriber/Interface.hpp>
-#include "../Config/State.hpp"
+#include <BurpTree/Subscriber.hpp>
 
 namespace BurpDimmer {
   namespace ConfigFile {
 
-    class Interface : public BurpRedux::Subscriber::Interface<Config::State::Instance> {
+    class Interface : public BurpTree::Subscriber {
 
       public:
 

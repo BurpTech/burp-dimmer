@@ -1,26 +1,23 @@
+#include <functional>
 #include <EEPROM.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
+#include <BurpTree/Node.hpp>
+#include <BurpTree/Root.hpp>
+#include <BurpTree/Leaf.hpp>
+#include <BurpTree/Branch.hpp>
+#include <BurpTree/Dispatcher.hpp>
 #include <BurpDimmer/FactorySettings/Instance.hpp>
-#include <BurpDimmer/Light/Store.hpp>
+#include <BurpDimmer/Light/State.hpp>
 #include <BurpDimmer/LightFile/Instance.hpp>
-#include <BurpDimmer/Light/Reducer.hpp>
-#include <BurpDimmer/Light/Actions.hpp>
 #include <BurpDimmer/Light/ConfigSubscriber.hpp>
 #include <BurpDimmer/LightControls/Instance.hpp>
 #include <BurpDimmer/Network/Manager.hpp>
 #include <BurpDimmer/ConfigFile/Instance.hpp>
-#include <BurpDimmer/Config/Store.hpp>
-#include <BurpDimmer/Config/Light/Reducer.hpp>
-#include <BurpDimmer/Config/Light/Actions.hpp>
-#include <BurpDimmer/Config/Reducer.hpp>
-#include <BurpDimmer/Config/Network/Reducer.hpp>
-#include <BurpDimmer/Config/Network/AccessPoint/Reducer.hpp>
-#include <BurpDimmer/Config/Network/AccessPoint/Actions.hpp>
-#include <BurpDimmer/Config/Network/Manager/Reducer.hpp>
-#include <BurpDimmer/Config/Network/Manager/Actions.hpp>
-#include <BurpDimmer/Config/Network/Station/Reducer.hpp>
-#include <BurpDimmer/Config/Network/Station/Actions.hpp>
+#include <BurpDimmer/Config/Light/State.hpp>
+#include <BurpDimmer/Config/Network/AccessPoint/State.hpp>
+#include <BurpDimmer/Config/Network/Manager/State.hpp>
+#include <BurpDimmer/Config/Network/Station/State.hpp>
 #include <BurpDimmer/Json/File/Instance.hpp>
 #include <BurpDimmer/Components/Light.hpp>
 #include <BurpDimmer/Components/RotaryEncoder.hpp>
@@ -53,36 +50,39 @@ namespace BurpDimmer {
 
   namespace Light {
 
+    namespace Id {
+      enum : BurpTree::Node::Id {
+        root
+      };
+    }
+
     Components::Light::Instance light(pin);
 
     Json::File::Instance fileInstance(filePath);
     LightFile::Instance<fileSize> file(fileInstance);
 
-    State::Creator creator;
-    Reducer reducer(creator, deserialize);
-    using S = Store::Instance<2>;
-    S store(reducer, S::Subscribers({
+    Factory factory;
+    using Node = BurpTree::Leaf<2>;
+    Node node(Id::root, factory, Node::Subscribers({
         &light,
         &file
     }));
 
-    ICACHE_RAM_ATTR void rotaryEncoderInterruptDispatch();
+    BurpTree::Root root(node);
+    BurpTree::Dispatcher<Factory> dispatcher(root, Id::root, factory);
 
+    ICACHE_RAM_ATTR void rotaryEncoderInterruptDispatch();
     Components::RotaryEncoder rotaryEncoder(
         rotaryEncoderPinA,
         rotaryEncoderPinB,
         rotaryEncoderInterruptDispatch
     );
-
     void rotaryEncoderInterruptDispatch() {
       rotaryEncoder.interrupt();
     }
-
     Components::Button button(buttonPin, buttonDebounceDelay);
-
-    LightControls::Instance controls(store, rotaryEncoder, button);
-
-    ConfigSubscriber configSubscriber(store);
+    LightControls::Instance controls(dispatcher, rotaryEncoder, button);
+    ConfigSubscriber configSubscriber(dispatcher, factory);
 
   }
 
@@ -99,63 +99,87 @@ namespace BurpDimmer {
     Json::File::Instance fileInstance(filePath);
     ConfigFile::Instance<fileSize> file(fileInstance);
 
+    namespace Id {
+      enum : BurpTree::Node::Id {
+        light,
+        networkAccessPoint,
+        networkManager,
+        networkStation
+      };
+    }
+
     namespace Light {
-      State::Creator creator;
-      Reducer reducer(creator, deserialize);
-      ReducerMapping reducerMapping(reducer);
-      Selector<1> selector({
+      Factory factory;
+      using Node = BurpTree::Leaf<1>;
+      Node node(Id::light, factory, Node::Subscribers({
           &BurpDimmer::Light::configSubscriber
-      });
+      }));
+    }
+
+    namespace Network {
+
+      namespace AccessPoint {
+        Factory factory;
+        using Node = BurpTree::Leaf<0>;
+        Node node(Id::networkAccessPoint, factory, Node::Subscribers({
+        }));
+      }
+      namespace Manager {
+        Factory factory;
+        using Node = BurpTree::Leaf<1>;
+        Node node(Id::networkManager, factory, Node::Subscribers({
+            &BurpDimmer::Network::Manager::instance
+        }));
+      }
+      namespace Station {
+        Factory factory;
+        using Node = BurpTree::Leaf<0>;
+        Node node(Id::networkStation, factory, Node::Subscribers({
+        }));
+      }
+
+      constexpr char accessPointField[] = "accessPoint";
+      constexpr char managerField[] = "manager";
+      constexpr char stationField[] = "station";
+
+      using Node = BurpTree::Branch<3, 0>;
+      Node node(Node::Map({
+          Node::Entry({accessPointField, &AccessPoint::node}),
+          Node::Entry({managerField, &Manager::node}),
+          Node::Entry({stationField, &Station::node})
+      }), Node::Subscribers({
+      }));
+
+    }
+
+    constexpr char lightField[] = "light";
+    constexpr char networkField[] = "network";
+
+    using Node = BurpTree::Branch<2, 1>;
+    Node node(Node::Map({
+        Node::Entry({lightField, &Light::node}),
+        Node::Entry({networkField, &Network::node})
+    }), Node::Subscribers({
+        &file,
+    }));
+
+    BurpTree::Root root(node);
+
+    namespace Light {
+      BurpTree::Dispatcher<Factory> dispatcher(root, Id::light, factory);
     }
 
     namespace Network {
       namespace AccessPoint {
-        State::Creator creator;
-        Reducer reducer(creator, deserialize);
-        ReducerMapping reducerMapping(reducer);
-        Selector<0> selector({});
+        BurpTree::Dispatcher<Factory> dispatcher(root, Id::networkAccessPoint, factory);
       }
       namespace Manager {
-        State::Creator creator;
-        Reducer reducer(creator, deserialize);
-        ReducerMapping reducerMapping(reducer);
-        Selector<1> selector({
-            &BurpDimmer::Network::Manager::instance
-        });
+        BurpTree::Dispatcher<Factory> dispatcher(root, Id::networkManager, factory);
       }
       namespace Station {
-        State::Creator creator;
-        Reducer reducer(creator, deserialize);
-        ReducerMapping reducerMapping(reducer);
-        Selector<0> selector({});
+        BurpTree::Dispatcher<Factory> dispatcher(root, Id::networkStation, factory);
       }
-      State::Creator creator;
-      using R  = Reducer<3>;
-      R reducer(creator, R::Map{
-          &AccessPoint::reducerMapping,
-          &Manager::reducerMapping,
-          &Station::reducerMapping
-      });
-      ReducerMapping reducerMapping(reducer);
-      Selector<3> selector({
-          &AccessPoint::selector,
-          &Manager::selector,
-          &Station::selector
-      });
     }
-
-    State::Creator creator;
-    using R  = Reducer<2>;
-    R reducer(creator, R::Map{
-        &Light::reducerMapping,
-        &Network::reducerMapping
-    });
-    using S = Store::Instance<3>;
-    S store(reducer, S::Subscribers({
-        &file,
-        &Light::selector,
-        &Network::selector
-    }));
 
   }
 
@@ -181,23 +205,16 @@ namespace BurpDimmer {
 
     FactorySettings::instance.setup();
 
-    Config::file.read([](const JsonObject & object) {
-        Config::State::Params params;
-        Config::store.deserialize(object, params);
-    });
-
-    Light::file.read([](const JsonObject & object) {
-        Light::State::Params params;
-        params.config = Config::Light::selector.getState();
-        Light::store.deserialize(object, params);
-    });
+    using namespace std::placeholders;
+    Config::file.read(std::bind(&BurpTree::Root::deserialize, &Config::root, _1));
+    Light::file.read(std::bind(&BurpTree::Root::deserialize, &Light::root, _1));
 
     Light::controls.setup();
   }
 
   void loop() {
-    Config::store.loop();
-    Light::store.loop();
+    Config::root.loop();
+    Light::root.loop();
     Light::file.loop();
     Light::controls.loop();
   }
