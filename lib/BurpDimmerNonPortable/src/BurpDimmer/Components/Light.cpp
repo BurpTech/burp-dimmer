@@ -11,15 +11,14 @@ namespace BurpDimmer {
         _pin(pin)
       {}
 
-      void Instance::setup(const BurpTree::State * state) {
+      void Instance::setup(const State * state) {
         pinMode(_pin, OUTPUT);
-        onPublish(state);
+        update(state);
       }
 
-      void Instance::onPublish(const BurpTree::State * state) {
-        const State * s = state->as<State>();
-        if (s->on) {
-          analogWrite(_pin, s->pwm);
+      void Instance::update(const State * state) {
+        if (state->on) {
+          analogWrite(_pin, state->pwm);
         } else {
           digitalWrite(_pin, LOW);
         }

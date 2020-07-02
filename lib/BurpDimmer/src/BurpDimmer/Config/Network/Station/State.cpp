@@ -9,40 +9,38 @@ namespace BurpDimmer {
 
         constexpr int defaultTest = 0;
 
-        State::State(
-            const Uid uid,
-            const int test
-        ) :
-          BurpTree::State(uid),
+        State::State(const int test) :
           test(test)
         {}
 
-        State::State(const Uid uid) :
-          State(uid, defaultTest)
+        State::State() :
+          State(defaultTest)
         {}
 
         void State::serialize(const JsonObject & object) const {
           object[testField] = test;
         }
 
-        const BurpTree::State * Factory::deserialize(const JsonObject & object) {
+        bool Factory::deserialize(const JsonObject & object) {
           return create([&]() -> const State * {
             if (!object.isNull()) {
               if (object.containsKey(testField)) {
                 const JsonVariant v = object[testField];
                 if (!v.is<int>()) {
-                  return fail(Status::invalidTest);
+                  return error(Status::invalidTest);
                 }
-                return new(getAddress()) State(getUid(), v.as<int>());
+                return new(getAddress()) State(v.as<int>());
               }
-              return fail(Status::noTest);
+              return error(Status::noTest);
             }
-            return fail(Status::noObject);
+            return error(Status::noObject);
           });
         }
 
-        const State * Factory::_default() {
-          return new(getAddress()) State(getUid());
+        void Factory::createDefault() {
+          create([&]() -> const State * {
+              return new(getAddress()) State();
+          });
         }
 
         #define C_STR_LABEL "BurpDimmer::Config::Network::Station"

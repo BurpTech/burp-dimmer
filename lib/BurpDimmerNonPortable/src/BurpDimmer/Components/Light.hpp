@@ -7,15 +7,15 @@ namespace BurpDimmer {
   namespace Components {
     namespace Light {
 
-      class Instance : public BurpTree::Subscriber {
+      class Instance : public BurpTree::Subscriber<BurpDimmer::Light::State> {
 
         public:
 
           using State = BurpDimmer::Light::State;
 
           Instance(int pin);
-          void setup(const BurpTree::State * state) override;
-          void onPublish(const BurpTree::State * state) override;
+          void setup(const State * state) override;
+          void update(const State * state) override;
 
         private:
 

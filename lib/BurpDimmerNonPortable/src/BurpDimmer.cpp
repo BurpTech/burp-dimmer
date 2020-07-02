@@ -62,14 +62,17 @@ namespace BurpDimmer {
     LightFile::Instance<fileSize> file(fileInstance);
 
     Factory factory;
-    using Node = BurpTree::Leaf<2>;
+    using Node = BurpTree::Leaf<Factory, 2>;
     Node node(Id::root, factory, Node::Subscribers({
         &light,
         &file
     }));
 
-    BurpTree::Root root(node);
-    BurpTree::Dispatcher<Factory> dispatcher(root, Id::root, factory);
+    using Root = BurpTree::Root<Node>;
+    Root root(node);
+
+    using Dispatcher = BurpTree::Dispatcher<Node>;
+    Dispatcher dispatcher(root, node);
 
     ICACHE_RAM_ATTR void rotaryEncoderInterruptDispatch();
     Components::RotaryEncoder rotaryEncoder(
@@ -81,8 +84,8 @@ namespace BurpDimmer {
       rotaryEncoder.interrupt();
     }
     Components::Button button(buttonPin, buttonDebounceDelay);
-    LightControls::Instance controls(dispatcher, rotaryEncoder, button);
-    ConfigSubscriber configSubscriber(dispatcher, factory);
+    LightControls::Instance<Dispatcher> controls(dispatcher, rotaryEncoder, button);
+    ConfigSubscriber<Dispatcher> configSubscriber(dispatcher);
 
   }
 
@@ -96,9 +99,6 @@ namespace BurpDimmer {
 
   namespace Config {
 
-    Json::File::Instance fileInstance(filePath);
-    ConfigFile::Instance<fileSize> file(fileInstance);
-
     namespace Id {
       enum : BurpTree::Node::Id {
         light,
@@ -110,7 +110,7 @@ namespace BurpDimmer {
 
     namespace Light {
       Factory factory;
-      using Node = BurpTree::Leaf<1>;
+      using Node = BurpTree::Leaf<Factory, 1>;
       Node node(Id::light, factory, Node::Subscribers({
           &BurpDimmer::Light::configSubscriber
       }));
@@ -120,20 +120,20 @@ namespace BurpDimmer {
 
       namespace AccessPoint {
         Factory factory;
-        using Node = BurpTree::Leaf<0>;
+        using Node = BurpTree::Leaf<Factory, 0>;
         Node node(Id::networkAccessPoint, factory, Node::Subscribers({
         }));
       }
       namespace Manager {
         Factory factory;
-        using Node = BurpTree::Leaf<1>;
+        using Node = BurpTree::Leaf<Factory, 1>;
         Node node(Id::networkManager, factory, Node::Subscribers({
             &BurpDimmer::Network::Manager::instance
         }));
       }
       namespace Station {
         Factory factory;
-        using Node = BurpTree::Leaf<0>;
+        using Node = BurpTree::Leaf<Factory, 0>;
         Node node(Id::networkStation, factory, Node::Subscribers({
         }));
       }
@@ -156,6 +156,10 @@ namespace BurpDimmer {
     constexpr char networkField[] = "network";
 
     using Node = BurpTree::Branch<2, 1>;
+
+    Json::File::Instance fileInstance(filePath);
+    ConfigFile::Instance<Node::State, fileSize> file(fileInstance);
+
     Node node(Node::Map({
         Node::Entry({lightField, &Light::node}),
         Node::Entry({networkField, &Network::node})
@@ -163,21 +167,22 @@ namespace BurpDimmer {
         &file,
     }));
 
-    BurpTree::Root root(node);
+    using Root = BurpTree::Root<Node>;
+    Root root(node);
 
     namespace Light {
-      BurpTree::Dispatcher<Factory> dispatcher(root, Id::light, factory);
+      BurpTree::Dispatcher<Node> dispatcher(root, node);
     }
 
     namespace Network {
       namespace AccessPoint {
-        BurpTree::Dispatcher<Factory> dispatcher(root, Id::networkAccessPoint, factory);
+        BurpTree::Dispatcher<Node> dispatcher(root, node);
       }
       namespace Manager {
-        BurpTree::Dispatcher<Factory> dispatcher(root, Id::networkManager, factory);
+        BurpTree::Dispatcher<Node> dispatcher(root, node);
       }
       namespace Station {
-        BurpTree::Dispatcher<Factory> dispatcher(root, Id::networkStation, factory);
+        BurpTree::Dispatcher<Node> dispatcher(root, node);
       }
     }
 
@@ -206,8 +211,8 @@ namespace BurpDimmer {
     FactorySettings::instance.setup();
 
     using namespace std::placeholders;
-    Config::file.read(std::bind(&BurpTree::Root::deserialize, &Config::root, _1));
-    Light::file.read(std::bind(&BurpTree::Root::deserialize, &Light::root, _1));
+    Config::file.read(std::bind(&Config::Root::deserialize, &Config::root, _1));
+    Light::file.read(std::bind(&Light::Root::deserialize, &Light::root, _1));
 
     Light::controls.setup();
   }

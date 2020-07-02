@@ -20,22 +20,19 @@ namespace BurpDimmer {
         };
 
         State::State(
-            const Uid uid,
             const PermMode permMode,
             const TempMode tempMode,
             const bool tempModeActive,
             const Timeout accessPointTimeout
         ) :
-          BurpTree::State(uid),
           permMode(permMode),
           tempMode(tempMode),
           tempModeActive(tempModeActive),
           accessPointTimeout(accessPointTimeout)
         {}
 
-        State::State(const Uid uid) :
+        State::State() :
           State(
-              uid,
               defaultPermMode,
               defaultTempMode,
               defaultTempModeActive,
@@ -49,25 +46,24 @@ namespace BurpDimmer {
           object[accessPointTimeoutField] = accessPointTimeout;
         }
 
-        const BurpTree::State * Factory::deserialize(const JsonObject & object) {
+        bool Factory::deserialize(const JsonObject & object) {
           return create([&]() -> const State * {
             if (!object.isNull()) {
               if (object.containsKey(modeField)) {
                 if (object.containsKey(accessPointTimeoutField)) {
                   const JsonVariant vapt = object[accessPointTimeoutField];
                   if (!vapt.is<State::Timeout>()) {
-                    return fail(Status::invalidAccessPointTimeout);
+                    return error(Status::invalidAccessPointTimeout);
                   }
                   const State::Timeout accessPointTimeout = vapt.as<State::Timeout>();
                   const JsonVariant vm = object[modeField];
                   if (!vm.is<const char *>()) {
-                    return fail(Status::invalidMode);
+                    return error(Status::invalidMode);
                   }
                   const char * modeString = vm.as<const char *>();
                   for (size_t i = 0 ; i < State::PermMode::count; i++) {
                     if (strcmp(modeString, permModeNames[i]) == 0) {
                       return new(getAddress()) State(
-                          getUid(),
                           static_cast<State::PermMode>(i),
                           defaultTempMode,
                           defaultTempModeActive,
@@ -75,21 +71,20 @@ namespace BurpDimmer {
                       );
                     }
                   }
-                  return fail(Status::unknownMode);
+                  return error(Status::unknownMode);
                 }
-                return fail(Status::noAccessPointTimeout);
+                return error(Status::noAccessPointTimeout);
               }
-              return fail(Status::noMode);
+              return error(Status::noMode);
             }
-            return fail(Status::noObject);
+            return error(Status::noObject);
           });
         }
 
-        const BurpTree::State * Factory::nextPermMode() {
+        bool Factory::nextPermMode() {
           return create([&]() -> const State * {
             const State * previous = getState();
             return new(getAddress()) State(
-                getUid(),
                 static_cast<State::PermMode>((previous->permMode + 1) % State::PermMode::count),
                 previous->tempMode,
                 previous->tempModeActive,
@@ -98,11 +93,10 @@ namespace BurpDimmer {
           });
         }
 
-        const BurpTree::State * Factory::startTempAccessPoint() {
+        bool Factory::startTempAccessPoint() {
           return create([&]() -> const State * {
             const State * previous = getState();
             return new(getAddress()) State(
-                getUid(),
                 previous->permMode,
                 State::TempMode::ACCESS_POINT,
                 true,
@@ -111,11 +105,10 @@ namespace BurpDimmer {
           });
         }
 
-        const BurpTree::State * Factory::startWpsConfig() {
+        bool Factory::startWpsConfig() {
           return create([&]() -> const State * {
             const State * previous = getState();
             return new(getAddress()) State(
-                getUid(),
                 previous->permMode,
                 State::TempMode::WPS_CONFIG,
                 true,
@@ -124,11 +117,10 @@ namespace BurpDimmer {
           });
         }
 
-        const BurpTree::State * Factory::stopTempMode() {
+        bool Factory::stopTempMode() {
           return create([&]() -> const State * {
             const State * previous = getState();
             return new(getAddress()) State(
-                getUid(),
                 previous->permMode,
                 previous->tempMode,
                 false,
@@ -137,11 +129,10 @@ namespace BurpDimmer {
           });
         }
 
-        const BurpTree::State * Factory::setNormalMode() {
+        bool Factory::setNormalMode() {
           return create([&]() -> const State * {
             const State * previous = getState();
             return new(getAddress()) State(
-                getUid(),
                 State::PermMode::NORMAL,
                 previous->tempMode,
                 false,
@@ -150,8 +141,10 @@ namespace BurpDimmer {
           });
         }
 
-        const State * Factory::_default() {
-          return new(getAddress()) State(getUid());
+        void Factory::createDefault() {
+          create([&]() -> const State * {
+              return new(getAddress()) State();
+          });
         }
 
         #define C_STR_LABEL "BurpDimmer::Config::Network::Manager"

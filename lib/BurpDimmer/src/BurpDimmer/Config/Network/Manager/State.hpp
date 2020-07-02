@@ -34,13 +34,12 @@ namespace BurpDimmer {
             const Timeout accessPointTimeout;
 
             State(
-                const Uid uid,
                 const PermMode permMode,
                 const TempMode tempMode,
                 const bool tempModeActive,
                 const Timeout accessPointTimeout
             );
-            State(const Uid uid);
+            State();
             void serialize(const JsonObject & object) const override;
 
         };
@@ -63,16 +62,13 @@ namespace BurpDimmer {
 
           public:
 
-            const BurpTree::State * deserialize(const JsonObject & serialized) override ;
-            const BurpTree::State * nextPermMode();
-            const BurpTree::State * startTempAccessPoint();
-            const BurpTree::State * startWpsConfig();
-            const BurpTree::State * stopTempMode();
-            const BurpTree::State * setNormalMode();
-
-          private:
-
-            const State * _default() override;
+            void createDefault() override;
+            bool deserialize(const JsonObject & serialized) override ;
+            bool nextPermMode();
+            bool startTempAccessPoint();
+            bool startWpsConfig();
+            bool stopTempMode();
+            bool setNormalMode();
 
         };
 

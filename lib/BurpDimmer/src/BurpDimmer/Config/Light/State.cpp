@@ -39,19 +39,17 @@ namespace BurpDimmer {
       constexpr unsigned char defaultOffLevel = 24;
 
       State::State(
-          const Uid uid,
           const Levels levels,
           const Delay saveStateDelay,
           const Level offLevel
       ) :
-        BurpTree::State(uid),
         levels(levels),
         saveStateDelay(saveStateDelay),
         offLevel(offLevel)
       {}
 
-      State::State(const Uid uid) :
-        State(uid, defaultLevels, defaultSaveStateDelay, defaultOffLevel)
+      State::State() :
+        State(defaultLevels, defaultSaveStateDelay, defaultOffLevel)
       {}
 
       void State::serialize(const JsonObject & object) const {
@@ -68,7 +66,7 @@ namespace BurpDimmer {
         object[offLevelField] = offLevel;
       }
 
-      const BurpTree::State * Factory::deserialize(const JsonObject & object) {
+      bool Factory::deserialize(const JsonObject & object) {
         return create([&]() -> const State * {
           if (!object.isNull()) {
             if (object.containsKey(levelsField)) {
@@ -78,50 +76,52 @@ namespace BurpDimmer {
                   if (array) {
                     auto size = array.size();
                     if (size > maxLevels) {
-                      return fail(Status::maxLevels);
+                      return error(Status::maxLevels);
                     }
                     if (size == 0) {
-                      return fail(Status::minLevels);
+                      return error(Status::minLevels);
                     }
                     auto index = 0;
                     State::Levels levels;
                     for(JsonVariant v : array) {
                       if (!v.is<State::Level>()) {
-                        return fail(Status::invalidLevels);
+                        return error(Status::invalidLevels);
                       }
                       const State::Level level = v.as<State::Level>();
                       if (level == 0) {
-                        return fail(Status::levelZero);
+                        return error(Status::levelZero);
                       }
                       levels[index++] = level;
                     }
                     if (!object[saveStateDelayField].is<State::Delay>()) {
-                      return fail(Status::invalidSaveStateDelay);
+                      return error(Status::invalidSaveStateDelay);
                     }
                     State::Delay saveStateDelay = object[saveStateDelayField];
                     if (!object[offLevelField].is<State::Level>()) {
-                      return fail(Status::invalidOffLevel);
+                      return error(Status::invalidOffLevel);
                     }
                     State::Level offLevel = object[offLevelField];
                     if (offLevel >= size) {
-                      return fail(Status::offLevelOutOfRange);
+                      return error(Status::offLevelOutOfRange);
                     }
-                    return new(getAddress()) State(getUid(), levels, saveStateDelay, offLevel);
+                    return new(getAddress()) State(levels, saveStateDelay, offLevel);
                   }
-                  return fail(Status::notAnArray);
+                  return error(Status::notAnArray);
                 }
-                return fail(Status::noOffLevel);
+                return error(Status::noOffLevel);
               }
-              return fail(Status::noSaveStateDelay);
+              return error(Status::noSaveStateDelay);
             }
-            return fail(Status::noLevels);
+            return error(Status::noLevels);
           }
-          return fail(Status::noObject);
+          return error(Status::noObject);
         });
       }
 
-      const State * Factory::_default() {
-        return new(getAddress()) State(getUid());
+      void Factory::createDefault() {
+        create([&]() -> const State * {
+            return new(getAddress()) State();
+        });
       }
 
       #define C_STR_LABEL "BurpDimmer::Config::Light"

@@ -7,8 +7,8 @@
 namespace BurpDimmer {
   namespace ConfigFile {
 
-    template <size_t size>
-    class Instance : public Interface {
+    template <class Config, size_t size>
+    class Instance : public Interface<Config> {
 
       public:
 
@@ -23,11 +23,11 @@ namespace BurpDimmer {
           });
         }
 
-        void setup(const BurpTree::State * initial) override {
+        void setup(const Config * initial) override {
           // do nothing (the config read triggers setup)
         }
 
-        void onPublish(const BurpTree::State * next) override {
+        void update(const Config * next) override {
           Json::withStaticDoc<size>([&](JsonDocument & doc) {
             JsonObject object = doc.to<JsonObject>();
             next->serialize(object);

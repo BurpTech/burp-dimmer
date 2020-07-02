@@ -9,13 +9,13 @@ namespace BurpDimmer {
 
       using Config = Config::Network::Manager::State;
 
-      class Instance : public BurpTree::Subscriber {
+      class Instance : public BurpTree::Subscriber<Config> {
 
         public:
 
           Instance();
-          void setup(const BurpTree::State * state) override;
-          void onPublish(const BurpTree::State * state) override;
+          void setup(const Config * initial) override;
+          void update(const Config * next) override;
 
         private:
 

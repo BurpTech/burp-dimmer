@@ -6,11 +6,12 @@
 namespace BurpDimmer {
   namespace ConfigFile {
 
-    class Interface : public BurpTree::Subscriber {
+    using f_withObj = std::function<void(const JsonObject & object)>;
+
+    template <class Config>
+    class Interface : public BurpTree::Subscriber<Config> {
 
       public:
-
-        using f_withObj = std::function<void(const JsonObject & object)>;
 
         virtual void read(f_withObj withObj) = 0;
 

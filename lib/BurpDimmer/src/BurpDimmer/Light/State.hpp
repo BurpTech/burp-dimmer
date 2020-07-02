@@ -22,13 +22,12 @@ namespace BurpDimmer {
         const Pwm pwm;
 
         State(
-            const Uid uid,
             const Config * config,
             const bool on,
             const Level level,
             const Pwm pwm
         );
-        State(const Uid uid, const Config * config);
+        State(const Config * config);
         void serialize(const JsonObject & object) const override;
 
     };
@@ -55,11 +54,12 @@ namespace BurpDimmer {
 
         void setConfig(const Config * config);
 
-        const BurpTree::State * deserialize(const JsonObject & serialized) override ;
-        const BurpTree::State * applyConfig(const Config * config);
-        const BurpTree::State * toggle();
-        const BurpTree::State * increaseBrightness();
-        const BurpTree::State * decreaseBrightness();
+        void createDefault() override;
+        bool deserialize(const JsonObject & serialized) override ;
+        bool applyConfig(const Config * config);
+        bool toggle();
+        bool increaseBrightness();
+        bool decreaseBrightness();
 
       private:
 
@@ -70,8 +70,6 @@ namespace BurpDimmer {
             const State::Level level,
             const State::Pwm pwm
         );
-
-        const State * _default() override;
 
     };
 

@@ -9,12 +9,12 @@ namespace BurpDimmer {
         _config(nullptr)
       {}
 
-      void Instance::setup(const BurpTree::State * state) {
-        _config = state->as<Config>();
+      void Instance::setup(const Config * initial) {
+        _config = initial;
       }
 
-      void Instance::onPublish(const BurpTree::State * state) {
-        _config = state->as<Config>();
+      void Instance::update(const Config * next) {
+        _config = next;
         BURP_DEBUG_INFO("_config: %p", _config);
       }
 

@@ -34,12 +34,11 @@ namespace BurpDimmer {
           const Level offLevel;
 
           State(
-              const Uid uid,
               const Levels levels,
               const Delay saveStateDelay,
               const Level offLevel
           );
-          State(const Uid uid);
+          State();
           void serialize(const JsonObject & object) const override;
 
       };
@@ -68,11 +67,8 @@ namespace BurpDimmer {
 
         public:
 
-          const BurpTree::State * deserialize(const JsonObject & serialized) override ;
-
-        private:
-
-          const State * _default() override;
+          bool deserialize(const JsonObject & serialized) override ;
+          void createDefault() override;
 
       };
 
