@@ -27,7 +27,7 @@ namespace BurpDimmer {
         class Status : public BurpTree::Status {
           public:
             enum : BurpTree::Status::Code {
-              noError,
+              ok,
               noObject,
               noTest,
               invalidTest

@@ -183,7 +183,7 @@ namespace BurpDimmer {
     #define C_STR_DEFAULT BURP_TREE_C_STR_DEFAULT(C_STR_LABEL)
     const char * Status::c_str() const {
       switch (getCode()) {
-        C_STR_CASE(noError);
+        C_STR_CASE(ok);
         C_STR_CASE(noObject);
         C_STR_CASE(maxLevels);
         C_STR_CASE(outOfRange);
