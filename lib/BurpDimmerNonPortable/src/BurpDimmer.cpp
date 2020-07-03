@@ -6,7 +6,7 @@
 #include <BurpTree/Root.hpp>
 #include <BurpTree/Leaf.hpp>
 #include <BurpTree/Branch.hpp>
-#include <BurpTree/Dispatcher.hpp>
+#include <BurpTree/Updater.hpp>
 #include <BurpDimmer/FactorySettings/Instance.hpp>
 #include <BurpDimmer/Light/State.hpp>
 #include <BurpDimmer/LightFile/Instance.hpp>
@@ -72,8 +72,8 @@ namespace BurpDimmer {
     using Root = BurpTree::Root<Node>;
     Root root(node);
 
-    using Dispatcher = BurpTree::Dispatcher<Node>;
-    Dispatcher dispatcher(root, node);
+    using Updater = BurpTree::Updater<Node>;
+    Updater updater(root, node);
 
     ICACHE_RAM_ATTR void rotaryEncoderInterruptDispatch();
     Components::RotaryEncoder rotaryEncoder(
@@ -85,8 +85,8 @@ namespace BurpDimmer {
       rotaryEncoder.interrupt();
     }
     Components::Button button(buttonPin, buttonDebounceDelay);
-    LightControls::Instance<Dispatcher> controls(dispatcher, rotaryEncoder, button);
-    ConfigSubscriber<Dispatcher> configSubscriber(dispatcher);
+    LightControls::Instance<Updater> controls(updater, rotaryEncoder, button);
+    ConfigSubscriber<Updater> configSubscriber(updater);
 
   }
 
@@ -181,18 +181,18 @@ namespace BurpDimmer {
     Root root(node);
 
     namespace Light {
-      BurpTree::Dispatcher<Node> dispatcher(root, node);
+      BurpTree::Updater<Node> updater(root, node);
     }
 
     namespace Network {
       namespace AccessPoint {
-        BurpTree::Dispatcher<Node> dispatcher(root, node);
+        BurpTree::Updater<Node> updater(root, node);
       }
       namespace Manager {
-        BurpTree::Dispatcher<Node> dispatcher(root, node);
+        BurpTree::Updater<Node> updater(root, node);
       }
       namespace Station {
-        BurpTree::Dispatcher<Node> dispatcher(root, node);
+        BurpTree::Updater<Node> updater(root, node);
       }
     }
 
@@ -221,8 +221,8 @@ namespace BurpDimmer {
     FactorySettings::instance.setup();
 
     using namespace std::placeholders;
-    Config::file.read(std::bind(&Config::Root::deserialize, &Config::root, _1));
-    Light::file.read(std::bind(&Light::Root::deserialize, &Light::root, _1));
+    Config::file.read(std::bind(&Config::Root::setup, &Config::root, _1));
+    Light::file.read(std::bind(&Light::Root::setup, &Light::root, _1));
 
     Light::controls.setup();
   }

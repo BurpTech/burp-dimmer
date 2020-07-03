@@ -63,12 +63,12 @@ namespace BurpDimmer {
                   const char * modeString = vm.as<const char *>();
                   for (size_t i = 0 ; i < State::PermMode::count; i++) {
                     if (strcmp(modeString, permModeNames[i]) == 0) {
-                      return new(getAddress()) State(
+                      return ok(new(getAddress()) State(
                           static_cast<State::PermMode>(i),
                           defaultTempMode,
                           defaultTempModeActive,
                           accessPointTimeout
-                      );
+                      ));
                     }
                   }
                   return error(Status::unknownMode);
@@ -84,66 +84,66 @@ namespace BurpDimmer {
         bool Factory::nextPermMode() {
           return create([&]() -> const State * {
             const State * previous = getState();
-            return new(getAddress()) State(
+            return ok(new(getAddress()) State(
                 static_cast<State::PermMode>((previous->permMode + 1) % State::PermMode::count),
                 previous->tempMode,
                 previous->tempModeActive,
                 previous->accessPointTimeout
-            );
+            ));
           });
         }
 
         bool Factory::startTempAccessPoint() {
           return create([&]() -> const State * {
             const State * previous = getState();
-            return new(getAddress()) State(
+            return ok(new(getAddress()) State(
                 previous->permMode,
                 State::TempMode::ACCESS_POINT,
                 true,
                 previous->accessPointTimeout
-            );
+            ));
           });
         }
 
         bool Factory::startWpsConfig() {
           return create([&]() -> const State * {
             const State * previous = getState();
-            return new(getAddress()) State(
+            return ok(new(getAddress()) State(
                 previous->permMode,
                 State::TempMode::WPS_CONFIG,
                 true,
                 previous->accessPointTimeout
-            );
+            ));
           });
         }
 
         bool Factory::stopTempMode() {
           return create([&]() -> const State * {
             const State * previous = getState();
-            return new(getAddress()) State(
+            return ok(new(getAddress()) State(
                 previous->permMode,
                 previous->tempMode,
                 false,
                 previous->accessPointTimeout
-            );
+            ));
           });
         }
 
         bool Factory::setNormalMode() {
           return create([&]() -> const State * {
             const State * previous = getState();
-            return new(getAddress()) State(
+            return ok(new(getAddress()) State(
                 State::PermMode::NORMAL,
                 previous->tempMode,
                 false,
                 previous->accessPointTimeout
-            );
+            ));
           });
         }
 
-        void Factory::createDefault() {
-          create([&]() -> const State * {
-              return new(getAddress()) State();
+        bool Factory::createDefault() {
+          return create([&]() -> const State * {
+              return ok(new(getAddress()) State());
           });
         }
 

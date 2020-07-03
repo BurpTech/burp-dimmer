@@ -1,6 +1,5 @@
 #pragma once
 
-#include <BurpTree/Dispatcher.hpp>
 #include <BurpTree/Subscriber.hpp>
 #include "../Logger.hpp"
 #include "Config.hpp"
@@ -9,28 +8,28 @@
 namespace BurpDimmer {
   namespace Light {
 
-    template <class Dispatcher>
+    template <class Updater>
     class ConfigSubscriber : public BurpTree::Subscriber<Config> {
 
       public:
 
-        ConfigSubscriber(Dispatcher & dispatcher) :
-          _dispatcher(dispatcher),
+        ConfigSubscriber(Updater & updater) :
+          _updater(updater),
           _logger("Light::ConfigSubscriber")
         {}
 
         void setup(const Config * initial) override {
-          _dispatcher.getFactory().setConfig(initial);
+          _updater.getFactory().setConfig(initial);
         }
 
         void update(const Config * next) override {
           using namespace std::placeholders;
-          _logger.status(_dispatcher.dispatch(std::bind(&Factory::applyConfig, _1, next)));
+          _logger.status(_updater.update(std::bind(&Factory::applyConfig, _1, next)));
         }
 
       private:
 
-        Dispatcher & _dispatcher;
+        Updater & _updater;
         Logger _logger;
 
     };

@@ -75,7 +75,7 @@ namespace BurpDimmer {
             if (pwm == 0) {
               return error(Status::outOfRange);
             }
-            return new(getAddress()) State(config, on, level, pwm);
+            return ok(new(getAddress()) State(config, on, level, pwm));
           }
           return error(Status::noObject);
       });
@@ -92,7 +92,7 @@ namespace BurpDimmer {
     bool Factory::toggle() {
       return create([&]() -> const State * {
           const State * previous = getState();
-          return new(getAddress()) State(previous->config, !previous->on, previous->level, previous->pwm);
+          return ok(new(getAddress()) State(previous->config, !previous->on, previous->level, previous->pwm));
       });
     }
 
@@ -113,7 +113,7 @@ namespace BurpDimmer {
           } else {
             level = 0;
           }
-          return new(getAddress()) State(config, true, level, levels[level]);
+          return ok(new(getAddress()) State(config, true, level, levels[level]));
       });
     }
 
@@ -135,7 +135,7 @@ namespace BurpDimmer {
             on = true;
             level = previous->level - 1;
           }
-          return new(getAddress()) State(config, on, level, levels[level]);
+          return ok(new(getAddress()) State(config, on, level, levels[level]));
       });
     }
 
@@ -148,7 +148,7 @@ namespace BurpDimmer {
       auto offLevel = _config->offLevel;
       // check if the pwm and level matches the current config levels
       if (pwm == levels[level]) {
-        return new(getAddress()) State(_config, on, level, pwm);
+        return ok(new(getAddress()) State(_config, on, level, pwm));
       }
       // pick the largest pwm less than or equal to the current pwm
       // if no level found then pick the maximum level
@@ -169,12 +169,12 @@ namespace BurpDimmer {
           break;
         }
       }
-      return new(getAddress()) State(_config, _on, _level, levels[_level]);
+      return ok(new(getAddress()) State(_config, _on, _level, levels[_level]));
     }
 
-    void Factory::createDefault() {
-      create([&]() -> const State * {
-          return new(getAddress()) State(_config);
+    bool Factory::createDefault() {
+      return create([&]() -> const State * {
+          return ok(new(getAddress()) State(_config));
       });
     }
 

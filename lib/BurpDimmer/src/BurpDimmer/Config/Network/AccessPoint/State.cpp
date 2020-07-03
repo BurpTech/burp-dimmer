@@ -29,7 +29,7 @@ namespace BurpDimmer {
                 if (!v.is<int>()) {
                   return error(Status::invalidTest);
                 }
-                return new(getAddress()) State(v.as<int>());
+                return ok(new(getAddress()) State(v.as<int>()));
               }
               return error(Status::noTest);
             }
@@ -37,9 +37,9 @@ namespace BurpDimmer {
           });
         }
 
-        void Factory::createDefault() {
-          create([&]() -> const State * {
-              return new(getAddress()) State();
+        bool Factory::createDefault() {
+          return create([&]() -> const State * {
+              return ok(new(getAddress()) State());
           });
         }
 

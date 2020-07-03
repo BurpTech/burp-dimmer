@@ -62,7 +62,7 @@ namespace BurpDimmer {
 
           public:
 
-            void createDefault() override;
+            bool createDefault() override;
             bool deserialize(const JsonObject & serialized) override ;
             bool nextPermMode();
             bool startTempAccessPoint();

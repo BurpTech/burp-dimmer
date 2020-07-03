@@ -68,7 +68,7 @@ namespace BurpDimmer {
         public:
 
           bool deserialize(const JsonObject & serialized) override ;
-          void createDefault() override;
+          bool createDefault() override;
 
       };
 

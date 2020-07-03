@@ -11,13 +11,13 @@ namespace BurpDimmer {
     using namespace Components;
     using namespace std::placeholders;
 
-    template <class Dispatcher>
+    template <class Updater>
     class Instance {
 
       public:
 
-        Instance(Dispatcher & dispatcher, RotaryEncoder & rotaryEncoder, Button & button) :
-          _dispatcher(dispatcher),
+        Instance(Updater & updater, RotaryEncoder & rotaryEncoder, Button & button) :
+          _updater(updater),
           _rotaryEncoder(rotaryEncoder),
           _button(button),
           _logger("LightControls")
@@ -35,21 +35,21 @@ namespace BurpDimmer {
 
       private:
 
-        Dispatcher & _dispatcher;
+        Updater & _updater;
         RotaryEncoder & _rotaryEncoder;
         Button & _button;
         Logger _logger;
 
         void _rotaryEncoderChange(int direction) {
           if (direction > 0) {
-            _logger.status(_dispatcher.dispatch(&Light::Factory::increaseBrightness));
+            _logger.status(_updater.update(&Light::Factory::increaseBrightness));
           } else {
-            _logger.status(_dispatcher.dispatch(&Light::Factory::decreaseBrightness));
+            _logger.status(_updater.update(&Light::Factory::decreaseBrightness));
           }
         }
 
         void _buttonRelease() {
-          _logger.status(_dispatcher.dispatch(&Light::Factory::toggle));
+          _logger.status(_updater.update(&Light::Factory::toggle));
         }
 
     };

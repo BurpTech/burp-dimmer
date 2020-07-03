@@ -104,7 +104,7 @@ namespace BurpDimmer {
                     if (offLevel >= size) {
                       return error(Status::offLevelOutOfRange);
                     }
-                    return new(getAddress()) State(levels, saveStateDelay, offLevel);
+                    return ok(new(getAddress()) State(levels, saveStateDelay, offLevel));
                   }
                   return error(Status::notAnArray);
                 }
@@ -118,9 +118,9 @@ namespace BurpDimmer {
         });
       }
 
-      void Factory::createDefault() {
-        create([&]() -> const State * {
-            return new(getAddress()) State();
+      bool Factory::createDefault() {
+        return create([&]() -> const State * {
+            return ok(new(getAddress()) State());
         });
       }
 

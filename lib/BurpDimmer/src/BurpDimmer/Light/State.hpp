@@ -54,7 +54,7 @@ namespace BurpDimmer {
 
         void setConfig(const Config * config);
 
-        void createDefault() override;
+        bool createDefault() override;
         bool deserialize(const JsonObject & serialized) override ;
         bool applyConfig(const Config * config);
         bool toggle();
