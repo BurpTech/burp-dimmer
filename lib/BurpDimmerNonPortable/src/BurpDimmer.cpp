@@ -63,10 +63,11 @@ namespace BurpDimmer {
 
     Factory factory;
     using Node = BurpTree::Leaf<Factory, 2>;
-    Node node(Id::root, factory, Node::Subscribers({
+    Node::Subscribers subscribers = {
         &light,
         &file
-    }));
+    };
+    Node node(Id::root, factory, subscribers);
 
     using Root = BurpTree::Root<Node>;
     Root root(node);
@@ -99,6 +100,8 @@ namespace BurpDimmer {
 
   namespace Config {
 
+    using Node = BurpTree::Branch<2, 1>;
+
     namespace Id {
       enum : BurpTree::Node::Id {
         light,
@@ -109,63 +112,70 @@ namespace BurpDimmer {
     }
 
     namespace Light {
+      constexpr char field[] = "light";
       Factory factory;
       using Node = BurpTree::Leaf<Factory, 1>;
-      Node node(Id::light, factory, Node::Subscribers({
+      Node::Subscribers subscribers = {
           &BurpDimmer::Light::configSubscriber
-      }));
+      };
+      Node node(Id::light, factory, subscribers);
+      Config::Node::Entry entry = {field, &node};
     }
 
     namespace Network {
 
+      constexpr char field[] = "network";
+      using Node = BurpTree::Branch<3, 0>;
+
       namespace AccessPoint {
+        constexpr char field[] = "accessPoint";
         Factory factory;
         using Node = BurpTree::Leaf<Factory, 0>;
-        Node node(Id::networkAccessPoint, factory, Node::Subscribers({
-        }));
+        Node::Subscribers subscribers = {};
+        Node node(Id::networkAccessPoint, factory, subscribers);
+        Network::Node::Entry entry = {field, &node};
       }
       namespace Manager {
+        constexpr char field[] = "manager";
         Factory factory;
         using Node = BurpTree::Leaf<Factory, 1>;
-        Node node(Id::networkManager, factory, Node::Subscribers({
+        Node::Subscribers subscribers = {
             &BurpDimmer::Network::Manager::instance
-        }));
+        };
+        Node node(Id::networkManager, factory, subscribers);
+        Network::Node::Entry entry = {field, &node};
       }
       namespace Station {
+        constexpr char field[] = "station";
         Factory factory;
         using Node = BurpTree::Leaf<Factory, 0>;
-        Node node(Id::networkStation, factory, Node::Subscribers({
-        }));
+        Node::Subscribers subscribers = {};
+        Node node(Id::networkStation, factory, subscribers);
+        Network::Node::Entry entry = {field, &node};
       }
 
-      constexpr char accessPointField[] = "accessPoint";
-      constexpr char managerField[] = "manager";
-      constexpr char stationField[] = "station";
-
-      using Node = BurpTree::Branch<3, 0>;
-      Node node(Node::Map({
-          Node::Entry({accessPointField, &AccessPoint::node}),
-          Node::Entry({managerField, &Manager::node}),
-          Node::Entry({stationField, &Station::node})
-      }), Node::Subscribers({
-      }));
+      Node::Map map = {
+          &AccessPoint::entry,
+          &Manager::entry,
+          &Station::entry
+      };
+      Node::Subscribers subscribers = {};
+      Node node(map, subscribers);
+      Config::Node::Entry entry = {field, &node};
 
     }
-
-    constexpr char lightField[] = "light";
-    constexpr char networkField[] = "network";
-
-    using Node = BurpTree::Branch<2, 1>;
 
     Json::File::Instance fileInstance(filePath);
     ConfigFile::Instance<Node::State, fileSize> file(fileInstance);
 
-    Node node(Node::Map({
-        Node::Entry({lightField, &Light::node}),
-        Node::Entry({networkField, &Network::node})
-    }), Node::Subscribers({
+    Node::Map map = {
+        &Light::entry,
+        &Network::entry
+    };
+    Node::Subscribers subscribers = {
         &file,
-    }));
+    };
+    Node node(map, subscribers);
 
     using Root = BurpTree::Root<Node>;
     Root root(node);
