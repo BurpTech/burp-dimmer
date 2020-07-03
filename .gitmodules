@@ -6,10 +6,13 @@
 	url = https://github.com/bblanchon/ArduinoJson.git
 [submodule "lib/BurpUnity"]
 	path = lib/BurpUnity
-	url = https://github.com/pghalliday/BurpUnity.git
-[submodule "lib/BurpDebug"]
-	path = lib/BurpDebug
-	url = https://github.com/pghalliday/BurpDebug.git
+	url = https://github.com/BurpTech/BurpUnity.git
 [submodule "lib/BurpTree"]
 	path = lib/BurpTree
-	url = https://github.com/pghalliday/BurpTree.git
+	url = https://github.com/BurpTech/BurpTree.git
+[submodule "lib/BurpDebug"]
+	path = lib/BurpDebug
+	url = https://github.com/BurpTech/BurpDebug.git
+[submodule "lib/BurpLogger"]
+	path = lib/BurpLogger
+	url = https://github.com/BurpTech/BurpLogger.git
