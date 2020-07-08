@@ -4,6 +4,7 @@
 .clang_complete
 .gcc-flags.json
 .clangd/
+.vscode/
 compile_commands.json
 /local-ports.sh
 /logs/

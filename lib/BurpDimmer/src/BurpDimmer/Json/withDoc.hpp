@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ArduinoJson.h>
-#include <BurpDebug.hpp>
 
 namespace BurpDimmer {
   namespace Json {
@@ -10,7 +9,6 @@ namespace BurpDimmer {
     template <size_t size>
     void withStaticDoc(f_onDoc onDoc) {
       StaticJsonDocument<size> doc;
-      BURP_DEBUG_INFO("created JSON document with size: %u", doc.capacity());
       onDoc(doc);
     }
 

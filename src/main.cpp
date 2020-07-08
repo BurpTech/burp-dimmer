@@ -1,4 +1,7 @@
+#ifndef BURP_NATIVE
 #include <Arduino.h>
+#endif
+
 #include <BurpDimmer.hpp>
 
 void setup() {

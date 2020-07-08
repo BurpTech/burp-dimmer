@@ -2,6 +2,7 @@
 
 #include <ESP8266WiFi.h>
 #include <stddef.h>
+#include <BurpLogger.hpp>
 #include <BurpDimmer/FactorySettings/Interface.hpp>
 
 namespace BurpDimmer {
@@ -11,6 +12,7 @@ namespace BurpDimmer {
 
       public:
 
+        Instance(const BurpLogger::Logger * logger);
         void setup();
         const char * getSsid() const override;
         const char * getPassword() const override;
@@ -22,8 +24,9 @@ namespace BurpDimmer {
           char password[WL_WPA_KEY_MAX_LENGTH + 1];
         };
 
+        const BurpLogger::Logger * _logger;
         Values _values = {"", ""};
-        static void _fillRandom(char * buffer, size_t offset, size_t length, size_t size);
+        static void _fillRandom(const BurpLogger::Logger * logger, char * buffer, size_t offset, size_t length, size_t size);
         void _initialize();
 
 

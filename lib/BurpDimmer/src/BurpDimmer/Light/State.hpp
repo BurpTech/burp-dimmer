@@ -1,8 +1,8 @@
 #pragma once
 
 #include <ArduinoJson.h>
+#include <BurpStatus/Status.hpp>
 #include <BurpTree/State.hpp>
-#include <BurpTree/Status.hpp>
 #include <BurpTree/Factory.hpp>
 #include "Config.hpp"
 
@@ -32,9 +32,9 @@ namespace BurpDimmer {
 
     };
 
-    class Status : public BurpTree::Status {
+    class Status : public BurpStatus::Status {
       public:
-        enum : BurpTree::Status::Code {
+        enum : BurpStatus::Status::Code {
           ok,
           noObject,
           maxLevels,

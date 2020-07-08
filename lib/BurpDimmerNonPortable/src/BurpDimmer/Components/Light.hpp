@@ -1,5 +1,6 @@
 #pragma once
 
+#include <BurpLogger.hpp>
 #include <BurpTree/Subscriber.hpp>
 #include <BurpDimmer/Light/State.hpp>
 
@@ -13,13 +14,14 @@ namespace BurpDimmer {
 
           using State = BurpDimmer::Light::State;
 
-          Instance(int pin);
+          Instance(const BurpLogger::Logger * logger, const int pin);
           void setup(const State * state) override;
           void update(const State * state) override;
 
         private:
 
-          int _pin;
+          const BurpLogger::Logger * _logger;
+          const int _pin;
 
       };
 

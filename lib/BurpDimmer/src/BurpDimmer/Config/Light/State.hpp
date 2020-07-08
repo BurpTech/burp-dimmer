@@ -1,9 +1,9 @@
 #pragma once
 
 #include <array>
+#include <BurpStatus/Status.hpp>
 #include <BurpTree/State.hpp>
 #include <BurpTree/Factory.hpp>
-#include <BurpTree/Status.hpp>
 
 namespace BurpDimmer {
   namespace Config {
@@ -43,9 +43,9 @@ namespace BurpDimmer {
 
       };
 
-      class Status : public BurpTree::Status {
+      class Status : public BurpStatus::Status {
         public:
-          enum : BurpTree::Status::Code {
+          enum : BurpStatus::Status::Code {
             ok,
             noObject,
             noLevels,

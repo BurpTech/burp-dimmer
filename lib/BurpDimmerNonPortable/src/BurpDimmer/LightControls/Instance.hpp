@@ -1,7 +1,7 @@
 #pragma once
 
+#include <BurpLogger.hpp>
 #include <BurpDimmer/Light/State.hpp>
-#include <BurpDimmer/Logger.hpp>
 #include "../Components/RotaryEncoder.hpp"
 #include "../Components/Button.hpp"
 
@@ -16,11 +16,11 @@ namespace BurpDimmer {
 
       public:
 
-        Instance(Updater & updater, RotaryEncoder & rotaryEncoder, Button & button) :
+        Instance(const BurpLogger::Logger * logger, Updater & updater, RotaryEncoder & rotaryEncoder, Button & button) :
           _updater(updater),
           _rotaryEncoder(rotaryEncoder),
           _button(button),
-          _logger("LightControls")
+          _logger(logger)
         {} 
 
         void setup() {
@@ -38,7 +38,7 @@ namespace BurpDimmer {
         Updater & _updater;
         RotaryEncoder & _rotaryEncoder;
         Button & _button;
-        Logger _logger;
+        const BurpLogger::Logger * _logger;
 
         void _rotaryEncoderChange(int direction) {
           if (direction > 0) {

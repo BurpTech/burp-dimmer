@@ -1,11 +1,11 @@
-#include <BurpDebug.hpp>
 #include "Manager.hpp"
 
 namespace BurpDimmer {
   namespace Network {
     namespace Manager {
 
-      Instance::Instance() :
+      Instance::Instance(const BurpLogger::Logger * logger) :
+        _logger(logger),
         _config(nullptr)
       {}
 
@@ -15,7 +15,7 @@ namespace BurpDimmer {
 
       void Instance::update(const Config * next) {
         _config = next;
-        BURP_DEBUG_INFO("_config: %p", _config);
+        _logger->info("_config: %p", _config);
       }
 
     }

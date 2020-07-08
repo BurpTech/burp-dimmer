@@ -1,6 +1,5 @@
 #pragma once
 
-#include <BurpDebug.hpp>
 #include "../Json/withDoc.hpp"
 #include "../Json/File/Interface.hpp"
 #include "Interface.hpp"

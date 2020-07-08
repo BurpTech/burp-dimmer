@@ -1,7 +1,7 @@
 #pragma once
 
+#include <BurpLogger.hpp>
 #include <BurpTree/Subscriber.hpp>
-#include "../Logger.hpp"
 #include "Config.hpp"
 #include "State.hpp"
 
@@ -13,9 +13,9 @@ namespace BurpDimmer {
 
       public:
 
-        ConfigSubscriber(Updater & updater) :
-          _updater(updater),
-          _logger("Light::ConfigSubscriber")
+        ConfigSubscriber(const BurpLogger::Logger * logger, Updater & updater) :
+          _logger(logger),
+          _updater(updater)
         {}
 
         void setup(const Config * initial) override {
@@ -24,13 +24,13 @@ namespace BurpDimmer {
 
         void update(const Config * next) override {
           using namespace std::placeholders;
-          _logger.status(_updater.update(std::bind(&Factory::applyConfig, _1, next)));
+          _logger.log("update config", _updater.update(std::bind(&Factory::applyConfig, _1, next)));
         }
 
       private:
 
+        const BurpLogger::Logger * _logger;
         Updater & _updater;
-        Logger _logger;
 
     };
 
