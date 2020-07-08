@@ -2,6 +2,7 @@
 #include <EEPROM.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
+#include <BurpLogger.hpp>
 #include <BurpTree/Node.hpp>
 #include <BurpTree/Root.hpp>
 #include <BurpTree/Leaf.hpp>
@@ -30,22 +31,38 @@
 
 #define EEPROM_SIZE 512
 
-#ifndef APPL_NAME
-#define APPL_NAME application
+#ifndef BURP_APPL_NAME
+#define BURP_APPL_NAME application
 #endif
 
-#ifndef VERSION
-#define VERSION development
+#ifndef BURP_VERSION
+#define BURP_VERSION development
 #endif
 
-#ifndef BAUDRATE
-#define BAUDRATE 9600
+#ifndef BURP_BAUDRATE
+#define BURP_BAUDRATE 9600
+#endif
+
+#ifndef BURP_LOG_LEVEL
+#define BURP_LOG_LEVEL BurpLogger::Level::silly
 #endif
 
 namespace BurpDimmer {
 
+  constexpr size_t loggerMessageSize = 256;
+  constexpr size_t loggerTransportCount = 1;
+  constexpr size_t loggerCount = 8;
+
+  using LoggerFactory = BurpLogger::Factory<loggerMessageSize, loggerTransportCount, loggerCount>;
+  BurpLogger::Transport::Console loggerTransportConsole;
+  const LoggerFactory::Transports loggerTransports = {
+    &loggerTransportConsole
+  };
+  LoggerFactory loggerFactory(static_cast<BurpLogger::Level::Level>(BURP_LOG_LEVEL), loggerTransports);
+  const BurpLogger::Logger * logger = loggerFactory.create(STR(BURP_APPL_NAME));
+    
   namespace FactorySettings {
-    Instance instance;
+    Instance instance(logger->create("FactorySettings"));
   }
 
   namespace Light {
@@ -56,9 +73,9 @@ namespace BurpDimmer {
       };
     }
 
-    Components::Light::Instance light(pin);
+    Components::Light::Instance light(logger->create("light"), pin);
 
-    Json::File::Instance fileInstance(filePath);
+    Json::File::Instance fileInstance(logger->create("lightFile"), filePath);
     LightFile::Instance<fileSize> file(fileInstance);
 
     Factory factory;
@@ -85,15 +102,15 @@ namespace BurpDimmer {
       rotaryEncoder.interrupt();
     }
     Components::Button button(buttonPin, buttonDebounceDelay);
-    LightControls::Instance<Updater> controls(updater, rotaryEncoder, button);
-    ConfigSubscriber<Updater> configSubscriber(updater);
+    LightControls::Instance<Updater> controls(logger->create("lightControls"), updater, rotaryEncoder, button);
+    ConfigSubscriber<Updater> configSubscriber(logger->create("configSubscriber"), updater);
 
   }
 
   namespace Network {
 
     namespace Manager {
-      Instance instance;
+      Instance instance(logger->create("networkManager"));
     }
 
   }
@@ -165,7 +182,7 @@ namespace BurpDimmer {
 
     }
 
-    Json::File::Instance fileInstance(filePath);
+    Json::File::Instance fileInstance(logger->create("configFile"), filePath);
     ConfigFile::Instance<Node::State, fileSize> file(fileInstance);
 
     Node::Map map = {
@@ -200,10 +217,14 @@ namespace BurpDimmer {
 
   void setup() {
     // Initialise the serial output
-    Serial.begin(BAUDRATE);
+    Serial.begin(BURP_BAUDRATE);
     
-    // Report name and version
-    Serial.println(STR(APPL_NAME) " : " STR(VERSION));
+    // Report version
+    logger->always("version : " STR(BURP_VERSION));
+
+    // Report the actual number of loggers
+    logger->always("logger count : " BURP_SIZE_T_FORMAT, loggerFactory.getCount());
+    logger->always("logger max exceeded : %s", loggerFactory.maxExceeded() ? "TRUE" : "FALSE");
 
     // TODO: We may not be concerned about
     // real random values but should probably

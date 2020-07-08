@@ -24,7 +24,7 @@ namespace BurpDimmer {
 
         void update(const Config * next) override {
           using namespace std::placeholders;
-          _logger.log("update config", _updater.update(std::bind(&Factory::applyConfig, _1, next)));
+          _logger->log("apply config", _updater.update(std::bind(&Factory::applyConfig, _1, next)));
         }
 
       private:

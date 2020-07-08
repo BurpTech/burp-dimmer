@@ -42,14 +42,14 @@ namespace BurpDimmer {
 
         void _rotaryEncoderChange(int direction) {
           if (direction > 0) {
-            _logger.status(_updater.update(&Light::Factory::increaseBrightness));
+            _logger->log("increase brightness", _updater.update(&Light::Factory::increaseBrightness));
           } else {
-            _logger.status(_updater.update(&Light::Factory::decreaseBrightness));
+            _logger->log("decrease brightness", _updater.update(&Light::Factory::decreaseBrightness));
           }
         }
 
         void _buttonRelease() {
-          _logger.status(_updater.update(&Light::Factory::toggle));
+          _logger->log("toggle", _updater.update(&Light::Factory::toggle));
         }
 
     };
