@@ -233,6 +233,7 @@ namespace BurpDimmer {
     logger->create("configControls"),
     Config::Network::Manager::updater,
     reset,
+    Config::Network::Manager::node,
     blinker,
     blinkTime,
     button,

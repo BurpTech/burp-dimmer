@@ -1,6 +1,7 @@
 #pragma once
 
 #include <BurpLogger.hpp>
+#include <BurpTree/Node.hpp>
 #include <BurpDimmer/Config/Network/Manager/State.hpp>
 #include "../Components/Blinker.hpp"
 #include "../Components/Button.hpp"
@@ -18,10 +19,14 @@ namespace BurpDimmer {
 
       public:
 
+        using ConfigState = Config::Network::Manager::State;
+        using ConfigNode = BurpTree::Node::Interface<ConfigState>;
+
         Instance(
           const BurpLogger::Logger * logger,
           Updater & updater,
           const Reset::Interface & reset,
+          const ConfigNode & configNode,
           Blinker & blinker,
           const unsigned long blinkTime,
           Button & button,
@@ -30,6 +35,7 @@ namespace BurpDimmer {
         ) :
           _updater(updater),
           _reset(reset),
+          _configNode(configNode),
           _blinker(blinker),
           _blinkTime(blinkTime),
           _button(button),
@@ -51,6 +57,7 @@ namespace BurpDimmer {
 
         Updater & _updater;
         const Reset::Interface & _reset;
+        const ConfigNode & _configNode;
         Blinker & _blinker;
         const unsigned long _blinkTime;
         Button & _button;
@@ -116,7 +123,22 @@ namespace BurpDimmer {
 
         void _queryRelease() {
           _logger->info("query release");
-          _logger->info("TODO: query network mode");
+          const ConfigState * state = _configNode.getState();
+          _logger->info("permMode: %u", state->permMode);
+          delay(1000);
+          switch (state->permMode) {
+            case ConfigState::PermMode::NORMAL:
+              _blinker.blink(1, _blinkTime);
+              break;
+            case ConfigState::PermMode::ACCESS_POINT:
+              _blinker.blink(2, _blinkTime);
+              break;
+            case ConfigState::PermMode::OFF:
+              _blinker.blink(3, _blinkTime);
+              break;
+            default:
+              break;
+          }
         }
 
         void _nextPermModePress() {
@@ -151,6 +173,7 @@ namespace BurpDimmer {
 
         void _factoryResetPress() {
           _logger->info("factoryReset press");
+          _blinker.blink(5, _blinkTime);
           _reset.factoryReset();
         }
 
