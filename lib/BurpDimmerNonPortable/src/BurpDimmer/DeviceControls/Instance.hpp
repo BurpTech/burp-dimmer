@@ -7,7 +7,7 @@
 #include "../Reset/Interface.hpp"
 
 namespace BurpDimmer {
-  namespace ConfigControls {
+  namespace DeviceControls {
 
     using namespace Config::Network::Manager;
     using namespace Components;

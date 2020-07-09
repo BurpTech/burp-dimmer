@@ -13,7 +13,7 @@
 #include <BurpDimmer/LightFile/Instance.hpp>
 #include <BurpDimmer/Light/ConfigSubscriber.hpp>
 #include <BurpDimmer/LightControls/Instance.hpp>
-#include <BurpDimmer/ConfigControls/Instance.hpp>
+#include <BurpDimmer/DeviceControls/Instance.hpp>
 #include <BurpDimmer/Network/Manager.hpp>
 #include <BurpDimmer/ConfigFile/Instance.hpp>
 #include <BurpDimmer/Config/Light/State.hpp>
@@ -219,26 +219,26 @@ namespace BurpDimmer {
       }
     }
 
-    Components::Blinker blinker(blinkerPin, blinkerOn);
-    Components::Button button(buttonPin, buttonDebounceDelay);
-    using Reset = BurpDimmer::Reset::Instance<2>;
-    const Reset::Files toDelete = {
-      &fileInstance,
-      &BurpDimmer::Light::fileInstance
-    };
-    const Reset reset(toDelete);
-    ConfigControls::Instance<Network::Manager::Updater> controls(
-      logger->create("configControls"),
-      Network::Manager::updater,
-      reset,
-      blinker,
-      blinkTime,
-      button,
-      shortDelay,
-      longDelay
-    );
-
   }
+
+  Components::Blinker blinker(blinkerPin, blinkerOn);
+  Components::Button button(buttonPin, buttonDebounceDelay);
+  using Reset2 = Reset::Instance<2>;
+  const Reset2::Files toDelete = {
+    &Config::fileInstance,
+    &Light::fileInstance
+  };
+  const Reset2 reset(toDelete);
+  DeviceControls::Instance<Config::Network::Manager::Updater> controls(
+    logger->create("configControls"),
+    Config::Network::Manager::updater,
+    reset,
+    blinker,
+    blinkTime,
+    button,
+    shortDelay,
+    longDelay
+  );
 
   void setup() {
     // Initialise the serial output
@@ -274,7 +274,7 @@ namespace BurpDimmer {
     Light::file.read(std::bind(&Light::Root::setup, &Light::root, _1));
 
     Light::controls.setup();
-    Config::controls.setup();
+    controls.setup();
   }
 
   void loop() {
@@ -282,7 +282,7 @@ namespace BurpDimmer {
     Light::root.loop();
     Light::file.loop();
     Light::controls.loop();
-    Config::controls.loop();
+    controls.loop();
   }
 
 }

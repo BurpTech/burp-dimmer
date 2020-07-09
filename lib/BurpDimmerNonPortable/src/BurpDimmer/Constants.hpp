@@ -16,14 +16,14 @@ namespace BurpDimmer {
   namespace Config {
     constexpr char filePath[] = "/config.json";
     constexpr size_t fileSize = 1024;
-    constexpr int blinkerPin = LED_BUILTIN;
-    constexpr unsigned long blinkTime = 200;
-    constexpr int blinkerOn = LOW;
-    constexpr int buttonPin = D2;
-    constexpr unsigned long shortDelay = 2000;
-    constexpr unsigned long longDelay = 5000;
   }
 
   constexpr unsigned long buttonDebounceDelay = 20;
+  constexpr int blinkerPin = LED_BUILTIN;
+  constexpr unsigned long blinkTime = 200;
+  constexpr int blinkerOn = LOW;
+  constexpr int buttonPin = D2;
+  constexpr unsigned long shortDelay = 2000;
+  constexpr unsigned long longDelay = 5000;
 
 }
