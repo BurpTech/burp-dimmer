@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 // Maximum size of a SSID
 #define WL_SSID_MAX_LENGTH 32
 // Length of passphrase. Valid lengths are 8-63.
@@ -10,3 +12,5 @@
 #define WL_MAC_ADDR_LENGTH 6
 // Size of a MAC-address or BSSID
 #define WL_IPV4_LENGTH 4
+
+using IPAddress = uint32_t;

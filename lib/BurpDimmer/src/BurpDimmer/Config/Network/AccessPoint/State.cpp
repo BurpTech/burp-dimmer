@@ -5,20 +5,83 @@ namespace BurpDimmer {
     namespace Network {
       namespace AccessPoint {
 
-        constexpr char testField[] = "test";
+        constexpr char ssidField[] = "ssid";
+        constexpr char passphraseField[] = "passphrase";
+        constexpr char channelField[] = "channel";
+        constexpr char ssidHiddenField[] = "ssidHidden";
+        constexpr char maxConnectionsField[] = "maxConnections";
+        constexpr char ipConfigField[] = "ipConfig";
+        constexpr char localIpField[] = "localIp";
+        constexpr char gatewayField[] = "gateway";
+        constexpr char subnetField[] = "subnet";
 
-        constexpr int defaultTest = 0;
+        const char * defaultSsid(const FactorySettings::Interface & factorySettings) {
+          return factorySettings.getSsid();
+        }
 
-        State::State(const int test) :
-          test(test)
-        {}
+        const char * defaultPassphrase(const FactorySettings::Interface & factorySettings) {
+          return factorySettings.getPassword();
+        }
 
-        State::State() :
-          State(defaultTest)
+        constexpr int defaultChannel = 1;
+        constexpr int defaultSsidHidden = 0;
+        constexpr int defaultMaxConnections = 4;
+        constexpr IPConfig * defaultIpConfig = nullptr;
+
+        State::State(
+          const FactorySettings::Interface & factorySettings,
+          const char * ssid,
+          const char * passphrase,
+          const int channel,
+          const int ssidHidden,
+          const int maxConnections,
+          const IPConfig * ipConfig
+        ) :
+          factorySettings(factorySettings),
+          channel(channel),
+          ssidHidden(ssidHidden),
+          maxConnections(maxConnections),
+          hasPassphrase(passphrase != nullptr),
+          hasIpConfig(ipConfig != nullptr)
+        {
+          strncpy(this->ssid, ssid, WL_SSID_MAX_LENGTH + 1);
+          if (hasPassphrase) {
+            strncpy(this->passphrase, passphrase, WL_WPA_KEY_MAX_LENGTH + 1);
+          }
+          if (hasIpConfig) {
+            this->ipConfig = *ipConfig;
+          }
+        }
+
+        State::State(const FactorySettings::Interface & factorySettings) :
+          State(
+            factorySettings,
+            defaultSsid(factorySettings),
+            defaultPassphrase(factorySettings),
+            defaultChannel,
+            defaultSsidHidden,
+            defaultMaxConnections,
+            defaultIpConfig
+          )
         {}
 
         void State::serialize(const JsonObject & object) const {
-          object[testField] = test;
+          object[ssidField] = ssid;
+          if (hasPassphrase) {
+            object[passphraseField] = passphrase;
+          }
+          object[channelField] = channel;
+          object[ssidHiddenField] = ssidHidden;
+          object[maxConnectionsField] = maxConnections;
+          if (hasIpConfig) {
+            object[ipConfigField][localIpField] = ipConfig.localIp;
+            object[ipConfigField][gatewayField] = ipConfig.gateway;
+            object[ipConfigField][subnetField] = ipConfig.subnet;
+          }
+        }
+
+        void Factory::setFactorySettings(const FactorySettings::Interface & factorySettings) {
+          _factorySettings = factorySettings;
         }
 
         bool Factory::deserialize(const JsonObject & object) {
@@ -39,7 +102,7 @@ namespace BurpDimmer {
 
         bool Factory::createDefault() {
           return create([&]() -> const State * {
-              return ok(new(getAddress()) State());
+              return ok(new(getAddress()) State(_factorySettings));
           });
         }
 
