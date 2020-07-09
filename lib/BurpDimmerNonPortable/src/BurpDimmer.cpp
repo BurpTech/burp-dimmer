@@ -13,6 +13,7 @@
 #include <BurpDimmer/LightFile/Instance.hpp>
 #include <BurpDimmer/Light/ConfigSubscriber.hpp>
 #include <BurpDimmer/LightControls/Instance.hpp>
+#include <BurpDimmer/ConfigControls/Instance.hpp>
 #include <BurpDimmer/Network/Manager.hpp>
 #include <BurpDimmer/ConfigFile/Instance.hpp>
 #include <BurpDimmer/Config/Light/State.hpp>
@@ -22,7 +23,9 @@
 #include <BurpDimmer/Json/File/Instance.hpp>
 #include <BurpDimmer/Components/Light.hpp>
 #include <BurpDimmer/Components/RotaryEncoder.hpp>
+#include <BurpDimmer/Components/Blinker.hpp>
 #include <BurpDimmer/Components/Button.hpp>
+#include <BurpDimmer/Reset/Instance.hpp>
 #include <BurpDimmer/Constants.hpp>
 #include "BurpDimmer.hpp"
 
@@ -51,7 +54,7 @@ namespace BurpDimmer {
 
   constexpr size_t loggerMessageSize = 256;
   constexpr size_t loggerTransportCount = 1;
-  constexpr size_t loggerCount = 8;
+  constexpr size_t loggerCount = 9;
 
   using LoggerFactory = BurpLogger::Factory<loggerMessageSize, loggerTransportCount, loggerCount>;
   BurpLogger::Transport::Console loggerTransportConsole;
@@ -203,15 +206,37 @@ namespace BurpDimmer {
 
     namespace Network {
       namespace AccessPoint {
-        BurpTree::Updater<Node> updater(root, node);
+        using Updater = BurpTree::Updater<Node>;
+        Updater updater(root, node);
       }
       namespace Manager {
-        BurpTree::Updater<Node> updater(root, node);
+        using Updater = BurpTree::Updater<Node>;
+        Updater updater(root, node);
       }
       namespace Station {
-        BurpTree::Updater<Node> updater(root, node);
+        using Updater = BurpTree::Updater<Node>;
+        Updater updater(root, node);
       }
     }
+
+    Components::Blinker blinker(blinkerPin, blinkerOn);
+    Components::Button button(buttonPin, buttonDebounceDelay);
+    using Reset = BurpDimmer::Reset::Instance<2>;
+    const Reset::Files toDelete = {
+      &fileInstance,
+      &BurpDimmer::Light::fileInstance
+    };
+    const Reset reset(toDelete);
+    ConfigControls::Instance<Network::Manager::Updater> controls(
+      logger->create("configControls"),
+      Network::Manager::updater,
+      reset,
+      blinker,
+      blinkTime,
+      button,
+      shortDelay,
+      longDelay
+    );
 
   }
 
@@ -223,8 +248,11 @@ namespace BurpDimmer {
     logger->always("version : " STR(BURP_VERSION));
 
     // Report the actual number of loggers
-    logger->always("logger count : " BURP_SIZE_T_FORMAT, loggerFactory.getCount());
-    logger->always("logger max exceeded : %s", loggerFactory.maxExceeded() ? "TRUE" : "FALSE");
+    const size_t loggerCount = loggerFactory.getCount();
+    const size_t loggerRequestedCount = loggerFactory.getRequestedCount();
+    logger->always("logger max exceeded : %s", loggerRequestedCount > loggerCount ? "TRUE" : "FALSE");
+    logger->always("logger count : " BURP_SIZE_T_FORMAT, loggerCount);
+    logger->always("logger requested count : " BURP_SIZE_T_FORMAT, loggerRequestedCount);
 
     // TODO: We may not be concerned about
     // real random values but should probably
@@ -246,6 +274,7 @@ namespace BurpDimmer {
     Light::file.read(std::bind(&Light::Root::setup, &Light::root, _1));
 
     Light::controls.setup();
+    Config::controls.setup();
   }
 
   void loop() {
@@ -253,6 +282,7 @@ namespace BurpDimmer {
     Light::root.loop();
     Light::file.loop();
     Light::controls.loop();
+    Config::controls.loop();
   }
 
 }
