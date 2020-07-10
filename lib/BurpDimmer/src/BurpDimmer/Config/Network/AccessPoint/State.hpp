@@ -62,7 +62,7 @@ namespace BurpDimmer {
 
           public:
 
-            void setFactorySettings(const FactorySettings::Interface & factorySettings);
+            Factory(const FactorySettings::Interface & factorySettings);
 
             bool deserialize(const JsonObject & serialized) override ;
             bool createDefault() override;

@@ -149,7 +149,7 @@ namespace BurpDimmer {
 
       namespace AccessPoint {
         constexpr char field[] = "accessPoint";
-        Factory factory;
+        Factory factory(FactorySettings::instance);
         using Node = BurpTree::Leaf<Factory, 0>;
         Node::Subscribers subscribers = {};
         Node node(Id::networkAccessPoint, factory, subscribers);

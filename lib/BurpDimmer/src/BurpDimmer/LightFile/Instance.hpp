@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Json/withDoc.hpp"
+#include <ArduinoJson.h>
 #include "../Json/File/Interface.hpp"
 #include "Interface.hpp"
 
@@ -19,10 +19,9 @@ namespace BurpDimmer {
         {}
 
         void read(f_withObj withObj) override {
-          Json::withStaticDoc<size>([&](JsonDocument & doc) {
-            _file.read(doc);
-            withObj(doc.as<JsonObject>());
-          });
+          StaticJsonDocument<size> doc;
+          _file.read(doc);
+          withObj(doc.template as<JsonObject>());
         }
 
         void setup(const Light::State * initial) override {
@@ -40,11 +39,10 @@ namespace BurpDimmer {
             // There has been a change so check for inactivity
             if (millis() - _lastChange > _light->config->saveStateDelay) {
               _lastChange = 0;
-              Json::withStaticDoc<size>([&](JsonDocument & doc) {
-                JsonObject object = doc.to<JsonObject>();
-                _light->serialize(object);
-                _file.write(doc);
-              });
+              StaticJsonDocument<size> doc;
+              JsonObject object = doc.template to<JsonObject>();
+              _light->serialize(object);
+              _file.write(doc);
             }
           }
         }

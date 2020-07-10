@@ -74,30 +74,31 @@ namespace BurpDimmer {
           object[ssidHiddenField] = ssidHidden;
           object[maxConnectionsField] = maxConnections;
           if (hasIpConfig) {
-            object[ipConfigField][localIpField] = ipConfig.localIp;
-            object[ipConfigField][gatewayField] = ipConfig.gateway;
-            object[ipConfigField][subnetField] = ipConfig.subnet;
+            object[ipConfigField][localIpField] = static_cast<uint32_t>(ipConfig.localIp);
+            object[ipConfigField][gatewayField] = static_cast<uint32_t>(ipConfig.gateway);
+            object[ipConfigField][subnetField] = static_cast<uint32_t>(ipConfig.subnet);
           }
         }
 
-        void Factory::setFactorySettings(const FactorySettings::Interface & factorySettings) {
-          _factorySettings = factorySettings;
-        }
+        Factory::Factory(const FactorySettings::Interface & factorySettings) :
+          _factorySettings(factorySettings)
+        {}
 
         bool Factory::deserialize(const JsonObject & object) {
-          return create([&]() -> const State * {
-            if (!object.isNull()) {
-              if (object.containsKey(testField)) {
-                const JsonVariant v = object[testField];
-                if (!v.is<int>()) {
-                  return error(Status::invalidTest);
-                }
-                return ok(new(getAddress()) State(v.as<int>()));
-              }
-              return error(Status::noTest);
-            }
-            return error(Status::noObject);
-          });
+          return false;
+          // return create([&]() -> const State * {
+          //   if (!object.isNull()) {
+          //     if (object.containsKey(testField)) {
+          //       const JsonVariant v = object[testField];
+          //       if (!v.is<int>()) {
+          //         return error(Status::invalidTest);
+          //       }
+          //       return ok(new(getAddress()) State(v.as<int>()));
+          //     }
+          //     return error(Status::noTest);
+          //   }
+          //   return error(Status::noObject);
+          // });
         }
 
         bool Factory::createDefault() {
