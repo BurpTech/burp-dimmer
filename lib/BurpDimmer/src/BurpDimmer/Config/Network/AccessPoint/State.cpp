@@ -1,10 +1,12 @@
 #include "State.hpp"
+#include "../../Json/Serialization/Root.hpp"
 
 namespace BurpDimmer {
   namespace Config {
     namespace Network {
       namespace AccessPoint {
 
+        constexpr char securityConfigField[] = "securityConfig";
         constexpr char ssidField[] = "ssid";
         constexpr char passphraseField[] = "passphrase";
         constexpr char channelField[] = "channel";
@@ -15,12 +17,31 @@ namespace BurpDimmer {
         constexpr char gatewayField[] = "gateway";
         constexpr char subnetField[] = "subnet";
 
-        const char * defaultSsid(const FactorySettings::Interface & factorySettings) {
-          return factorySettings.getSsid();
-        }
-
-        const char * defaultPassphrase(const FactorySettings::Interface & factorySettings) {
-          return factorySettings.getPassword();
+        namespace Serialization {
+          constexpr Json::Serialization::Field::CStr ssid();
+          constexpr Json::Serialization::Field::CStr passphrase();
+          constexpr Json::Serialization::Field::Object securityConfig({
+            {ssidField, ssid},
+            {passphraseField, passphrase}
+          });
+          constexpr Json::Serialization::Field::Int8 channel();
+          constexpr Json::Serialization::Field::CBool ssidHidden();
+          constexpr Json::Serialization::Field::Int8 maxConnections();
+          constexpr Json::Serialization::Field::IPAddress localIp();
+          constexpr Json::Serialization::Field::IPAddress gateway();
+          constexpr Json::Serialization::Field::IPAddress subnet();
+          constexpr Json::Serialization::Field::Object ipConfig({
+            {localIpField, localIp},
+            {gatewayField, gateway},
+            {subnetField, subnet}
+          });
+          constexpr Json::Serialization::Field::Object root({
+            {securityConfigField, securityConfig},
+            {channelField, channel},
+            {ssidHiddenField, ssidHidden},
+            {maxConnectionsField, maxConnections},
+            {ipConfigField, ipConfig}
+          });
         }
 
         constexpr int defaultChannel = 1;
@@ -29,7 +50,6 @@ namespace BurpDimmer {
         constexpr IPConfig * defaultIpConfig = nullptr;
 
         State::State(
-          const FactorySettings::Interface & factorySettings,
           const char * ssid,
           const char * passphrase,
           const int channel,
@@ -37,74 +57,77 @@ namespace BurpDimmer {
           const int maxConnections,
           const IPConfig * ipConfig
         ) :
-          factorySettings(factorySettings),
+          ssid(ssid),
+          hasPassphrase(passphrase != nullptr),
+          passphrase(passphrase ? passphrase : ""),
           channel(channel),
           ssidHidden(ssidHidden),
           maxConnections(maxConnections),
-          hasPassphrase(passphrase != nullptr),
-          hasIpConfig(ipConfig != nullptr)
-        {
-          strncpy(this->ssid, ssid, WL_SSID_MAX_LENGTH + 1);
-          if (hasPassphrase) {
-            strncpy(this->passphrase, passphrase, WL_WPA_KEY_MAX_LENGTH + 1);
-          }
-          if (hasIpConfig) {
-            this->ipConfig = *ipConfig;
-          }
-        }
+          hasIpConfig(ipConfig != nullptr),
+          ipConfig(ipConfig ? *ipConfig : IPConfig({0, 0, 0}))
+        {}
 
-        State::State(const FactorySettings::Interface & factorySettings) :
+        State::State(
+          const char * defaultSsid,
+          const char * defaultPassphrase,
+        ) :
           State(
-            factorySettings,
-            defaultSsid(factorySettings),
-            defaultPassphrase(factorySettings),
+            defaultSsid,
+            defaultPassphrase,
             defaultChannel,
             defaultSsidHidden,
             defaultMaxConnections,
-            defaultIpConfig
+            defaultIpConfig,
           )
         {}
 
-        void State::serialize(const JsonObject & object) const {
-          object[ssidField] = ssid;
-          if (hasPassphrase) {
-            object[passphraseField] = passphrase;
-          }
-          object[channelField] = channel;
-          object[ssidHiddenField] = ssidHidden;
-          object[maxConnectionsField] = maxConnections;
+        void State::serialize(const JsonVariant & serialized) const {
+          Serialization::securityConfig.exists(true);
+          Serialization::ssid.set(ssid);
+          Serialization::passphrase.set(passphrase);
+          Serialization::channel.set(channel),
+          Serialization::ssidHidden.set(ssidHidden),
+          Serialization::maxConnections.set(maxConnections),
           if (hasIpConfig) {
-            object[ipConfigField][localIpField] = static_cast<uint32_t>(ipConfig.localIp);
-            object[ipConfigField][gatewayField] = static_cast<uint32_t>(ipConfig.gateway);
-            object[ipConfigField][subnetField] = static_cast<uint32_t>(ipConfig.subnet);
+            Serialization::ipConfig.exists(true);
+            Serialization::localIp.get(ipConfig.localIp),
+            Serialization::gateway.get(ipConfig.gateway),
+            Serialization::subnet.get(ipConfig.subnet)
+          } else {
+            Serialization::ipConfig.exists(false);
           }
+          Serialization::root.serialize(serialized);
         }
 
-        Factory::Factory(const FactorySettings::Interface & factorySettings) :
-          _factorySettings(factorySettings)
-        {}
-
-        bool Factory::deserialize(const JsonObject & object) {
-          return false;
-          // return create([&]() -> const State * {
-          //   if (!object.isNull()) {
-          //     if (object.containsKey(testField)) {
-          //       const JsonVariant v = object[testField];
-          //       if (!v.is<int>()) {
-          //         return error(Status::invalidTest);
-          //       }
-          //       return ok(new(getAddress()) State(v.as<int>()));
-          //     }
-          //     return error(Status::noTest);
-          //   }
-          //   return error(Status::noObject);
-          // });
+        bool Factory::deserialize(const JsonVariant & serialized) {
+          BurpStatus::Status::Code statusCode = Serialization::root.deserialize(serialized);
+          if (statusCode == Status::ok) {
+            const IPConfig ipConfig = {
+              Serialization::localIp.get(),
+              Serialization::gateway.get(),
+              Serialization::subnet.get()
+            };
+            return ok(new(getAddress()) State(
+              Serialization::securityConfig.exists() ? Serialization::ssid.get() : _defaultSsid,
+              Serialization::securityConfig.exists() ? Serialization::passphrase.get() : _defaultPassphrase,
+              Serialization::channel.get(),
+              Serialization::ssidHidden.get(),
+              Serialization::maxConnections.get(),
+              Serialization::ipConfig.exists() ? &ipConfig : nullptr
+            ));
+          }
+          return fail(statusCode);
         }
 
         bool Factory::createDefault() {
           return create([&]() -> const State * {
-              return ok(new(getAddress()) State(_factorySettings));
+              return ok(new(getAddress()) State(_defaultSsid, _defaultPassphrase));
           });
+        }
+
+        void Factory::setDefaults(const char * defaultSsid, const char * defaultPassphrase) {
+          _defaultSsid = defaultSsid;
+          _defaultPassphrase = defaultPassphrase;
         }
 
         #define C_STR_LABEL "BurpDimmer::Config::Network::AccessPoint"

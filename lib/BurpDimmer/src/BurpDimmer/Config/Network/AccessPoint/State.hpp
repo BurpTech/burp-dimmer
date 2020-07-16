@@ -4,7 +4,6 @@
 #include <BurpStatus/Status.hpp>
 #include <BurpTree/State.hpp>
 #include <BurpTree/Factory.hpp>
-#include "../../../FactorySettings/Interface.hpp"
 
 namespace BurpDimmer {
   namespace Config {
@@ -21,28 +20,24 @@ namespace BurpDimmer {
 
           public:
 
-            const FactorySettings::Interface & factorySettings;
-            char ssid[WL_SSID_MAX_LENGTH + 1];
+            const char ssid[WL_SSID_MAX_LENGTH + 1];
+            const bool hasPassphrase;
+            const char passphrase[WL_WPA_KEY_MAX_LENGTH + 1];
             const int channel;
             const int ssidHidden;
             const int maxConnections;
-
-            const bool hasPassphrase;
-            char passphrase[WL_WPA_KEY_MAX_LENGTH + 1];
-
             const bool hasIpConfig;
-            IPConfig ipConfig;
+            const IPConfig ipConfig;
 
             State(
-              const FactorySettings::Interface & factorySettings,
               const char * ssid,
               const char * passphrase,
               const int channel,
               const int ssidHidden,
               const int maxConnections,
-              const IPConfig * ipConfig
+              const IPConfig ipConfig
             );
-            State(const FactorySettings::Interface & factorySettings);
+            State(const char * defaultSsid, const char * defaultPassphrase);
             void serialize(const JsonObject & object) const override;
 
         };
@@ -62,14 +57,14 @@ namespace BurpDimmer {
 
           public:
 
-            Factory(const FactorySettings::Interface & factorySettings);
-
+            void setDefaults(const char * defaultSsid, const char * defaultPassphrase);
             bool deserialize(const JsonObject & serialized) override ;
             bool createDefault() override;
 
           private:
 
-            const FactorySettings::Interface & _factorySettings;
+            const char * _defaultSsid;
+            const char * _defaultPassphrase;
 
         };
 
