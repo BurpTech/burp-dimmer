@@ -14,7 +14,9 @@
 #include <BurpDimmer/Light/ConfigSubscriber.hpp>
 #include <BurpDimmer/LightControls/Instance.hpp>
 #include <BurpDimmer/DeviceControls/Instance.hpp>
+#include <BurpDimmer/Network/AccessPoint.hpp>
 #include <BurpDimmer/Network/Manager.hpp>
+#include <BurpDimmer/Network/Station.hpp>
 #include <BurpDimmer/ConfigFile/Instance.hpp>
 #include <BurpDimmer/Config/Light/Factory.hpp>
 #include <BurpDimmer/Config/Network/AccessPoint/Factory.hpp>
@@ -54,7 +56,7 @@ namespace BurpDimmer {
 
   constexpr size_t loggerMessageSize = 256;
   constexpr size_t loggerTransportCount = 1;
-  constexpr size_t loggerCount = 9;
+  constexpr size_t loggerCount = 11;
 
   using LoggerFactory = BurpLogger::Factory<loggerMessageSize, loggerTransportCount, loggerCount>;
   BurpLogger::Transport::Console loggerTransportConsole;
@@ -112,8 +114,16 @@ namespace BurpDimmer {
 
   namespace Network {
 
+    namespace AccessPoint {
+      Instance instance(logger->create("networkAccessPoint"));
+    }
+
     namespace Manager {
       Instance instance(logger->create("networkManager"));
+    }
+
+    namespace Station {
+      Instance instance(logger->create("networkStation"));
     }
 
   }
@@ -150,8 +160,10 @@ namespace BurpDimmer {
       namespace AccessPoint {
         constexpr char field[] = "accessPoint";
         Factory factory;
-        using Node = BurpTree::Leaf<Factory, 0>;
-        Node::Subscribers subscribers = {};
+        using Node = BurpTree::Leaf<Factory, 1>;
+        Node::Subscribers subscribers = {
+          &BurpDimmer::Network::AccessPoint::instance
+        };
         Node node(Id::networkAccessPoint, factory, subscribers);
         Network::Node::Entry entry = {field, &node};
       }
@@ -168,8 +180,10 @@ namespace BurpDimmer {
       namespace Station {
         constexpr char field[] = "station";
         Factory factory;
-        using Node = BurpTree::Leaf<Factory, 0>;
-        Node::Subscribers subscribers = {};
+        using Node = BurpTree::Leaf<Factory, 1>;
+        Node::Subscribers subscribers = {
+          &BurpDimmer::Network::Station::instance
+        };
         Node node(Id::networkStation, factory, subscribers);
         Network::Node::Entry entry = {field, &node};
       }
