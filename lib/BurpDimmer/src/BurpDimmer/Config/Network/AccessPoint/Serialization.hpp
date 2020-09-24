@@ -15,7 +15,7 @@ namespace BurpDimmer {
 
           private:
 
-              using Int8Scalar = BurpSerialization::Scalar<int8_t>;
+              using UInt8Scalar = BurpSerialization::Scalar<uint8_t>;
               using BoolScalar = BurpSerialization::Scalar<bool>;
               using IPv4 = BurpSerialization::IPv4;
 
@@ -28,9 +28,9 @@ namespace BurpDimmer {
                     const char * ssid;
                     const char * passphrase;
                   } securityConfig;
-                  Int8Scalar::Value channel;
+                  UInt8Scalar::Value channel;
                   BoolScalar::Value ssidHidden;
-                  Int8Scalar::Value maxConnections;
+                  UInt8Scalar::Value maxConnections;
                   struct {
                     bool isNull = false;
                     IPv4::Value localIp;
@@ -51,9 +51,9 @@ namespace BurpDimmer {
               const CStr _ssid;
               const CStr _passphrase;
               const Object2 _securityConfig;
-              const Int8Scalar _channel;
+              const UInt8Scalar _channel;
               const BoolScalar _ssidHidden;
-              const Int8Scalar _maxConnections;
+              const UInt8Scalar _maxConnections;
               const IPv4 _localIp;
               const IPv4 _gateway;
               const IPv4 _subnet;

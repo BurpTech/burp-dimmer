@@ -66,24 +66,31 @@ namespace BurpDimmer {
           _logger->info("Checksum invalid, initializing with new values: expected: [%08X]: actual: [%08X]", check.checksum, checksum);
           _initialize();
         } else {
-          _logger->info("Checksum valid, initial values are: ssid: [%s]: password: [%s]", _values.ssid, _values.password);
+          _logger->info("Checksum valid, initial values are: hostname: [%s]: ssid: [%s]: password: [%s]", _values.hostname, _values.ssid, _values.passphrase);
         }
       }
+    }
+
+    const char * Instance::getHostname() const {
+      return _values.hostname;
     }
 
     const char * Instance::getSsid() const {
       return _values.ssid;
     }
 
-    const char * Instance::getPassword() const {
-      return _values.password;
+    const char * Instance::getPassphrase() const {
+      return _values.passphrase;
     }
 
     void Instance::_initialize() {
-      // initialize new random values
-      strlcpy(_values.ssid, namePrefix, WL_SSID_MAX_LENGTH + 1);
-      _fillRandom(_logger, _values.ssid, sizeof(namePrefix) - 1, nameSuffixLength, WL_SSID_MAX_LENGTH + 1);
-      _fillRandom(_logger, _values.password, 0, passwordLength, WL_WPA_KEY_MAX_LENGTH + 1);
+      // initialize a random hostname
+      strlcpy(_values.hostname, namePrefix, WL_SSID_MAX_LENGTH + 1);
+      _fillRandom(_logger, _values.hostname, sizeof(namePrefix) - 1, nameSuffixLength, WL_SSID_MAX_LENGTH + 1);
+      // use the same value for the ssid
+      strlcpy(_values.ssid, _values.hostname, WL_SSID_MAX_LENGTH + 1);
+      // initialize a random passphrase
+      _fillRandom(_logger, _values.passphrase, 0, passwordLength, WL_WPA_KEY_MAX_LENGTH + 1);
 
       // Create a new Check structure
       Check check;
@@ -101,7 +108,7 @@ namespace BurpDimmer {
       address += sizeof(Check);
 
       // write initial values to EEPROM
-      _logger->info("initial values are: ssid: [%s]: password: [%s]", _values.ssid, _values.password);
+      _logger->info("initial values are: hostname: [%s]: ssid: [%s]: password: [%s]", _values.hostname, _values.ssid, _values.passphrase);
       EEPROM.put(address, _values);
       address += sizeof(Values);
 

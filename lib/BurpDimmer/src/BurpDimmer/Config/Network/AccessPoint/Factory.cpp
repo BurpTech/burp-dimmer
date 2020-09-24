@@ -6,9 +6,9 @@ namespace BurpDimmer {
     namespace Network {
       namespace AccessPoint {
 
-        constexpr int defaultChannel = 1;
-        constexpr int defaultSsidHidden = 0;
-        constexpr int defaultMaxConnections = 4;
+        constexpr uint8_t defaultChannel = 1;
+        constexpr bool defaultSsidHidden = false;
+        constexpr uint8_t defaultMaxConnections = 4;
         constexpr IPConfig * defaultIpConfig = nullptr;
 
         bool Factory::deserialize(const JsonVariant & serialized) {

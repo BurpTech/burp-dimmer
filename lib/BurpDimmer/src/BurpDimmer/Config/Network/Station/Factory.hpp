@@ -13,8 +13,13 @@ namespace BurpDimmer {
 
           public:
 
+            void setDefaultHostname(const char * defaultHostname);
             bool deserialize(const JsonVariant & serialized) override ;
             bool createDefault() override;
+
+          private:
+
+            const char * _defaultHostname;
 
         };
 

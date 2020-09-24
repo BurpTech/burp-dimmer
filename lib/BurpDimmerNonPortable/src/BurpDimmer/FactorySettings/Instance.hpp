@@ -14,14 +14,16 @@ namespace BurpDimmer {
 
         Instance(const BurpLogger::Logger * logger);
         void setup();
+        const char * getHostname() const override;
         const char * getSsid() const override;
-        const char * getPassword() const override;
+        const char * getPassphrase() const override;
 
       private:
 
         struct Values {
+          char hostname[WL_SSID_MAX_LENGTH + 1];
           char ssid[WL_SSID_MAX_LENGTH + 1];
-          char password[WL_WPA_KEY_MAX_LENGTH + 1];
+          char passphrase[WL_WPA_KEY_MAX_LENGTH + 1];
         };
 
         const BurpLogger::Logger * _logger;

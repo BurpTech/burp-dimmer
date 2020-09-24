@@ -1,6 +1,6 @@
-#include <ESP8266WiFi.h>
 #include "Status.hpp"
 #include "Serialization.hpp"
+#include "../Constants.hpp"
 
 namespace BurpDimmer {
   namespace Config {
@@ -20,16 +20,18 @@ namespace BurpDimmer {
 
         Serialization::Serialization() :
           BurpSerialization::Serialization(_root),
-          _ssid(WL_SSID_MAX_LENGTH, {
+          _ssid(0, MAX_SSID_LENGTH, {
             Status::ok,
             Status::missingSsid,
             Status::invalidSsid,
+            Status::ok, // min length is 0 so can't get too short error
             Status::ssidTooLong
           }, root.securityConfig.ssid),
-          _passphrase(WL_WPA_KEY_MAX_LENGTH, {
+          _passphrase(MIN_PASSPHRASE_LENGTH, MAX_PASSPHRASE_LENGTH, {
             Status::ok,
             Status::ok, // passphrase optional
             Status::invalidPassphrase,
+            Status::passphraseTooShort,
             Status::passphraseTooLong
           }, root.securityConfig.passphrase),
           _securityConfig({

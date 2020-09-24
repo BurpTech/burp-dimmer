@@ -15,6 +15,7 @@ namespace BurpDimmer {
             C_STR_CASE(invalidSsid);
             C_STR_CASE(ssidTooLong);
             C_STR_CASE(invalidPassphrase);
+            C_STR_CASE(passphraseTooShort);
             C_STR_CASE(passphraseTooLong);
             C_STR_CASE(invalidSecurityConfig);
             C_STR_CASE(invalidChannel);

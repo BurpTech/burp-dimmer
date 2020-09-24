@@ -9,9 +9,9 @@ namespace BurpDimmer {
         State::State(
           const char * _ssid,
           const char * _passphrase,
-          const int8_t channel,
+          const uint8_t channel,
           const bool ssidHidden,
-          const int8_t maxConnections,
+          const uint8_t maxConnections,
           const IPConfig * ipConfig
         ) :
           hasPassphrase(_passphrase != nullptr),
@@ -21,9 +21,9 @@ namespace BurpDimmer {
           hasIpConfig(ipConfig != nullptr),
           ipConfig(ipConfig ? *ipConfig : IPConfig({0, 0, 0}))
         {
-          strncpy(ssid, _ssid, WL_SSID_MAX_LENGTH);
+          strlcpy(ssid, _ssid, MAX_SSID_LENGTH + 1);
           if (hasPassphrase) {
-            strncpy(passphrase, _passphrase, WL_WPA_KEY_MAX_LENGTH);
+            strlcpy(passphrase, _passphrase, MAX_PASSPHRASE_LENGTH + 1);
           }
         }
 

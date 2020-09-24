@@ -11,10 +11,27 @@ namespace BurpDimmer {
           public:
             enum : BurpStatus::Status::Code {
               ok,
+              invalidHostname,
+              hostnameTooLong,
+              missingSsid,
+              invalidSsid,
+              ssidTooLong,
+              invalidPassphrase,
+              passphraseTooShort,
+              passphraseTooLong,
+              invalidChannel,
+              invalidBssid,
+              missingLocalIp,
+              invalidLocalIp,
+              missingGateway,
+              invalidGateway,
+              missingSubnet,
+              invalidSubnet,
+              invalidDns1,
+              invalidDns2,
+              invalidIpConfig,
               noObject,
-              invalidObject,
-              noTest,
-              invalidTest
+              invalidConfig
             };
             const char * c_str() const override;
         };

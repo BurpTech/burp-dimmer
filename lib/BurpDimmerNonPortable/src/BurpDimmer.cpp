@@ -271,7 +271,10 @@ namespace BurpDimmer {
     FactorySettings::instance.setup();
     Config::Network::AccessPoint::factory.setDefaults(
       FactorySettings::instance.getSsid(),
-      FactorySettings::instance.getPassword()
+      FactorySettings::instance.getPassphrase()
+    );
+    Config::Network::Station::factory.setDefaultHostname(
+      FactorySettings::instance.getHostname()
     );
 
     using namespace std::placeholders;

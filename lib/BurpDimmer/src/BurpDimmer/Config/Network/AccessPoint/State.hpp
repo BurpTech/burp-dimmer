@@ -1,6 +1,7 @@
 #pragma once
 
 #include <BurpTree/State.hpp>
+#include "../Constants.hpp"
 #include "Types.hpp"
 
 namespace BurpDimmer {
@@ -12,21 +13,21 @@ namespace BurpDimmer {
 
           public:
 
-            char ssid[WL_SSID_MAX_LENGTH + 1];
+            char ssid[MAX_SSID_LENGTH + 1];
             const bool hasPassphrase;
-            char passphrase[WL_WPA_KEY_MAX_LENGTH + 1];
-            const int8_t channel;
+            char passphrase[MAX_PASSPHRASE_LENGTH + 1];
+            const uint8_t channel;
             const bool ssidHidden;
-            const int8_t maxConnections;
+            const uint8_t maxConnections;
             const bool hasIpConfig;
             const IPConfig ipConfig;
 
             State(
               const char * ssid,
               const char * passphrase,
-              const int8_t channel,
+              const uint8_t channel,
               const bool ssidHidden,
-              const int8_t maxConnections,
+              const uint8_t maxConnections,
               const IPConfig * ipConfig
             );
             bool serialize(const JsonVariant & serialized) const override;

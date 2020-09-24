@@ -7,8 +7,9 @@ namespace BurpDimmer {
 
       public:
 
+        virtual const char * getHostname() const = 0;
         virtual const char * getSsid() const = 0;
-        virtual const char * getPassword() const = 0;
+        virtual const char * getPassphrase() const = 0;
 
     };
 

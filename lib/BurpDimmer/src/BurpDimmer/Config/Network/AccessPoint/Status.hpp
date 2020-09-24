@@ -15,6 +15,7 @@ namespace BurpDimmer {
               invalidSsid,
               ssidTooLong,
               invalidPassphrase,
+              passphraseTooShort,
               passphraseTooLong,
               invalidSecurityConfig,
               invalidChannel,
