@@ -2,8 +2,7 @@
 
 #include <BurpLogger.hpp>
 #include <BurpTree/Subscriber.hpp>
-#include "Config.hpp"
-#include "State.hpp"
+#include "Factory.hpp"
 
 namespace BurpDimmer {
   namespace Light {

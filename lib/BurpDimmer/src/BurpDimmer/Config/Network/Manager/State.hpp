@@ -1,9 +1,7 @@
 #pragma once
 
-#include <array>
-#include <BurpStatus/Status.hpp>
 #include <BurpTree/State.hpp>
-#include <BurpTree/Factory.hpp>
+#include "Types.hpp"
 
 namespace BurpDimmer {
   namespace Config {
@@ -13,20 +11,6 @@ namespace BurpDimmer {
         class State : public BurpTree::State {
 
           public:
-
-            enum PermMode : size_t {
-              NORMAL = 0,
-              ACCESS_POINT,
-              OFF,
-              count
-            };
-
-            enum class TempMode {
-              ACCESS_POINT,
-              WPS_CONFIG
-            };
-
-            using Timeout = unsigned long;
 
             const PermMode permMode;
             const TempMode tempMode;
@@ -39,36 +23,7 @@ namespace BurpDimmer {
                 const bool tempModeActive,
                 const Timeout accessPointTimeout
             );
-            State();
-            void serialize(const JsonObject & object) const override;
-
-        };
-
-        class Status : public BurpStatus::Status {
-          public:
-            enum : BurpStatus::Status::Code {
-              ok,
-              noObject,
-              noMode,
-              noAccessPointTimeout,
-              invalidMode,
-              invalidAccessPointTimeout,
-              unknownMode
-            };
-            const char * c_str() const override;
-        };
-
-        class Factory : public BurpTree::Factory<State, Status> {
-
-          public:
-
-            bool createDefault() override;
-            bool deserialize(const JsonObject & serialized) override ;
-            bool nextPermMode();
-            bool startTempAccessPoint();
-            bool startWpsConfig();
-            bool stopTempMode();
-            bool setNormalMode();
+            bool serialize(const JsonVariant & serialized) const override;
 
         };
 

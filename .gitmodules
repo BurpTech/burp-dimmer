@@ -16,3 +16,6 @@
 [submodule "lib/BurpStatus"]
 	path = lib/BurpStatus
 	url = https://github.com/BurpTech/BurpStatus.git
+[submodule "lib/BurpSerialization"]
+	path = lib/BurpSerialization
+	url = https://github.com/BurpTech/BurpSerialization.git

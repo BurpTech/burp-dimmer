@@ -21,7 +21,7 @@ namespace BurpDimmer {
         void read(f_withObj withObj) override {
           StaticJsonDocument<size> doc;
           _file.read(doc);
-          withObj(doc.template as<JsonObject>());
+          withObj(doc.template as<JsonVariant>());
         }
 
         void setup(const Light::State * initial) override {
@@ -37,11 +37,11 @@ namespace BurpDimmer {
         void loop() override {
           if (_lastChange > 0) {
             // There has been a change so check for inactivity
-            if (millis() - _lastChange > _light->config->saveStateDelay) {
+            if (millis() - _lastChange > _light->saveStateDelay) {
               _lastChange = 0;
               StaticJsonDocument<size> doc;
-              JsonObject object = doc.template to<JsonObject>();
-              _light->serialize(object);
+              JsonVariant variant = doc.template to<JsonVariant>();
+              _light->serialize(variant);
               _file.write(doc);
             }
           }

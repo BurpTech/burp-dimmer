@@ -9,17 +9,17 @@
 #include <BurpTree/Branch.hpp>
 #include <BurpTree/Updater.hpp>
 #include <BurpDimmer/FactorySettings/Instance.hpp>
-#include <BurpDimmer/Light/State.hpp>
+#include <BurpDimmer/Light/Factory.hpp>
 #include <BurpDimmer/LightFile/Instance.hpp>
 #include <BurpDimmer/Light/ConfigSubscriber.hpp>
 #include <BurpDimmer/LightControls/Instance.hpp>
 #include <BurpDimmer/DeviceControls/Instance.hpp>
 #include <BurpDimmer/Network/Manager.hpp>
 #include <BurpDimmer/ConfigFile/Instance.hpp>
-#include <BurpDimmer/Config/Light/State.hpp>
-#include <BurpDimmer/Config/Network/AccessPoint/State.hpp>
-#include <BurpDimmer/Config/Network/Manager/State.hpp>
-#include <BurpDimmer/Config/Network/Station/State.hpp>
+#include <BurpDimmer/Config/Light/Factory.hpp>
+#include <BurpDimmer/Config/Network/AccessPoint/Factory.hpp>
+#include <BurpDimmer/Config/Network/Manager/Factory.hpp>
+#include <BurpDimmer/Config/Network/Station/Factory.hpp>
 #include <BurpDimmer/Json/File/Instance.hpp>
 #include <BurpDimmer/Components/Light.hpp>
 #include <BurpDimmer/Components/RotaryEncoder.hpp>
@@ -149,7 +149,7 @@ namespace BurpDimmer {
 
       namespace AccessPoint {
         constexpr char field[] = "accessPoint";
-        Factory factory(FactorySettings::instance);
+        Factory factory;
         using Node = BurpTree::Leaf<Factory, 0>;
         Node::Subscribers subscribers = {};
         Node node(Id::networkAccessPoint, factory, subscribers);
@@ -269,6 +269,10 @@ namespace BurpDimmer {
     LittleFS.begin();
 
     FactorySettings::instance.setup();
+    Config::Network::AccessPoint::factory.setDefaults(
+      FactorySettings::instance.getSsid(),
+      FactorySettings::instance.getPassword()
+    );
 
     using namespace std::placeholders;
     Config::file.read(std::bind(&Config::Root::setup, &Config::root, _1));

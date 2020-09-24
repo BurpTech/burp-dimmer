@@ -2,7 +2,7 @@
 
 #include <BurpLogger.hpp>
 #include <BurpTree/Node.hpp>
-#include <BurpDimmer/Config/Network/Manager/State.hpp>
+#include <BurpDimmer/Config/Network/Manager/Factory.hpp>
 #include "../Components/Blinker.hpp"
 #include "../Components/Button.hpp"
 #include "../Reset/Interface.hpp"
@@ -19,6 +19,7 @@ namespace BurpDimmer {
 
       public:
 
+        using PermMode = Config::Network::Manager::PermMode;
         using ConfigState = Config::Network::Manager::State;
         using ConfigNode = BurpTree::Node::Interface<ConfigState>;
 
@@ -127,13 +128,13 @@ namespace BurpDimmer {
           _logger->info("permMode: %u", state->permMode);
           delay(1000);
           switch (state->permMode) {
-            case ConfigState::PermMode::NORMAL:
+            case PermMode::NORMAL:
               _blinker.blink(1, _blinkTime);
               break;
-            case ConfigState::PermMode::ACCESS_POINT:
+            case PermMode::ACCESS_POINT:
               _blinker.blink(2, _blinkTime);
               break;
-            case ConfigState::PermMode::OFF:
+            case PermMode::OFF:
               _blinker.blink(3, _blinkTime);
               break;
             default:

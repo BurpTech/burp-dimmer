@@ -1,10 +1,9 @@
 #pragma once
 
 #include <ArduinoJson.h>
-#include <BurpStatus/Status.hpp>
 #include <BurpTree/State.hpp>
 #include <BurpTree/Factory.hpp>
-#include "Config.hpp"
+#include "Types.hpp"
 
 namespace BurpDimmer {
   namespace Light {
@@ -13,63 +12,18 @@ namespace BurpDimmer {
 
       public:
 
-        using Level = Config::Level;
-        using Pwm = unsigned char;
-
-        const Config * config;
         const bool on;
-        const Level level;
-        const Pwm pwm;
+        const LevelIndex level;
+        const Level pwm;
+        const Delay saveStateDelay;
 
         State(
-            const Config * config,
             const bool on,
-            const Level level,
-            const Pwm pwm
+            const LevelIndex level,
+            const Level pwm,
+            const Delay saveStateDelay
         );
-        State(const Config * config);
-        void serialize(const JsonObject & object) const override;
-
-    };
-
-    class Status : public BurpStatus::Status {
-      public:
-        enum : BurpStatus::Status::Code {
-          ok,
-          noObject,
-          maxLevels,
-          outOfRange,
-          invalidOn,
-          invalidLevel,
-          invalidPwm,
-          maxBrightness,
-          minBrightness
-        };
-        const char * c_str() const override;
-    };
-
-    class Factory : public BurpTree::Factory<State, Status> {
-
-      public:
-
-        void setConfig(const Config * config);
-
-        bool createDefault() override;
-        bool deserialize(const JsonObject & serialized) override ;
-        bool applyConfig(const Config * config);
-        bool toggle();
-        bool increaseBrightness();
-        bool decreaseBrightness();
-
-      private:
-
-        const Config * _config;
-
-        const State * _applyConfig(
-            const bool on,
-            const State::Level level,
-            const State::Pwm pwm
-        );
+        bool serialize(const JsonVariant & serialized) const override;
 
     };
 

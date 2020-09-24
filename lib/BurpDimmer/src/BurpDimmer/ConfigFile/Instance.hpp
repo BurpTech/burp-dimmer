@@ -19,7 +19,7 @@ namespace BurpDimmer {
         void read(f_withObj withObj) override {
           StaticJsonDocument<size> doc;
           _file.read(doc);
-          withObj(doc.template as<JsonObject>());
+          withObj(doc.template as<JsonVariant>());
         }
 
         void setup(const Config * initial) override {
@@ -28,8 +28,8 @@ namespace BurpDimmer {
 
         void update(const Config * next) override {
           StaticJsonDocument<size> doc;
-          JsonObject object = doc.template to<JsonObject>();
-          next->serialize(object);
+          JsonVariant variant = doc.template to<JsonVariant>();
+          next->serialize(variant);
           _file.write(doc);
         }
 
